@@ -1,0 +1,55 @@
+{
+  "common": {
+    "back": "Back",
+    "save": "Save",
+    "detail": "Detail",
+    "next": "Next",
+    "confirm": "Confirm",
+    "retry": "Retry",
+    "enter_password": "Enter password",
+    "continue": "Continue",
+    "send": "Send",
+    "receive": "Receive",
+    "cancel": "Cancel",
+    "copied_to_clipboard": "Copied to clipboard",
+    "close": "Close",
+    "more": "More",
+    "please_wait": "Please wait.",
+    "done": "Done",
+    "update": "Update",
+    "hot_news": "Top News"
+  },
+  "messages": {
+    "saved_news": "saved to bookmark."
+  },
+  "pages": {
+    "hot": "Hot",
+    "news": "News",
+    "top": "Top",
+    "reading": "Reading",
+    "setting": "Setting",
+    "categories": "Categories",
+    "category_detail": "Category Detail",
+    "profile": "Profile",
+    "bookmark": "Bookmark"
+  },
+  "category": {
+    "hot": "HOT",
+    "news": "NEWS",
+    "top": "TOP",
+    "hot_topic": "HOT TOPIC",
+    "newest_post": "NEWEST POST",
+    "most_popular": "MOST POPULAR"
+  },
+  "reading": {
+    "loading_more_comments": "Loading More Comments",
+    "save_news": "Save",
+    "share": "Share",
+    "font_size": "Font size"
+  },
+  "option": {
+    "bookmark": "Bookmark",
+    "about": "About",
+    "spiderum": "Spiderum"
+  }
+}

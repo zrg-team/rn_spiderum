@@ -1,0 +1,27 @@
+{
+  "DEBUG": true,
+  "TIMEOUT": 15000,
+  "DEFAULT_LANGUAGE": "en",
+  "STYLE_SHEET": {
+    "status_bar": {  "backgroundColor": "#024098" },
+    "bgPrimary": { "backgroundColor": "#F8F8F8" },
+    "bgSecondary": { "backgroundColor": "#051c3f" },
+    "carouselColor": { "backgroundColor": "#f08400" },
+    "txtPrimary" : {"color": "#000"},
+    "txtSecondary" : {"color": "#FFFFFF"},
+    "h2": { "fontSize": 22, "color": "#35474E", "fontWeight": "bold" },
+    "h3": { "fontSize": 20, "color": "#35474E", "fontWeight": "bold" },
+    "h4": { "fontSize": 14, "color": "#35474E" },
+    "gbMenu": { "backgroundColor": "#003074" },
+    "activeMenu": { "color": "#FFFFFF" },
+    "bgHeader": { "backgroundColor": "#024098" },
+    "txtHeader": { "fontSize": 17, "color": "#fff" },
+    "btnPrimary": { "backgroundColor": "#024098" },
+    "btnTxtPrimary": {"color": "#FFFFFF"},
+    "btnSecondary": { "backgroundColor" : "#8DA0C8" },
+    "btnTxtSecondary": {"color": "#FFFFFF"},
+    "btnDisable": { "backgroundColor": "#B7C4CC" },
+    "bottom_bar_active_item": { "backgroundColor": "#497ECC" }
+  },
+  "DEFAULT_HEADER_GRADIENT": ["#8DA0C8", "#024098"]
+}
