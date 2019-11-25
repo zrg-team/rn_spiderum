@@ -29,13 +29,12 @@ class CommentListComponent extends Component {
   renderItem (item, index) {
     const childPath = `${index}`.split('_').length || 0
     return (
-      <>
+      <View key={index}>
         <CommentListItem
-          key={index}
           style={[
             this.props.themedStyle.item,
             {
-              marginLeft: childPath * 20
+              marginLeft: 5 + (childPath - 1) * 20
             }
           ]}
           data={item}
@@ -44,7 +43,7 @@ class CommentListComponent extends Component {
           item.child_comments.map((childItem, childIndex) => {
             return this.renderItem(childItem, `${index}_${childIndex}`)
           })}
-      </>
+      </View>
     )
   }
 

@@ -247,7 +247,7 @@ class NotificationPanelComponent extends Component {
           style={[styles.list, animationStyles.container, commonStyles.shadow]}
         >
           <View style={styles.titleContainer}>
-            <AntDesignIcons name='solution1' size={30} />
+            <AntDesignIcons name='solution1' size={22} />
             <Text
               style={[styles.notificationTitle]}
             >
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   },
   notificationTitle: {
     color: '#35474E',
-    fontSize: 20,
+    fontSize: 18,
     paddingLeft: 10
   },
   itemMessage: {
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 3,
     paddingVertical: 10,
-    maxHeight: appHeight - 170,
+    maxHeight: appHeight - 120,
     top: Platform.OS === 'ios' ? 88 : 70,
     marginTop: StatusBar.currentHeight
   },
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
 function mapStateToProps (state) {
   return {
     appState: state.session.appState,
-    notifications: state[MODULE_HOME].news.top || []
+    notifications: state[MODULE_HOME].top.top || []
   }
 }
 

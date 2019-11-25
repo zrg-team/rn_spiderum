@@ -48,8 +48,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent'
   },
   image: {
-    width: 350,
-    height: 350,
+    width: 300,
+    height: 300,
     alignSelf: 'center'
   }
 })

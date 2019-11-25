@@ -8,7 +8,7 @@ const mapDispatchToProps = (dispatch, props) => ({
 })
 
 const mapStateToProps = (state, props) => {
-  const data = state[MODULE_HOME].news || {}
+  const data = state[MODULE_HOME].top || {}
   return {
     data: data.top || []
   }

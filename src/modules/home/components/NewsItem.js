@@ -98,9 +98,12 @@ class NewsItemComponent extends React.Component {
               contentContainerStyle={themedStyle.tagScroll}
             >
               {article.tags.map(item => {
+                if (!item.name) {
+                  return null
+                }
                 return (
                   <View
-                    style={[themedStyle.badgeContainer, themedStyle.badge]}
+                    style={[themedStyle.badgeContainer, themedStyle.badge, commonStyles.shadow]}
                     key={item._id}
                   >
                     <Text style={themedStyle.textBadge}>{item.name}</Text>
@@ -140,7 +143,9 @@ export default withStyles(NewsItemComponent, (theme) => ({
   },
   badgeContainer: {
     marginRight: 5,
-    marginBottom: 5
+    marginBottom: 5,
+    borderRadius: 2,
+    justifyContent: 'center'
   },
   badge: {
     backgroundColor: theme['color-info-default']

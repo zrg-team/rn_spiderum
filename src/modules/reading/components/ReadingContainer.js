@@ -52,7 +52,7 @@ class ReadingContainerComponent extends React.Component {
 
   render () {
     const { inital } = this.state
-    const { page, themedStyle, data, navigation } = this.props
+    const { page, themedStyle, data, navigation, type } = this.props
     return (
       <ViewPager
         pageMargin={10}
@@ -65,6 +65,7 @@ class ReadingContainerComponent extends React.Component {
           return (
             <View style={themedStyle.viewPagerItem} key={index}>
               <Reading
+                type={type}
                 noComment={page !== index}
                 noTransition={index !== inital}
                 article={item}

@@ -24,9 +24,10 @@ import { READING_URL } from '../models'
 import Toast from '../../../common/components/Widgets/Toast'
 import { ActivityAuthoring } from '../../home/components/item/ActivityAuthoring'
 import { ArticleActivityBar } from '../../home/components/item/ArticleActivityBar'
-import { textStyle } from '../../../styles/common'
+import commonStyles, { textStyle } from '../../../styles/common'
 import { images } from '../../../assets/elements'
 import { ContentSkeleton } from '../../../libraries/components/Skeleton'
+import { navigationPop } from '../../../common/utils/navigation'
 import ParallaxScrollView from '../../../libraries/components/Parallax/ParallaxScrollView'
 
 const { width, height } = Dimensions.get('window')
@@ -48,8 +49,16 @@ class ReadingComponent extends React.Component {
     this.handleLoadMoreComments = this.handleLoadMoreComments.bind(this)
     this.handleIncreaseFont = this.handleIncreaseFont.bind(this)
     this.handleReduceFont = this.handleReduceFont.bind(this)
+    this.handleRemove = this.handleRemove.bind(this)
     this.handleShare = this.handleShare.bind(this)
     this.handleSave = this.handleSave.bind(this)
+  }
+
+  handleRemove () {
+    const { article, removeNews, navigation } = this.props
+    removeNews(article)
+    Toast.show(i18n.t('messages.removed_news'))
+    navigationPop(navigation)
   }
 
   handleSave () {
@@ -250,6 +259,34 @@ class ReadingComponent extends React.Component {
     return renders
   }
 
+  renderActions () {
+    const { type } = this.props
+
+    return (
+      <ActionButton fixNativeFeedbackRadius key='1' buttonColor='rgba(231,76,60,1)'>
+        {type === 'bookmark'
+          ? (
+            <ActionButton.Item key='1' buttonColor='#9b59b6' title={i18n.t('reading.save_news')} onPress={this.handleRemove}>
+              <Icon name='close' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+            </ActionButton.Item>
+          ) : (
+            <ActionButton.Item key='1' buttonColor='#9b59b6' title={i18n.t('reading.save_news')} onPress={this.handleSave}>
+              <Icon name='cloud-download' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+            </ActionButton.Item>
+          )}
+        <ActionButton.Item key='2' buttonColor='#3498db' title={i18n.t('reading.share')} onPress={this.handleShare}>
+          <Icon name='share' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+        </ActionButton.Item>
+        <ActionButton.Item key='3' buttonColor='#1abc9c' title={i18n.t('reading.font_size')} onPress={this.handleIncreaseFont}>
+          <Icon name='magnifier-add' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+        </ActionButton.Item>
+        <ActionButton.Item key='4' buttonColor='#1abc9c' title={i18n.t('reading.font_size')} onPress={this.handleReduceFont}>
+          <Icon name='magnifier-remove' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+        </ActionButton.Item>
+      </ActionButton>
+    )
+  }
+
   render () {
     const {
       noTransition,
@@ -296,7 +333,7 @@ class ReadingComponent extends React.Component {
               {article.tags && article.tags.map(item => {
                 return (
                   <View
-                    style={[themedStyle.badgeContainer, themedStyle.badge]}
+                    style={[themedStyle.badgeContainer, themedStyle.badge, commonStyles.shadow]}
                     key={item._id}
                   >
                     <Text style={themedStyle.textBadge}>{item.name}</Text>
@@ -348,20 +385,7 @@ class ReadingComponent extends React.Component {
           {i18n.t('reading.loading_more_comments')}
         </Button>
       </ParallaxScrollView>,
-      <ActionButton fixNativeFeedbackRadius key='1' buttonColor='rgba(231,76,60,1)'>
-        <ActionButton.Item buttonColor='#9b59b6' title={i18n.t('reading.save_news')} onPress={this.handleSave}>
-          <Icon name='cloud-download' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
-        </ActionButton.Item>
-        <ActionButton.Item buttonColor='#3498db' title={i18n.t('reading.share')} onPress={this.handleShare}>
-          <Icon name='share' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
-        </ActionButton.Item>
-        <ActionButton.Item buttonColor='#1abc9c' title={i18n.t('reading.font_size')} onPress={this.handleIncreaseFont}>
-          <Icon name='magnifier-add' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
-        </ActionButton.Item>
-        <ActionButton.Item buttonColor='#1abc9c' title={i18n.t('reading.font_size')} onPress={this.handleReduceFont}>
-          <Icon name='magnifier-remove' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
-        </ActionButton.Item>
-      </ActionButton>
+      this.renderActions()
     ]
   }
 }
@@ -374,7 +398,9 @@ export default withStyles(ReadingComponent, (theme) => ({
   },
   badgeContainer: {
     marginRight: 5,
-    marginBottom: 5
+    marginBottom: 5,
+    borderRadius: 2,
+    justifyContent: 'center'
   },
   badge: {
     backgroundColor: theme['color-info-default']
@@ -415,7 +441,7 @@ export default withStyles(ReadingComponent, (theme) => ({
   },
   authorBar: {
     width: width - 74,
-    left: 74,
+    left: 80,
     zIndex: 999,
     backgroundColor: '#FFFFFF',
     position: 'absolute',
@@ -457,9 +483,9 @@ export default withStyles(ReadingComponent, (theme) => ({
     paddingVertical: 10,
     marginLeft: 130,
     width: width - 140,
-    height: 60,
+    height: 48,
     position: 'absolute',
-    bottom: -25,
+    bottom: -12,
     left: 5
   },
   button: {

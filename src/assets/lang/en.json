@@ -20,7 +20,8 @@
     "hot_news": "Top News"
   },
   "messages": {
-    "saved_news": "saved to bookmark."
+    "saved_news": "Saved.",
+    "removed_news": "Removed."
   },
   "pages": {
     "hot": "Hot",

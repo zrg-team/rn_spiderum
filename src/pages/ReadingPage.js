@@ -77,6 +77,7 @@ export default class NewsPage extends Component {
               />)
             : (
               <Reading
+                type={type}
                 noComment={false}
                 noTransition
                 article={article}

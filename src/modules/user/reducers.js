@@ -9,9 +9,21 @@ const defaultState = {
 const handlers = {
   [clearAll]: (state, action) => ({ ...defaultState }),
   [actions.saveNews]: (state, action) => {
+    const bookmark = (state.bookmark || []).filter(item => {
+      return item._id !== action.payload._id
+    })
     return {
       ...state,
-      bookmark: [action.payload, ...state.bookmark]
+      bookmark: [action.payload, ...bookmark]
+    }
+  },
+  [actions.removeNews]: (state, action) => {
+    const bookmark = (state.bookmark || []).filter(item => {
+      return item._id !== action.payload._id
+    })
+    return {
+      ...state,
+      bookmark
     }
   }
 }
