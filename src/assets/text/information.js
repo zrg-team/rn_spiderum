@@ -3,6 +3,7 @@ export const DEFAULT_TERM = `
   Simple application to read **"spiderum.com"**. This application is not public release or commercal as well.
   If you want to donate, donate to **"spiderum.com"**
 #### **1. Source code**
+  https://github.com/zrg-team/rn_spiderum
 ### **II. SPIDERUM**\n\n
 #### **1. Thông tin cơ bản**
   Spiderum là một nền tảng chia sẻ thông tin và thảo luận có chọn lọc theo nhu cầu của người dùng. Để làm được điều này, chúng tôi tập trung phát triển:

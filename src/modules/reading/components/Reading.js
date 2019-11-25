@@ -266,7 +266,7 @@ class ReadingComponent extends React.Component {
       <ActionButton fixNativeFeedbackRadius key='1' buttonColor='rgba(231,76,60,1)'>
         {type === 'bookmark'
           ? (
-            <ActionButton.Item key='1' buttonColor='#9b59b6' title={i18n.t('reading.save_news')} onPress={this.handleRemove}>
+            <ActionButton.Item key='1' buttonColor='#9b59b6' title={i18n.t('reading.close')} onPress={this.handleRemove}>
               <Icon name='close' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
             </ActionButton.Item>
           ) : (
