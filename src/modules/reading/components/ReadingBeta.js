@@ -6,8 +6,7 @@ import {
   Image,
   Linking,
   Dimensions,
-  ScrollView,
-  TouchableOpacity
+  ScrollView
 } from 'react-native'
 import {
   Text,
@@ -15,27 +14,28 @@ import {
   Button,
   withStyles
 } from 'react-native-ui-kitten'
+import WebView from 'react-native-webview'
 import Share from 'react-native-share'
 import ActionButton from 'react-native-action-button'
 import Icon from 'react-native-vector-icons/SimpleLineIcons'
-import YouTube from 'react-native-youtube'
-import WebView from 'react-native-webview'
 import FastImage from 'react-native-fast-image'
 import { Transition } from 'react-navigation-fluid-transitions'
 import { CommentList } from './comments/CommentList'
 import { READING_URL } from '../models'
+import ImageResize from '../../../common/components/Layout/ImageResize'
 import Toast from '../../../common/components/Widgets/Toast'
 import { ActivityAuthoring } from '../../home/components/item/ActivityAuthoring'
 import { ArticleActivityBar } from '../../home/components/item/ArticleActivityBar'
 import commonStyles, { textStyle } from '../../../styles/common'
-import { images } from '../../../assets/elements'
+import { images as commonImages } from '../../../assets/elements'
 import { ContentSkeleton } from '../../../libraries/components/Skeleton'
 import { navigationPop } from '../../../common/utils/navigation'
 import ParallaxScrollView from '../../../libraries/components/Parallax/ParallaxScrollView'
+import Html from 'react-native-render-html'
 
 const { width, height } = Dimensions.get('window')
 
-class ReadingComponent extends React.Component {
+class ReadingBetaComponent extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -57,11 +57,84 @@ class ReadingComponent extends React.Component {
     this.handleShare = this.handleShare.bind(this)
     this.handleSave = this.handleSave.bind(this)
     this.handlePressLink = this.handlePressLink.bind(this)
+    this.handleImageLoaded = this.handleImageLoaded.bind(this)
+
+    this.createTagStyles()
+
+    this.renderers = {
+      blockquote: (item, children, css, passProps) => {
+        const { themedStyle } = passProps
+        return (
+          <View
+            style={themedStyle.blockquote}
+          >
+            {children}
+          </View>
+        )
+      },
+      img: (item, children, css, passProps) => {
+        const { themedStyle, imagesSize = {} } = passProps
+        return (
+          <ImageResize
+            uri={item.src}
+            style={themedStyle.imageContent}
+            imagesSize={imagesSize[item.src]}
+            onImageLoaded={this.handleImageLoaded}
+          />
+        )
+      },
+      iframe: (item, children) => {
+        const ratio = item.width / item.height
+        return (
+          <WebView
+            key={`yotube_${item.src}`}
+            source={{ uri: `https://${item.src}` }}
+            style={{ alignSelf: 'stretch', height: width / ratio, width }}
+          />
+        )
+      }
+    }
   }
 
-  handlePressLink (link) {
+  handleImageLoaded (url, result) {
+    const { imagesSize = {} } = this.state
+    imagesSize[url] = result
+    this.setState({
+      imagesSize
+    })
+  }
+
+  createTagStyles (nextProps) {
+    const { fontSize } = nextProps || this.props
+    if (nextProps && nextProps.fontSize === this.props.fontSize) {
+      return
+    }
+    this.tagsStyles = {
+      div: { paddingVertical: 5, fontSize: fontSize },
+      a: { paddingVertical: 5, fontSize: fontSize },
+      p: { paddingVertical: 5, fontSize: fontSize },
+      h1: { paddingVertical: 5, fontSize: fontSize * 1.73 },
+      h2: { paddingVertical: 5, fontSize: fontSize * 1.58 },
+      h3: { paddingVertical: 5, fontSize: fontSize * 1.44 },
+      h4: { paddingVertical: 5, fontSize: fontSize * 1.3 },
+      h5: { paddingVertical: 5, fontSize: fontSize * 1.15 },
+      pre: { paddingVertical: 5, fontSize: fontSize }
+    }
+
+    this.setState({
+      loading: true
+    }, () => {
+      setTimeout(() => {
+        this.setState({
+          loading: false
+        })
+      }, 100)
+    })
+  }
+
+  handlePressLink (e, href) {
     Linking
-      .openURL(link)
+      .openURL(href)
       .catch(() => {})
   }
 
@@ -74,23 +147,13 @@ class ReadingComponent extends React.Component {
 
   handleSave () {
     const { article, saveNews } = this.props
-    const { data } = this.state
+    const { imagesSize, images } = this.state
     const news = { ...article }
-    const images = []
-    data.forEach(async (item, index) => {
-      switch (item.type) {
-        case 'image':
-          images.push({
-            uri: item.data
-          })
-          break
-      }
-    })
     try {
-      FastImage.preload(images.filter(item => item.uri))
+      FastImage.preload(images.map(item => ({ uri: item.data })))
     } catch (err) {
     }
-    news.data = data
+    news.imagesSize = imagesSize
     saveNews(news)
     Toast.show(i18n.t('messages.saved_news'))
   }
@@ -138,7 +201,6 @@ class ReadingComponent extends React.Component {
     const { images: lastImages } = this.state
     let images = await Promise.all(
       data
-        .filter(item => item.type === 'image')
         .map(item => {
           return new Promise((resolve, reject) => {
             if (lastImages[item.data]) {
@@ -147,8 +209,8 @@ class ReadingComponent extends React.Component {
             Image.getSize(item.data, (itemWidth, itemHeight) => {
               const result = {}
               const ratio = itemWidth / itemHeight
-              result.width = width
-              result.height = width / ratio
+              result.width = (width - 20)
+              result.height = result.width / ratio
               resolve({ [item.data]: { ...result } })
             }, () => {
               resolve(undefined)
@@ -160,33 +222,28 @@ class ReadingComponent extends React.Component {
       return { ...all, ...item }
     }, {})
     this.setState({
-      images
+      loading: false,
+      imagesSize: images
     })
   }
 
   async componentDidMount () {
-    const { article, parseContent } = this.props
-    if (article.data) {
-      const { noComment } = this.props
-      return this.setState({
-        data: article.data,
-        loadingComment: true,
-        webview: false,
-        loading: false
-      }, async () => {
-        !noComment && this.getComments()
-      })
+    const { article, getContent } = this.props
+    let result = await getContent(article)
+    result = result || {}
+    const newState = {
+      images: result.images,
+      data: result.body,
+      loadingComment: true,
+      webview: false,
+      loading: false
     }
-    const data = await parseContent(article)
-    this.handleImageSize(data)
+    if (article.imagesSize) {
+      newState.imagesSize = article.imagesSize
+    }
     setTimeout(() => {
       const { noComment } = this.props
-      this.setState({
-        data,
-        loadingComment: true,
-        webview: false,
-        loading: false
-      }, async () => {
+      this.setState(newState, async () => {
         !noComment && this.getComments()
       })
     }, 300)
@@ -202,6 +259,7 @@ class ReadingComponent extends React.Component {
       this.getComments()
     }
     if (fontSize !== nextProps.fontSize) {
+      this.createTagStyles(nextProps)
     }
   }
 
@@ -217,136 +275,6 @@ class ReadingComponent extends React.Component {
         comments: next === 1 ? comments : [...this.state.comments, ...comments]
       })
     }
-  }
-
-  renderTextStyle (item) {
-    const { fontSize } = this.props
-    const style = {
-      fontSize
-    }
-    if (item.h1) {
-      style.fontSize = fontSize * 1.73
-    } else if (item.h2) {
-      style.fontSize = fontSize * 1.58
-    } else if (item.h3) {
-      style.fontSize = fontSize * 1.44
-    } else if (item.h4) {
-      style.fontSize = fontSize * 1.3
-    } else if (item.h5) {
-      style.fontSize = fontSize * 1.15
-    }
-
-    style.color = style.fontSize > fontSize ? '#34495E' : undefined
-
-    style.height = undefined
-
-    if (item.strong) {
-      style.fontWeight = 'bold'
-    }
-
-    return style
-  }
-
-  renderContent () {
-    const { data, images } = this.state
-    const { article, themedStyle } = this.props
-
-    const renders = [
-      (
-        <Text
-          key='title'
-          style={themedStyle.titleLabel}
-          category='h5'
-        >
-          {article.title}
-        </Text>
-      )
-    ]
-    data.forEach((item, index) => {
-      let result = null
-      switch (item.type) {
-        case 'text':
-          result = (
-            <Text
-              key={index}
-              style={[themedStyle.contentLabel, this.renderTextStyle(item)]}
-            >
-              {item.data}
-            </Text>
-          )
-          break
-        case 'blockquote':
-          result = (
-            <View
-              style={themedStyle.blockquote}
-            >
-              <Text
-                key={index}
-                style={[themedStyle.contentLabel, this.renderTextStyle(item)]}
-              >
-                {item.data}
-              </Text>
-            </View>
-          )
-          break
-        case 'link':
-          result = (
-            <TouchableOpacity
-              onPress={() => this.handlePressLink(item.data)}
-              style={themedStyle.linkContainer}
-            >
-              <Text
-                style={[themedStyle.contentLinkText, this.renderTextStyle(item)]}
-              >
-                {item.data}
-              </Text>
-              <Text
-                key={index}
-                style={[themedStyle.contentLabel, this.renderTextStyle(item)]}
-              >
-                {item.description}
-              </Text>
-            </TouchableOpacity>
-          )
-          break
-        case 'youtube':
-          result = (
-            <YouTube
-              key={index}
-              apiKey='AIzaSyDMK1RbmZhPs3sNfNXTXy3_gvzJaW6Xa64'
-              videoId={item.data} // The YouTube video ID
-              style={{ alignSelf: 'stretch', height: 300, marginTop: 20 }}
-            />
-          )
-          break
-        case 'youtube_web':
-          result = (
-            <WebView
-              source={{ uri: `https://${item.fullUrl}` }}
-              style={{ alignSelf: 'stretch', height: 300, width: '100%', marginTop: 20 }}
-            />
-          )
-          break
-        case 'image':
-          result = [
-            <FastImage
-              key={`${index}_1`}
-              style={[themedStyle.imageContent, images[item.data]]}
-              resizeMode={FastImage.resizeMode.contain}
-              source={{ uri: item.data }}
-            />,
-            <Text
-              key={`${index}_2`}
-              style={themedStyle.imageCaption}
-            >
-              {item.title}
-            </Text>
-          ]
-          break
-      }
-      renders.push(result)
-    })
-    return renders
   }
 
   renderActions () {
@@ -383,8 +311,8 @@ class ReadingComponent extends React.Component {
       themedStyle,
       article = {}
     } = this.props
-    const { loadingComment, comments, loading } = this.state
-    const imageSource = article.og_image_url ? { uri: article.og_image_url } : images.default_image
+    const { imagesSize, data, loadingComment, comments, loading } = this.state
+    const imageSource = article.og_image_url ? { uri: article.og_image_url } : commonImages.default_image
     const readingTime = moment.duration(article.reading_time, 'seconds').minutes()
 
     return [
@@ -404,7 +332,7 @@ class ReadingComponent extends React.Component {
               <Avatar
                 style={themedStyle.authorPhoto}
                 size='large'
-                source={article.avatar ? { uri: article.avatar } : images.default_user}
+                source={article.avatar ? { uri: article.avatar } : commonImages.default_user}
               />
             )
           } else {
@@ -413,7 +341,7 @@ class ReadingComponent extends React.Component {
                 <Avatar
                   style={themedStyle.authorPhoto}
                   size='large'
-                  source={article.avatar ? { uri: article.avatar } : images.default_user}
+                  source={article.avatar ? { uri: article.avatar } : commonImages.default_user}
                 />
               </Transition>
             )
@@ -444,10 +372,30 @@ class ReadingComponent extends React.Component {
           name={article.creator_id.display_name}
           date={`${moment(article.created_at).fromNow()} . ${readingTime} phút đọc`}
         />
+        <Text
+          key='title'
+          style={themedStyle.titleLabel}
+          category='h5'
+        >
+          {article.title}
+        </Text>
         {
           loading
             ? <ContentSkeleton />
-            : this.renderContent()
+            : (
+              <View style={{ paddingHorizontal: 10 }}>
+                <Html
+                  tagsStyles={this.tagsStyles}
+                  html={data}
+                  onLinkPress={this.handlePressLink}
+                  imagesMaxWidth={width - 20}
+                  staticContentMaxWidth={width - 20}
+                  renderers={this.renderers}
+                  themedStyle={themedStyle}
+                  imagesSize={imagesSize}
+                />
+              </View>
+            )
         }
         <ArticleActivityBar
           style={themedStyle.detailsContainer}
@@ -480,7 +428,7 @@ class ReadingComponent extends React.Component {
   }
 }
 
-export default withStyles(ReadingComponent, (theme) => ({
+export default withStyles(ReadingBetaComponent, (theme) => ({
   container: {
     flex: 1,
     height: '100%',
@@ -539,6 +487,7 @@ export default withStyles(ReadingComponent, (theme) => ({
   },
   titleLabel: {
     marginHorizontal: 15,
+    marginBottom: 10,
     // marginLeft: 140,
     ...textStyle.headline
   },
@@ -599,8 +548,6 @@ export default withStyles(ReadingComponent, (theme) => ({
     backgroundColor: '#f2f2f2',
     borderLeftWidth: 4,
     borderLeftColor: '#0099DF',
-    marginLeft: 5,
-    marginRight: 5,
     padding: 10
   }
 }))

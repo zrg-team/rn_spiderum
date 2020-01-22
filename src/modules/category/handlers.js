@@ -1,3 +1,4 @@
+import database from '../../libraries/Database'
 import { requestLoading } from '../../common/effects'
 import { AVATAR_URL } from './models'
 import { setNews, setHots, setTops } from './actions'
@@ -6,6 +7,8 @@ export function parseHtml (page, data) {
   const results = {}
   const scriptTag = /<script>(.*?)<\/script>/g.exec(data)
   const pageData = JSON.parse(`${scriptTag[1]}`.replace("window['TRANSFER_STATE'] = ", ''))
+  const deleteKeys = []
+  const items = []
   Object.keys(pageData).forEach(key => {
     try {
       if (key.includes('populartags')) {
@@ -19,11 +22,28 @@ export function parseHtml (page, data) {
           // const itemDOM = cheerio.load(item.body)
           // item.decription = itemDOM.text().substring(0, 256)
           item.avatar = item.creator_id.avatar ? `${AVATAR_URL}${item.creator_id.avatar}` : null
+          const url = decodeURIComponent(`${item.fb_share_url}`.replace('https://www.facebook.com/sharer/sharer.php?u=', ''))
+          items.push({
+            key: url,
+            title: item.title,
+            body: item.body,
+            image: item.og_image_url
+          })
+          deleteKeys.push(url)
+          delete item.body
+          item.key = url
           return item
         })
       }
     } catch (err) {
     }
+  })
+  database.model('article').delete({
+    where: [['key', 'in', deleteKeys]]
+  }).then((response) => {
+    return database.model('article').bulkInsert(items)
+  }).catch((error) => {
+    console.log('error', error)
   })
   return results
 }

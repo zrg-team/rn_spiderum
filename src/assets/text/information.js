@@ -1,10 +1,10 @@
 export const DEFAULT_TERM = `
-### **I. ABOUT**\n\n
+### **I. ABOUT**
   Simple application to read **"spiderum.com"**. This application is not public release or commercal as well.
   If you want to donate, donate to **"spiderum.com"**
 #### **1. Source code**
-  https://github.com/zrg-team/rn_spiderum
-### **II. SPIDERUM**\n\n
+  [GITHUB SOURCE](https://github.com/zrg-team/rn_spiderum)
+### **II. SPIDERUM**
 #### **1. Thông tin cơ bản**
   Spiderum là một nền tảng chia sẻ thông tin và thảo luận có chọn lọc theo nhu cầu của người dùng. Để làm được điều này, chúng tôi tập trung phát triển:
   * Hệ thống subsciption: cho phép người dùng lựa chọn nội dung theo nhu cầu bằng cách subscribe để nhận được những nội dung hay nhất theo vào các chủ đề yêu thích.

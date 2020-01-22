@@ -4,7 +4,7 @@ import DefaultPage from '../common/hocs/DefaultPage'
 import DefaultHeader from '../common/containers/DefaultHeader'
 import { Layout } from 'react-native-ui-kitten'
 import ReadingContainer from '../modules/reading/containers/ReadingContainer'
-import Reading from '../modules/reading/containers/Reading'
+import ReadingBeta from '../modules/reading/containers/ReadingBeta'
 
 export default class NewsPage extends Component {
   constructor (props) {
@@ -76,7 +76,7 @@ export default class NewsPage extends Component {
                 navigation={navigation}
               />)
             : (
-              <Reading
+              <ReadingBeta
                 type={type}
                 noComment={false}
                 noTransition

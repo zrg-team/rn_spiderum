@@ -8,9 +8,9 @@ const mapDispatchToProps = (dispatch, props) => ({
 })
 
 const mapStateToProps = (state, props) => {
-  const data = state[MODULE_HOME].top || {}
+  const data = state[MODULE_HOME].hot || {}
   return {
-    data: data.top || []
+    data: data.random || []
   }
 }
 

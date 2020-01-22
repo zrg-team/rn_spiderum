@@ -1,11 +1,14 @@
 import { requestLoading } from '../../common/effects'
 import { ENPOINTS, AVATAR_URL } from './models'
 import { setNews, setHots, setTops } from './actions'
+import database from '../../libraries/Database'
 
 export function parseHtml (page, data) {
   const results = {}
   const scriptTag = /<script>(.*?)<\/script>/g.exec(data)
   const pageData = JSON.parse(`${scriptTag[1]}`.replace("window['TRANSFER_STATE'] = ", ''))
+  const deleteKeys = []
+  const items = []
   Object.keys(pageData).forEach(key => {
     try {
       if (key.includes('populartags')) {
@@ -21,51 +24,30 @@ export function parseHtml (page, data) {
           const regex = /(<([^>]+)>)/ig
           item.decription = item.body.substring(0, 480).replace(regex, '')
           item.avatar = item.creator_id.avatar ? `${AVATAR_URL}${item.creator_id.avatar}` : null
+          const url = decodeURIComponent(`${item.fb_share_url}`.replace('https://www.facebook.com/sharer/sharer.php?u=', ''))
+          items.push({
+            key: url,
+            title: item.title,
+            body: item.body,
+            image: item.og_image_url
+          })
+          deleteKeys.push(url)
+          delete item.body
+          item.key = url
           return item
         })
       }
     } catch (err) {
     }
   })
-  // $('li.feed-post').each(function (i) {
-  //   try {
-  //     const item = {}
-  //     const element = $(this)
-  //     const author = $(element.find('.author')[0])
-  //     const title = $(element.find('.title a')[0])
-  //     const description = $(element.find('.body')[0])
-  //     const thumb = $(element.find('.thumb img')[0])
-  //     const vote = $(element.find('.vote-count')[0])
-  //     const comment = $(element.find('.text')[0])
-  //     const category = $(element.find('.category-name')[0])
-  //     if (!title.attr('href')) {
-  //       return
-  //     }
-  //     if (author && author.find) {
-  //       const authorAvatar = $(author.find('img')[0])
-  //       const authorLink = $(author.find('.avatar')[0])
-  //       const itemDate = $(author.find('.date')[0])
-  //       const reading = $(author.find('.created span')[1])
-  //       const username = $(author.find('.username')[0])
-  //       item.author = {
-  //         avatar: authorAvatar.attr('src'),
-  //         url: authorLink.attr('href'),
-  //         date: itemDate.text(),
-  //         reading: reading.text(),
-  //         username: username.text()
-  //       }
-  //     }
-  //     item.title = title.text()
-  //     item.category = category.text()
-  //     item.url = title.attr('href')
-  //     item.description = description.text()
-  //     item.image = thumb.attr('src')
-  //     item.vote = vote.text()
-  //     item.comment = comment.text()
-  //     results.push(item)
-  //   } catch (err) {
-  //   }
-  // })
+  database.model('article').delete({
+    where: [['key', 'in', deleteKeys]]
+  }).then((response) => {
+    return database.model('article').bulkInsert(items)
+  }).catch((error) => {
+    console.log('error', error)
+  })
+
   return results
 }
 export function getNews (page = 1, type) {

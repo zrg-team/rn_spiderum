@@ -46,7 +46,7 @@ class ListComponent extends Component {
         this.setState({
           loading: false
         })
-      }, 1000)
+      }, 340)
     }
   }
 
@@ -85,6 +85,7 @@ class ListComponent extends Component {
     this.showAnimationNewItem -= 1
     return (
       <NewsItem
+        key={item._id}
         itemIndex={index}
         animationDeplay={(10 - this.showAnimationNewItem) * 140}
         shouldHaveAnimation={shouldHaveAnimation}

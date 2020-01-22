@@ -5,49 +5,26 @@ SQLite.DEBUG(DEBUG)
 SQLite.enablePromise(true)
 
 const SCHEMES = {
-  transactions: {
+  article: {
     id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
-    txKey: 'TEXT NOT NULL',
-    operator: 'TEXT NOT NULL',
-    blockHash: 'TEXT',
-    blockNumber: 'INTEGER',
-    cumulativeGasUsed: 'TEXT',
-    from: 'TEXT',
-    gas: 'TEXT',
-    gasPrice: 'TEXT',
-    gasUsed: 'TEXT',
-    hash: 'TEXT',
-    input: 'TEXT',
-    logs: 'TEXT',
-    nonce: 'INTEGER',
-    status: 'TEXT',
-    timeStamp: 'INTEGER',
-    to: 'TEXT',
-    transactionIndex: 'INTEGER',
-    value: 'TEXT',
-    param_1: 'TEXT',
-    param_2: 'TEXT',
-    param_3: 'TEXT',
-    param_4: 'TEXT',
-    param_5: 'TEXT',
-    param_6: 'TEXT',
-    param_7: 'TEXT',
-    param_8: 'TEXT',
-    param_9: 'TEXT'
+    key: 'TEXT NOT NULL',
+    title: 'TEXT NOT NULL',
+    image: 'TEXT',
+    body: 'TEXT'
   }
 }
 
 class Database {
   constructor () {
-    this.NAME = 'qvi'
+    this.NAME = 'spiderum'
     this.VERSION = '1.0'
-    this.DISPLAY_NAME = 'qvi transaction'
+    this.DISPLAY_NAME = 'spiderum.com'
     this.DATABASE_SIZE = 2000000
 
     this.database = null
   }
 
-  createTables (instance) {
+  createTables () {
     return new Promise((resolve, reject) => {
       this.database.transaction(async (transaction) => {
         return Promise.all(
@@ -90,7 +67,6 @@ class Database {
       query = `INSERT INTO ${table} (${fields.join(',')}) VALUES(${values.map(item => '?').join(',')})`
     }
 
-    console.log('insert', `${query};`, values)
     return { query, values }
   }
 
@@ -134,29 +110,57 @@ class Database {
     if (offset !== undefined) {
       query += ` OFFSET ${offset} `
     }
-    console.log('query', `${query};`, values)
+    return { query, values }
+  }
+
+  parseDeleteQuery (table, params) {
+    const { where = [] } = params
+    let query = `DELETE FROM ${table}`
+    let values = []
+    const conditions = where.map(item => {
+      const field = item[0]
+      let condition = '='
+      let value = ''
+      if (item.length === 3) {
+        condition = item[1]
+        value = item[2]
+      } else {
+        value = item[1]
+      }
+
+      switch (condition) {
+        case 'in':
+          values = [...values, ...value]
+          return ` "${field}" ${condition} (${Array(value.length).fill('?').join(',')}) `
+        default:
+          values.push(value)
+          return ` "${field}" ${condition} ? `
+      }
+    })
+
+    if (conditions.length) {
+      query += ` WHERE ${conditions.join('&')} `
+    }
+
     return { query, values }
   }
 
   parseBulkInsert (table, items) {
     let parameters = []
+    let txKeys = []
     let allQuery = ''
     let count = 0
     const queries = []
     items.forEach((item, index) => {
-      if (count === 0) {
-        const result = this.parseInsertQuery(table, item)
-        allQuery += result.query
-        parameters.push(result.values)
-      } else {
-        const result = this.parseInsertQuery(table, item, false)
-        allQuery += result.query
-        parameters.push(result.values)
-      }
+      const result = this.parseInsertQuery(table, item, count !== 0)
+      allQuery += result.query
+      parameters = [...parameters, ...result.values]
+      txKeys.push(item.txKey)
       count++
-      if (count > 300) {
-        queries.push({ query: `${allQuery};`, params: parameters })
+      if (count > 30) {
+        queries.push({ query: `${allQuery};`, params: parameters, txKeys })
         parameters = []
+        txKeys = []
         allQuery = ''
         count = 0
       } else {
@@ -164,9 +168,8 @@ class Database {
       }
     })
     if (count > 0) {
-      queries.push({ query: `${allQuery.slice(0, -1)};`, params: parameters })
+      queries.push({ query: `${allQuery.slice(0, -1)};`, params: parameters, txKeys })
     }
-    console.log('queries', queries)
     return queries
   }
 
@@ -176,12 +179,31 @@ class Database {
         const { query, values } = this.parseInsertQuery(table, params)
         return this.query(`${query};`, values)
       },
-      bulkInsert: (items) => {
+      bulkInsert: (items, options = {}) => {
         const queries = this.parseBulkInsert(table, items)
-        return this.transactionAll(queries)
+        // if (options.deleteTxkeys) {
+        //   options.beforeQuery = (item, transaction) => {
+        //     try {
+        //       const { query, values } = this.parseDeleteQuery(table, {
+        //         where: [
+        //           ['txKey', 'in', item.txKeys]
+        //         ]
+        //       })
+        //       // console.log('delete query', query, values)
+        //       return transaction.executeSql(query, values)
+        //     } catch (err) {
+        //       return null
+        //     }
+        //   }
+        // }
+        return this.transactionAll(queries, options)
       },
-      get: (params) => {
+      get: (params = {}) => {
         const { query, values } = this.parseSelectQuery(table, params)
+        return this.query(`${query};`, values)
+      },
+      delete: (params = {}) => {
+        const { query, values } = this.parseDeleteQuery(table, params)
         return this.query(`${query};`, values)
       }
     }
@@ -200,20 +222,23 @@ class Database {
     return this.database.executeSql(sql, params)
   }
 
-  transactionAll (queries) {
+  transactionAll (queries, options) {
     return new Promise((resolve, reject) => {
       this.database.transaction(async (transaction) => {
-        return Promise.all(
-          queries.map(item => {
-            return transaction.executeSql(item.query, item.params)
-          })
-        )
-          .then((result) => {
-            resolve(result)
-          })
-          .catch((err) => {
-            reject(err)
-          })
+        try {
+          const results = await Promise.all(
+            queries.map(async item => {
+              if (typeof options.beforeQuery === 'function') {
+                await options.beforeQuery(item, transaction)
+              }
+              const results = await transaction.executeSql(item.query, item.params)
+              return results
+            })
+          )
+          resolve(results)
+        } catch (err) {
+          reject(err)
+        }
       })
     })
   }
