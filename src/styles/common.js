@@ -1,40 +1,63 @@
 import _ from 'lodash'
-import { StyleSheet, Dimensions, StatusBar } from 'react-native'
+import { StyleSheet, Dimensions, StatusBar, Platform } from 'react-native'
 import { isIphoneX } from '../libraries/iphonex'
 import { STYLE_SHEET, DEFAULT_HEADER_GRADIENT } from '../configs'
 const { height } = Dimensions.get('window')
 const { height: screenHeight } = Dimensions.get('screen')
 
-export const DEFAULT_HEADER_HEIGHT = isIphoneX() ? 80 : 60
-export const DEFAULT_HEADER_COLOR = '#0061B1'
-export const DEFAULT_TEXT_COLOR = '#979797'
+export const DEFAULT_HEADER_HEIGHT = 60
 export const HEADER_GRADIENT = DEFAULT_HEADER_GRADIENT
 
 export const isFixedSize = parseInt(height) === parseInt(screenHeight - StatusBar.currentHeight)
-export const appHeight = height - (!isFixedSize ? StatusBar.currentHeight : 0)
+export const appHeight = height
+
+export const TAB_BAR_HEIGHT = isIphoneX() ? 62 : 52
 
 const style = {
+  mainContent: {
+    ...Platform.select({
+      android: {
+        height: '100%'
+      },
+      ios: {
+        height: appHeight - 20
+      }
+    })
+  },
   defaultPage: {
     flex: 1,
     display: 'flex',
     height: appHeight,
-    flexDirection: 'column'
+    flexDirection: 'column',
+    ...Platform.select({
+      android: {
+        paddingTop: StatusBar.currentHeight
+      }
+    })
   },
   defaultBackgroundColor: {
-    backgroundColor: '#F8F8F8'
   },
   backgroundColor: {
-    backgroundColor: '#FFFFFF'
   },
   defaultHeaderHeight: {
     height: DEFAULT_HEADER_HEIGHT,
     width: '100%'
   },
-  status_bar: {
-    position: 'absolute',
-    top: 0,
+  statusBar: {
+    // position: 'absolute',
     width: '100%',
-    height: StatusBar.currentHeight
+    ...Platform.select({
+      ios: {
+        height: isIphoneX() ? 44 : 20
+      },
+      android: {
+        height: 0
+      }
+    })
+    // height: Platform.select({
+    //   android: StatusBar.currentHeight,
+    //   ios: 0
+    // })
   },
   shadow: {
     elevation: 3,
@@ -44,13 +67,13 @@ const style = {
     shadowRadius: 0.8 * 5
   },
   text: {},
-  btnPrimary: { backgroundColor: '#0061B1' },
-  btnDisable: { backgroundColor: '#B7C4CC' },
-  btnText: { color: '#FFFFFF' },
+  btnPrimary: {},
+  btnDisable: {},
+  btnText: {},
   alertSuccess: { color: 'blue' },
   alertDanger: { color: 'blue' },
   table: {},
-  txtHeader: { fontSize: 17, color: '#fff' },
+  txtHeader: { fontSize: 17 },
   input: {},
   colorPrimary: {},
   colorDisabled: {},
@@ -62,10 +85,9 @@ const style = {
   modalHeader: {},
   bottom_bar_container: {
     borderTopColor: 'transparent',
-    height: 52
+    height: TAB_BAR_HEIGHT
   },
   bottom_bar_item_overlay: {
-    backgroundColor: 'background-color: rgba(73,126,204,0.05)',
     position: 'absolute',
     width: '100%',
     height: '100%'
@@ -82,27 +104,21 @@ export default StyleSheet.create(_.merge(style, STYLE_SHEET))
 
 export const textStyle = {
   headline: {
-    fontFamily: 'opensans-bold',
     fontWeight: 'normal'
   },
   subtitle: {
-    fontFamily: 'opensans-semibold',
     fontWeight: 'normal'
   },
   paragraph: {
-    fontFamily: 'opensans-regular',
     fontWeight: 'normal'
   },
   caption1: {
-    fontFamily: 'opensans-regular',
     fontWeight: 'normal'
   },
   caption2: {
-    fontFamily: 'opensans-semibold',
     fontWeight: 'normal'
   },
   label: {
-    fontFamily: 'opensans-bold',
     fontWeight: 'normal'
   },
   button: {

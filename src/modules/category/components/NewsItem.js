@@ -68,7 +68,8 @@ export default withStyles(NewsItemComponent, (theme) => ({
   infoContainer: {
     flex: 1,
     paddingHorizontal: 10,
-    paddingVertical: 10
+    paddingVertical: 10,
+    backgroundColor: theme['border-basic-color-3']
   },
   activityContainer: {
     marginTop: 24

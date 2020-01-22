@@ -1,13 +1,14 @@
 import React, { PureComponent } from 'react'
 import {
   View,
-  StyleSheet,
   BackHandler,
   findNodeHandle,
   StatusBar,
-  TouchableOpacity
+  TouchableOpacity,
+  Platform
 } from 'react-native'
 import { connect } from 'react-redux'
+import { withStyles } from 'react-native-ui-kitten'
 import { BlurView } from '@react-native-community/blur'
 import SwipeablePanel from '../../../libraries/components/SwipeablePanel'
 import commonStyles, { appHeight } from '../../../styles/common'
@@ -70,8 +71,13 @@ class BottomSheetComponent extends PureComponent {
     return this.state.show
   }
 
-  handleHide () {
+  handleHide (options = {}) {
     const { onCloseCallback } = this.state
+    const nextState = {}
+    if (options.forceHide) {
+      nextState.component = null
+      this.blurNode = null
+    }
     this.setState({
       level: 0,
       show: false,
@@ -79,13 +85,16 @@ class BottomSheetComponent extends PureComponent {
       onTouchOut: null,
       onCloseCallback: null,
       temporaryHide: false,
-      prevertTouchOut: false
+      prevertTouchOut: false,
+      ...nextState
     }, () => {
       this.closeTimeout = setTimeout(() => {
-        this.blurNode = null
-        this.setState({
-          component: null
-        })
+        if (this.state.component !== null) {
+          this.blurNode = null
+          this.setState({
+            component: null
+          })
+        }
       }, 400)
     })
     onCloseCallback && onCloseCallback()
@@ -151,10 +160,10 @@ class BottomSheetComponent extends PureComponent {
   }
 
   renderBackground () {
-    const { appState } = this.props
-    if (this.blurNode && appState === 'active') {
+    const { appState, themedStyle } = this.props
+    if (this.blurNode && appState === 'active' && Platform.OS === 'android') {
       return (
-        <TouchableOpacity onPress={this.handleTouchOutside} style={styles.overlay}>
+        <TouchableOpacity onPress={this.handleTouchOutside} style={themedStyle.overlay}>
           <BlurView
             viewRef={this.blurNode}
             blurType='light'
@@ -164,14 +173,15 @@ class BottomSheetComponent extends PureComponent {
         </TouchableOpacity>
       )
     }
-    return <TouchableOpacity onPress={this.handleTouchOutside} style={styles.overlay_background} />
+    return <TouchableOpacity onPress={this.handleTouchOutside} style={themedStyle.overlay_background} />
   }
 
   render () {
+    const { themedStyle } = this.props
     const { show, level, component, temporaryHide } = this.state
     const extraStyles = temporaryHide ? { height: 0, overflow: 'hidden' } : {}
     return (
-      <View style={styles.container}>
+      <View style={[themedStyle.container, !show && !component ? { height: 0 } : {}]}>
         {(show || component)
           ? this.renderBackground()
           : null}
@@ -180,7 +190,7 @@ class BottomSheetComponent extends PureComponent {
           isActive={show}
           openLarge
           onlyLarge
-          style={[commonStyles.shadow, extraStyles]}
+          style={[themedStyle.panel, commonStyles.shadow, extraStyles || {}]}
           height={SNAPPOINTS[+level]}
           onClose={this.handleOnClose}
         >
@@ -191,19 +201,20 @@ class BottomSheetComponent extends PureComponent {
   }
 }
 
-const styles = StyleSheet.create({
+const styles = (theme) => ({
   container: {
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    height: '100%'
+    height: '100%',
+    zIndex: 3
   },
   panel: {
-    backgroundColor: '#ffffff'
+    backgroundColor: theme['background-basic-color-1']
   },
   header: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme['background-basic-color-1'],
     shadowColor: '#000000',
     paddingTop: 20,
     borderTopLeftRadius: 20,
@@ -216,7 +227,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#00000040',
+    backgroundColor: theme['color-primary-focus'],
     marginBottom: 10
   },
   overlay: {
@@ -241,8 +252,14 @@ function mapStateToProps (state) {
 }
 
 export default {
-  Component: connect(mapStateToProps, {
-  })(BottomSheetComponent),
+  Component:
+    withStyles(
+      connect(
+        mapStateToProps,
+        {}
+      )(BottomSheetComponent),
+      styles
+    ),
   show (component, options = {}) {
     if (instance) {
       instance.show(component, options)

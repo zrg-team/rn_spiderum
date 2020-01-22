@@ -1,11 +1,8 @@
 import React, { PureComponent } from 'react'
 // import i18n from 'i18n-js'
 import {
-  Platform,
-  StyleSheet
-} from 'react-native'
-import {
   Icon,
+  withStyles,
   TopNavigation,
   TopNavigationAction
 } from 'react-native-ui-kitten'
@@ -13,19 +10,18 @@ import LinearGradient from 'react-native-linear-gradient'
 // import * as Animatable from 'react-native-animatable'
 import commonStyles, { HEADER_GRADIENT } from '../../styles/common'
 import { navigationPop, navigationPopToTop } from '../utils/navigation'
-import { isIphoneX } from '../../libraries/iphonex'
-import NotificationPanel from '../components/Widgets/NotificationPanel'
+import SearchPanel from '../components/Widgets/SearchPanel'
 
-export default class DefaultHeader extends PureComponent {
+class DefaultHeader extends PureComponent {
   constructor (props) {
     super(props)
     this.handleBack = this.handleBack.bind(this)
-    this.handleNotification = this.handleNotification.bind(this)
+    this.handleSearch = this.handleSearch.bind(this)
     this.renderRightComponent = this.renderRightComponent.bind(this)
   }
 
-  handleNotification () {
-    NotificationPanel.show()
+  handleSearch () {
+    SearchPanel.show()
   }
 
   handleBack () {
@@ -75,14 +71,14 @@ export default class DefaultHeader extends PureComponent {
   }
 
   renderRightComponent () {
-    const { notification } = this.props
-    if (notification) {
+    const { search } = this.props
+    if (search) {
       return [
         <TopNavigationAction
-          key='notification'
-          onPress={this.handleNotification}
+          key='search'
+          onPress={this.handleSearch}
           icon={(style) => {
-            return (<Icon style={[style, { fontSize: 30, width: 28 }]} name='book-open-variant' />)
+            return (<Icon style={[style, { fontSize: 30, width: 28 }]} name='search' />)
           }}
         />
       ]
@@ -92,22 +88,39 @@ export default class DefaultHeader extends PureComponent {
 
   render () {
     const {
-      title = ''
+      title = '',
+      themedStyle,
+      linearGradient,
+      headerContainer = {},
+      headerWrapperContainer = {}
       // leftTitle = ''
     } = this.props
+
+    if (!linearGradient) {
+      return (
+        <TopNavigation
+          title={title}
+          alignment='center'
+          titleStyle={{}}
+          style={[themedStyle.header, commonStyles.shadow, headerContainer]}
+          leftControl={this.renderLeftComponent()}
+          rightControls={this.renderRightComponent()}
+        />
+      )
+    }
     return (
       <LinearGradient
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         colors={HEADER_GRADIENT}
         // locations={[0.1, 0.6, 1]}
-        style={[styles.linearGradient, commonStyles.shadow]}
+        style={[themedStyle.linearGradient, commonStyles.shadow, headerWrapperContainer]}
       >
         <TopNavigation
           title={title}
           alignment='center'
           titleStyle={{}}
-          style={[commonStyles.shadow]}
+          style={[themedStyle.header, commonStyles.shadow, headerContainer]}
           leftControl={this.renderLeftComponent()}
           rightControls={this.renderRightComponent()}
         />
@@ -116,51 +129,9 @@ export default class DefaultHeader extends PureComponent {
   }
 }
 
-const checkHeaderPaddingTop = () => {
-  if (isIphoneX()) {
-    return 25
-  }
-  if (Platform.OS === 'ios') {
-    return 20
-  }
-  return 0
-}
-
-const styles = StyleSheet.create({
-  wrapperContainer: {
-    width: '100%',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-    paddingTop: checkHeaderPaddingTop()
-  },
-  rowInLine: {
-    zIndex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'transparent'
-  },
-  txtHeader: {
-    position: 'absolute',
-    zIndex: 1,
-    color: '#fff',
-    fontSize: 17,
-    fontWeight: '600',
-    textAlign: 'center',
-    width: '100%'
-  },
-  posArrow: {
-    left: 0,
-    paddingLeft: 10
-  },
-  iconArrowLeft: {
-    color: '#fff',
-    fontSize: 30,
-    paddingRight: 32
-  },
-  txtMore: {
-    color: '#fff',
-    fontSize: 17
+export default withStyles(DefaultHeader, (theme) => ({
+  header: {
+    backgroundColor: theme['background-basic-color-4']
   },
   notification: {
     zIndex: 99,
@@ -172,4 +143,4 @@ const styles = StyleSheet.create({
     // justifyContent: 'flex-end',
     alignItems: 'flex-end'
   }
-})
+}))

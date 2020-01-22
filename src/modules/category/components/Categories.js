@@ -85,9 +85,12 @@ export default withStyles(CategoriesComponent, (theme) => ({
     flex: 1
   },
   scroll: {
-    paddingBotton: 20
+    paddingBottom: 10
   },
   listHistory: {
     flex: 1
+  },
+  contentContainer: {
+    paddingBottom: 10
   }
 }))

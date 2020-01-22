@@ -39,7 +39,8 @@ export default class CollapsibleComp extends Component {
     Animated.timing(this.state.rotateAnimation, {
       toValue: rotate,
       duration: 300,
-      easing: Easing.linear
+      easing: Easing.linear,
+      useNativeDriver: true
     }).start()
 
     const spin = this.state.rotateAnimation.interpolate({

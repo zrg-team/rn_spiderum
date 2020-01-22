@@ -21,7 +21,7 @@ export async function overlay (overlayProcess) {
     return ret
   } catch (error) {
     CommonLoading.hide()
-    console.log('ERROR', error)
+    console.debug('[OVERLAY]', error)
     throw error
   }
 }
@@ -41,7 +41,7 @@ export async function splash (splashProcess) {
     return ret
   } catch (error) {
     CommonLoading.hide()
-    console.log('ERROR', error)
+    console.debug('[SPLASH]', error)
     throw error
   }
 }
@@ -58,7 +58,7 @@ export async function loading (fetchingProcess, done = undefined) {
     return ret
   } catch (error) {
     dispatch(loadEnd({ config: { key: 'loading' } }))
-    console.log('ERROR', error)
+    console.debug('[LOADING]', error)
     throw error
   }
 }
@@ -74,7 +74,7 @@ export async function fetchLoading (fetchingProcess, done = undefined) {
     return ret
   } catch (error) {
     ProgressBar.hide()
-    console.log('ERROR', error)
+    console.debug('[FETCH LOADING]', error)
     throw error
   }
 }
@@ -109,7 +109,11 @@ export function request ({ url, headers, ...options }) {
       ...headers
     },
     ...options
+  }).then(response => {
+    console.request('[REQUEST]', response)
+    return response
   }).catch(error => {
+    console.debug('[REQUEST] ERROR', error)
     if (error.response && error.response.data) { throw error.response.data }
     throw error
   })
@@ -127,11 +131,13 @@ export function requestLoading ({ url, ...options }) {
     url,
     ...options
   }).then((response) => {
+    console.request('[REQUEST LOADING]', response)
     dispatch && dispatch(fetchSuccess({ config: { key: url } }))
     return response
-  }).catch((err) => {
+  }).catch((error) => {
+    console.debug('[REQUEST LOADING] ERROR', error)
     dispatch && dispatch(fetchFailure({ config: { key: url } }))
-    throw err
+    throw error
   })
 }
 
@@ -154,9 +160,11 @@ export function requestAuthenticationLoading ({ url, headers, ...options }) {
     },
     ...options
   }).then((response) => {
+    console.request('[REQUEST AUTH LOADING]', response)
     dispatch && dispatch(fetchSuccess({ config: { key: url } }))
     return response
   }).catch(error => {
+    console.debug('[REQUEST AUTH LOADING] ERROR', error)
     dispatch && dispatch(fetchSuccess({ config: { key: url } }))
     throw error
   })

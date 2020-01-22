@@ -61,7 +61,7 @@ class NewsItemComponent extends React.Component {
     let wrapperProps = {}
     if (shouldHaveAnimation) {
       Wrapper = Animatable.View
-      wrapperProps = { delay: animationDeplay, duration: 360, useNativeDriver: true, animation: 'fadeInRight', easing: 'ease-in-out-sine' }
+      wrapperProps = { delay: animationDeplay, duration: 360, useNativeDriver: true, animation: 'zoomInUp', easing: 'ease-in-out-sine' }
     }
     return (
       <Wrapper {...wrapperProps}>
@@ -89,7 +89,6 @@ class NewsItemComponent extends React.Component {
             <Text
               numberOfLines={2}
               style={themedStyle.descriptionLabel}
-              category='h8'
             >
               {article.decription}
             </Text>
@@ -137,9 +136,9 @@ export default withStyles(NewsItemComponent, (theme) => ({
   container: {
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
-    marginTop: 5,
-    marginHorizontal: 5
+    backgroundColor: theme['border-basic-color-3'],
+    marginTop: 8,
+    marginHorizontal: 8
   },
   badgeContainer: {
     marginRight: 5,
@@ -154,7 +153,7 @@ export default withStyles(NewsItemComponent, (theme) => ({
     paddingHorizontal: 16,
     paddingTop: 5,
     borderBottomWidth: 1,
-    borderBottomColor: theme['border-basic-color-2']
+    borderBottomColor: theme['border-basic-color-4']
   },
   tagContainer: {
     width: '100%',

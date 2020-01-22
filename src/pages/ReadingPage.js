@@ -1,10 +1,7 @@
 import React, { Component } from 'react'
-import i18n from 'i18n-js'
 import DefaultPage from '../common/hocs/DefaultPage'
-import DefaultHeader from '../common/containers/DefaultHeader'
-import { Layout } from 'react-native-ui-kitten'
 import ReadingContainer from '../modules/reading/containers/ReadingContainer'
-import Reading from '../modules/reading/containers/Reading'
+import ReadingBeta from '../modules/reading/containers/ReadingBeta'
 
 export default class NewsPage extends Component {
   constructor (props) {
@@ -21,7 +18,6 @@ export default class NewsPage extends Component {
         ? [itemIndex - 1, itemIndex, itemIndex + 1].filter(item => !isNaN(item) && item >= 0)
         : []
     }
-    this.viewRef = null
     this.handleSelectArticle = this.handleSelectArticle.bind(this)
   }
 
@@ -56,35 +52,30 @@ export default class NewsPage extends Component {
     const { page, article, itemIndex, type, category, dataIndex } = this.state
 
     return (
-      <DefaultPage ref={ref => { this.viewRef = ref }}>
-        <DefaultHeader
-          transition={false}
-          title={i18n.t('pages.reading').toUpperCase()}
-          navigation={navigation}
-        />
-        <Layout style={[{ flexGrow: 1 }]} level='2'>
-          {itemIndex !== null
-            ? (
-              <ReadingContainer
-                page={page}
-                dataIndex={dataIndex}
-                onSelectArticle={this.handleSelectArticle}
-                article={article}
-                itemIndex={itemIndex}
-                type={type}
-                category={category}
-                navigation={navigation}
-              />)
-            : (
-              <Reading
-                type={type}
-                noComment={false}
-                noTransition
-                article={article}
-                navigation={navigation}
-              />
-            )}
-        </Layout>
+      <DefaultPage
+        containerStyle={{ paddingTop: 0 }}
+      >
+        {itemIndex !== null
+          ? (
+            <ReadingContainer
+              page={page}
+              dataIndex={dataIndex}
+              onSelectArticle={this.handleSelectArticle}
+              article={article}
+              itemIndex={itemIndex}
+              type={type}
+              category={category}
+              navigation={navigation}
+            />)
+          : (
+            <ReadingBeta
+              type={type}
+              noComment={false}
+              noTransition
+              article={article}
+              navigation={navigation}
+            />
+          )}
       </DefaultPage>
     )
   }

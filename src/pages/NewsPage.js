@@ -2,27 +2,34 @@ import React, { Component } from 'react'
 import i18n from 'i18n-js'
 import DefaultPage from '../common/hocs/DefaultPage'
 import DefaultHeader from '../common/containers/DefaultHeader'
+import Modal from '../common/components/Widgets/Modal'
+import ContentLoadingPage from './ContentLoadingPage'
 import { Layout } from 'react-native-ui-kitten'
 import List from '../modules/home/containers/List'
 
 export default class NewsPage extends Component {
   constructor (props) {
     super(props)
-    this.viewRef = null
+    Modal.showFullScreen(<ContentLoadingPage noSearch title={i18n.t('pages.news')} />)
+    this.handleLoadingDone = this.handleLoadingDone.bind(this)
+  }
+
+  handleLoadingDone () {
+    Modal.hide()
   }
 
   render () {
     const { navigation } = this.props
     return (
-      <DefaultPage ref={ref => { this.viewRef = ref }}>
+      <DefaultPage>
         <DefaultHeader
           noBack
           transition={false}
-          title={i18n.t('pages.news').toUpperCase()}
           navigation={navigation}
+          title={i18n.t('pages.news').toUpperCase()}
         />
         <Layout style={[{ flexGrow: 1 }]} level='2'>
-          <List noCarousel type='news' navigation={navigation} />
+          <List type='news' navigation={navigation} lazy onLoadingDone={this.handleLoadingDone} />
         </Layout>
       </DefaultPage>
     )

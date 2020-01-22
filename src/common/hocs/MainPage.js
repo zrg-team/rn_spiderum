@@ -5,17 +5,18 @@ import {
   View,
   Linking,
   AppState,
-  StatusBar,
-  BackHandler,
-  SafeAreaView
+  BackHandler
 } from 'react-native'
-import commonStyle, { appHeight } from '../../styles/common'
+import {
+  withStyles
+} from 'react-native-ui-kitten'
+import commonStyle from '../../styles/common'
 import Modal from '../components/Widgets/Modal'
 import ProgressBar from '../components/Widgets/ProgressBar'
-import Camera from '../components/Widgets/Camera'
+// import Camera from '../components/Widgets/Camera'
 import Toast from '../components/Widgets/Toast'
 import CommonLoading from '../components/Widgets/CommonLoading'
-import NotificationPanel from '../components/Widgets/NotificationPanel'
+import SearchPanel from '../components/Widgets/SearchPanel'
 import BottomSheet from '../components/Widgets/BottomSheet'
 import { setTopLevelNavigator } from '../utils/navigation'
 import {
@@ -38,7 +39,7 @@ function getActiveRouteName (navigationState) {
 }
 
 let LazyComponent = null
-export default class MainPage extends Component {
+class MainPage extends Component {
   constructor (props) {
     super(props)
     this.network = false
@@ -52,6 +53,7 @@ export default class MainPage extends Component {
     this.getNavigator = this.getNavigator.bind(this)
 
     BackHandler.addEventListener('hardwareBackPress', () => true)
+    console.time('[MAINPAGE] Render')
   }
 
   getNavigatorRef (ref) {
@@ -62,11 +64,6 @@ export default class MainPage extends Component {
     const { dispatch } = this.props
     // Should dispatch to redux network status
     dispatch(setApplicationState(currentAppState))
-    switch (currentAppState) {
-      case 'inactive':
-      case 'background':
-      case 'active':
-    }
   }
 
   getNavigator (appIntro, language) {
@@ -77,14 +74,16 @@ export default class MainPage extends Component {
     if (`${appIntro}_${language}` === this.unique) {
       return this.AppNavigator
     }
-    const { persistor, dispatch } = this.props
+    const { persistor, dispatch, themedStyle } = this.props
     this.AppNavigator = LazyComponent({
       persistor,
       dispatch,
       appIntro,
-      setTopLevelNavigator
+      setTopLevelNavigator,
+      themedStyle
     })
     this.unique = `${appIntro}_${language}`
+    console.info(`[MAIN PAGE] Navigation reloaded. Keys: ${this.unique}`)
     return this.AppNavigator
   }
 
@@ -128,50 +127,50 @@ export default class MainPage extends Component {
   }
 
   async componentDidMount () {
-    ProgressBar.show()
     NetInfo.isConnected.addEventListener(
       'connectionChange',
       this.handleFirstConnectivityChange.bind(this)
     )
-    AppState.removeEventListener('change', this.onAppStateChange)
     AppState.addEventListener('change', this.onAppStateChange.bind(this))
     this.initial()
   }
 
   initial () {
     LazyComponent = require('../routes').default
-    const { persistor, dispatch, appIntro, language } = this.props
+    const { persistor, dispatch, appIntro, language, themedStyle } = this.props
     // TODO: Loading page
     this.unique = `${appIntro}_${language}`
     this.AppNavigator = LazyComponent({
       persistor,
       dispatch,
       appIntro,
-      setTopLevelNavigator
+      setTopLevelNavigator,
+      themedStyle
     })
-    splashScreen.hide()
-    ProgressBar.hide()
     this.setState({
       lazy: false,
       loading: false
+    }, () => {
+      splashScreen.hide()
+      console.timeEnd('[MAINPAGE] Render')
+      console.info(`[MAIN PAGE] Navigation loaded. Keys: ${this.unique}`)
     })
   }
 
   render () {
-    const { appIntro, language } = this.props
+    const { appIntro, language, themedStyle } = this.props
     const { loading } = this.state
     const AppNavigator = this.getNavigator(appIntro, language)
     return (
-      <SafeAreaView>
-        <View style={commonStyle.status_bar} />
+      <>
+        <View style={[commonStyle.statusBar, themedStyle.statusBar]} />
         <View
           ref={this.getNavigatorRef}
           style={[
-            {
-              height: !loading ? appHeight : 0,
-              marginTop: StatusBar.currentHeight
-            },
-            commonStyle.backgroundColor
+            themedStyle.mainContent,
+            commonStyle.mainContent,
+            themedStyle.backgroundColor,
+            { opacity: loading ? 0 : 1 }
           ]}
         >
           <AppNavigator
@@ -184,12 +183,36 @@ export default class MainPage extends Component {
         </View>
         <Modal.Component key='common-modal' global />
         <BottomSheet.Component zIndex={2} parentRef={this.navigatorRef} key='common-bottom-sheet' global />
-        <NotificationPanel.Component parentRef={this.navigatorRef} key='notification-panel' global />
+        <SearchPanel.Component parentRef={this.navigatorRef} key='search-panel' global />
         <ProgressBar.Component key='progress-bar' global />
-        <CommonLoading.Component key='common-bar' global />
-        <Camera.Component key='app-camera' zIndex={5} global />
+        <CommonLoading.Component parentRef={this.navigatorRef} key='common-bar' global />
+        {/* <Camera.Component key='app-camera' zIndex={5} global /> */}
         <Toast.Component key='toast-bar' global />
-      </SafeAreaView>
+      </>
     )
   }
 }
+
+export default withStyles(MainPage, (theme) => ({
+  tabBarStyle: {
+    color: theme['text-basic-color']
+  },
+  barStyle: {
+    backgroundColor: theme['background-basic-color-4']
+  },
+  backgroundColor: {
+    backgroundColor: theme['background-basic-color-3']
+  },
+  backgroundTransparent: {
+    backgroundColor: 'transparent'
+  },
+  mainNavigator: {
+    backgroundColor: theme['background-basic-color-3']
+  },
+  mainContent: {
+    zIndex: 1
+  },
+  statusBar: {
+    backgroundColor: theme['background-basic-color-4']
+  }
+}))

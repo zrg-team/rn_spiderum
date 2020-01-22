@@ -1,32 +1,6 @@
 import { requestLoading } from '../../common/effects'
-import { AVATAR_URL } from './models'
 import { setNews, setHots, setTops } from './actions'
-
-export function parseHtml (page, data) {
-  const results = {}
-  const scriptTag = /<script>(.*?)<\/script>/g.exec(data)
-  const pageData = JSON.parse(`${scriptTag[1]}`.replace("window['TRANSFER_STATE'] = ", ''))
-  Object.keys(pageData).forEach(key => {
-    try {
-      if (key.includes('populartags')) {
-        results.tags = pageData[key].tags
-      } else if (key.includes('getRandomPost')) {
-        results.random = pageData[key]
-      } else if (key.includes('getTopPosts')) {
-        results.top = pageData[key].posts.items
-      } else if (key.includes('category')) {
-        results.data = pageData[key].posts.items.map(item => {
-          // const itemDOM = cheerio.load(item.body)
-          // item.decription = itemDOM.text().substring(0, 256)
-          item.avatar = item.creator_id.avatar ? `${AVATAR_URL}${item.creator_id.avatar}` : null
-          return item
-        })
-      }
-    } catch (err) {
-    }
-  })
-  return results
-}
+import { parseHtml } from '../home/handlers'
 
 function getTypeUrl (type, url) {
   if (type === 'news') {
@@ -63,7 +37,7 @@ export default (dispatch, props) => ({
       }
       return results
     } catch (err) {
-      console.log('error', err)
+      console.debug('[GET NEWS] Error', err)
       return undefined
     }
   }

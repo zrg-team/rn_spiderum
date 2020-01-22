@@ -3,8 +3,11 @@ import i18n from 'i18n-js'
 import moment from 'moment'
 import {
   View,
+  Image,
+  Linking,
   Dimensions,
-  ScrollView
+  ScrollView,
+  TouchableOpacity
 } from 'react-native'
 import {
   Text,
@@ -41,7 +44,8 @@ class ReadingComponent extends React.Component {
       webview: false,
       commentPage: 1,
       loadingComment: true,
-      comments: []
+      comments: [],
+      images: {}
     }
     this.handlePress = this.handlePress.bind(this)
     this.handleCommentsButtonPress = this.handleCommentsButtonPress.bind(this)
@@ -52,6 +56,13 @@ class ReadingComponent extends React.Component {
     this.handleRemove = this.handleRemove.bind(this)
     this.handleShare = this.handleShare.bind(this)
     this.handleSave = this.handleSave.bind(this)
+    this.handlePressLink = this.handlePressLink.bind(this)
+  }
+
+  handlePressLink (link) {
+    Linking
+      .openURL(link)
+      .catch(() => {})
   }
 
   handleRemove () {
@@ -91,8 +102,8 @@ class ReadingComponent extends React.Component {
       message: article.title,
       url: `${READING_URL}${article.slug}`
     })
-      .then((res) => { console.log(res) })
-      .catch((err) => { err && console.log(err) })
+      .then((res) => { console.info(res) })
+      .catch((err) => { err && console.debug('[READING SHARE] Error', err) })
   }
 
   handleIncreaseFont () {
@@ -123,9 +134,51 @@ class ReadingComponent extends React.Component {
     })
   }
 
-  componentDidMount () {
+  async handleImageSize (data) {
+    const { images: lastImages } = this.state
+    let images = await Promise.all(
+      data
+        .filter(item => item.type === 'image')
+        .map(item => {
+          return new Promise((resolve, reject) => {
+            if (lastImages[item.data]) {
+              resolve(undefined)
+            }
+            Image.getSize(item.data, (itemWidth, itemHeight) => {
+              const result = {}
+              const ratio = itemWidth / itemHeight
+              result.width = width
+              result.height = width / ratio
+              resolve({ [item.data]: { ...result } })
+            }, () => {
+              resolve(undefined)
+            })
+          })
+        })
+    )
+    images = images.reduce((all, item) => {
+      return { ...all, ...item }
+    }, {})
+    this.setState({
+      images
+    })
+  }
+
+  async componentDidMount () {
     const { article, parseContent } = this.props
-    const data = parseContent(article.body)
+    if (article.data) {
+      const { noComment } = this.props
+      return this.setState({
+        data: article.data,
+        loadingComment: true,
+        webview: false,
+        loading: false
+      }, async () => {
+        !noComment && this.getComments()
+      })
+    }
+    const data = await parseContent(article)
+    this.handleImageSize(data)
     setTimeout(() => {
       const { noComment } = this.props
       this.setState({
@@ -149,7 +202,6 @@ class ReadingComponent extends React.Component {
       this.getComments()
     }
     if (fontSize !== nextProps.fontSize) {
-      console.log('nextProps.fontSize', nextProps.fontSize)
     }
   }
 
@@ -184,6 +236,10 @@ class ReadingComponent extends React.Component {
       style.fontSize = fontSize * 1.15
     }
 
+    style.color = style.fontSize > fontSize ? '#34495E' : undefined
+
+    style.height = undefined
+
     if (item.strong) {
       style.fontWeight = 'bold'
     }
@@ -192,7 +248,7 @@ class ReadingComponent extends React.Component {
   }
 
   renderContent () {
-    const { data } = this.state
+    const { data, images } = this.state
     const { article, themedStyle } = this.props
 
     const renders = [
@@ -219,6 +275,40 @@ class ReadingComponent extends React.Component {
             </Text>
           )
           break
+        case 'blockquote':
+          result = (
+            <View
+              style={themedStyle.blockquote}
+            >
+              <Text
+                key={index}
+                style={[themedStyle.contentLabel, this.renderTextStyle(item)]}
+              >
+                {item.data}
+              </Text>
+            </View>
+          )
+          break
+        case 'link':
+          result = (
+            <TouchableOpacity
+              onPress={() => this.handlePressLink(item.data)}
+              style={themedStyle.linkContainer}
+            >
+              <Text
+                style={[themedStyle.contentLinkText, this.renderTextStyle(item)]}
+              >
+                {item.data}
+              </Text>
+              <Text
+                key={index}
+                style={[themedStyle.contentLabel, this.renderTextStyle(item)]}
+              >
+                {item.description}
+              </Text>
+            </TouchableOpacity>
+          )
+          break
         case 'youtube':
           result = (
             <YouTube
@@ -241,7 +331,7 @@ class ReadingComponent extends React.Component {
           result = [
             <FastImage
               key={`${index}_1`}
-              style={themedStyle.imageContent}
+              style={[themedStyle.imageContent, images[item.data]]}
               resizeMode={FastImage.resizeMode.contain}
               source={{ uri: item.data }}
             />,
@@ -301,7 +391,7 @@ class ReadingComponent extends React.Component {
       <ParallaxScrollView
         key='0'
         noTransition={noTransition}
-        windowHeight={height * 0.4}
+        windowHeight={height * 0.2}
         backgroundSource={imageSource}
         style={themedStyle.container}
         imageUrl={article.og_image_url}
@@ -448,15 +538,14 @@ export default withStyles(ReadingComponent, (theme) => ({
     top: 10
   },
   titleLabel: {
-    marginHorizontal: 24,
+    marginHorizontal: 15,
     // marginLeft: 140,
     ...textStyle.headline
   },
   contentLabel: {
-    flex: 1,
-    marginHorizontal: 24,
-    marginVertical: 10,
-    ...textStyle.paragraph
+    // flex: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 5
   },
   imageCaption: {
     flex: 1,
@@ -473,10 +562,8 @@ export default withStyles(ReadingComponent, (theme) => ({
     tintColor: theme['text-hint-color']
   },
   imageContent: {
-    height: 200,
-    marginVertical: 20,
-    marginHorizontal: 20,
-    backgroundColor: '#000'
+    marginVertical: 10,
+    marginHorizontal: 0
   },
   tagContainer: {
     flexDirection: 'row',
@@ -497,5 +584,23 @@ export default withStyles(ReadingComponent, (theme) => ({
   textBadge: {
     paddingHorizontal: 10,
     color: '#FFFFFF'
+  },
+  linkContainer: {
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginHorizontal: 10,
+    marginVerical: 10
+  },
+  contentLinkText: {
+    marginHorizontal: 10,
+    textDecorationLine: 'underline'
+  },
+  blockquote: {
+    backgroundColor: '#f2f2f2',
+    borderLeftWidth: 4,
+    borderLeftColor: '#0099DF',
+    marginLeft: 5,
+    marginRight: 5,
+    padding: 10
   }
 }))

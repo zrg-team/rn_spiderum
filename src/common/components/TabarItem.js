@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/AntDesign'
 import commonStyles from '../../styles/common'
 
 const TABS = ['Home', 'HotList', 'News', 'NewsList', 'Top', 'TopList', 'Category', 'Categories', 'Option', 'OptionList']
-export default memo(({ focused, navigation, previousPage }) => {
+export default memo(({ style, focused, navigation, previousPage }) => {
   const { routeName } = navigation.state
   let source
   const render = []
@@ -36,19 +36,8 @@ export default memo(({ focused, navigation, previousPage }) => {
         useNativeDriver
         style={[
           commonStyles.bottom_bar_active_item,
-          commonStyles.bottom_bar_item_bar]}
-      />
-    )
-    render.push(
-      <Animatable.View
-        key='background'
-        useNativeDriver
-        delay={0}
-        duration={240}
-        animation={animation}
-        style={[
-          commonStyles.bottom_bar_active_item,
-          commonStyles.bottom_bar_item_overlay]}
+          commonStyles.bottom_bar_item_bar
+        ]}
       />
     )
     render.push(
@@ -69,6 +58,7 @@ export default memo(({ focused, navigation, previousPage }) => {
     render.push(
       <Icon
         key='icon'
+        style={style}
         name={source}
         size={22}
       />

@@ -179,7 +179,7 @@ class ListComponent extends Component {
           {!loading
             ? this.renderContent()
             : (
-              <View style={{ paddingHorizontal: 20, backgroundColor: '#FFFFFF' }}>
+              <View style={{ paddingHorizontal: 20 }}>
                 <DefaultSkeleton />
                 <DefaultSkeleton />
                 <DefaultSkeleton />
@@ -211,10 +211,10 @@ export default withStyles(ListComponent, (theme) => ({
     height: '100%'
   },
   item: {
-    backgroundColor: '#FFFFFF'
+    backgroundColor: theme['background-basic-color-4']
   },
   itemReverse: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme['background-basic-color-4'],
     flexDirection: 'row-reverse'
   },
   pagerLabel: {

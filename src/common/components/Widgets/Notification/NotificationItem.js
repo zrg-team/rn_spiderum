@@ -90,7 +90,6 @@ class NotificationItemComponent extends React.Component {
               <Text
                 numberOfLines={2}
                 style={themedStyle.descriptionLabel}
-                category='h8'
               >
                 {article.decription}
               </Text>
@@ -136,7 +135,7 @@ export default withStyles(NotificationItemComponent, (theme) => ({
   container: {
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme['border-basic-color-0'],
     marginTop: 5,
     marginHorizontal: 5
   },
@@ -179,6 +178,6 @@ export default withStyles(NotificationItemComponent, (theme) => ({
   },
   textBadge: {
     paddingHorizontal: 10,
-    color: '#FFFFFF'
+    color: 'black'
   }
 }))

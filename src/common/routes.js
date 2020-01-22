@@ -1,16 +1,20 @@
 import React from 'react'
+import { Platform } from 'react-native'
 import {
   createAppContainer,
-  createStackNavigator,
   createBottomTabNavigator,
-  BottomTabBar
+  BottomTabBar,
+  createStackNavigator
 } from 'react-navigation'
+
+import createScreensStackNavigator from 'react-native-screens/createNativeStackNavigator'
 import { FluidNavigator } from 'react-navigation-fluid-transitions'
+import { fadeIn } from 'react-navigation-transitions'
 // import { icons } from '../assets/elements'
-import { Animated, Easing } from 'react-native'
-import commonStyle from '../styles/common'
+import commonStyle, { TAB_BAR_HEIGHT } from '../styles/common'
 import TabarItem from './containers/TabarItem'
 
+import DebugPage from '../pages/DebugPage'
 import HomePage from '../pages/HomePage'
 import NewsPage from '../pages/NewsPage'
 import TopPage from '../pages/TopPage'
@@ -40,24 +44,32 @@ export const SCREENS = {
   CategoryDetail: 'CategoryDetail',
   Profile: 'Profile',
   Bookmark: 'Bookmark',
-  AppIntro: 'AppIntro'
+  AppIntro: 'AppIntro',
+  Debug: 'Debug'
 }
 
-const transitionConfig = {
-  duration: 300,
-  timing: Animated.timing,
-  easing: Easing.easing
+const customScreenOption = {
+  navigationOptions: {
+    stackAnimation: 'fade'
+  }
 }
+
+const createNativeStackNavigator = Platform.OS !== 'ios'
+  ? createScreensStackNavigator
+  : createStackNavigator
 
 export default ({
   persistor = undefined,
   dispatch = null,
-  appIntro
+  appIntro,
+  themedStyle
 }) => {
-  const OptionFlow = createStackNavigator({
-    [SCREENS.OptionList]: { screen: OptionPage },
-    [SCREENS.Bookmark]: { screen: BookmarkPage },
-    [SCREENS.Reading]: { screen: ReadingPage }
+  // Option flow
+  const OptionFlow = createNativeStackNavigator({
+    [SCREENS.OptionList]: { screen: OptionPage, ...customScreenOption },
+    [SCREENS.Bookmark]: { screen: BookmarkPage, ...customScreenOption },
+    [SCREENS.Reading]: { screen: ReadingPage, ...customScreenOption },
+    [SCREENS.Debug]: { screen: DebugPage, ...customScreenOption }
   }, {
     headerMode: 'none',
     navigationOptions: ({ navigation }) => {
@@ -70,6 +82,7 @@ export default ({
       }
     }
   })
+  // Option Home flow
   const HomeFlow = FluidNavigator({
     [SCREENS.HotList]: { screen: HomePage },
     [SCREENS.Reading]: { screen: ReadingPage },
@@ -86,6 +99,7 @@ export default ({
       }
     }
   })
+  // News Home flow
   const NewsFlow = FluidNavigator({
     [SCREENS.NewsList]: { screen: NewsPage },
     [SCREENS.Reading]: { screen: ReadingPage },
@@ -102,6 +116,7 @@ export default ({
       }
     }
   })
+  // Top Home flow
   const TopFlow = FluidNavigator({
     [SCREENS.TopList]: { screen: TopPage },
     [SCREENS.Reading]: { screen: ReadingPage },
@@ -118,11 +133,12 @@ export default ({
       }
     }
   })
-  const CategoryFlow = FluidNavigator({
-    [SCREENS.Categories]: { screen: CategoriesPage },
-    [SCREENS.CategoryDetail]: { screen: CategoryDetailPage },
-    [SCREENS.Reading]: { screen: ReadingPage },
-    [SCREENS.Profile]: { screen: ProfilePage }
+  // Category Home flow
+  const CategoryFlow = createNativeStackNavigator({
+    [SCREENS.Categories]: { screen: CategoriesPage, ...customScreenOption },
+    [SCREENS.CategoryDetail]: { screen: CategoryDetailPage, ...customScreenOption },
+    [SCREENS.Reading]: { screen: ReadingPage, ...customScreenOption },
+    [SCREENS.Profile]: { screen: ProfilePage, ...customScreenOption }
   }, {
     headerMode: 'none',
     navigationOptions: ({ navigation }) => {
@@ -135,6 +151,7 @@ export default ({
       }
     }
   })
+  // Tab navigator
   const TabGroup = createBottomTabNavigator({
     [SCREENS.Home]: HomeFlow,
     [SCREENS.News]: NewsFlow,
@@ -147,7 +164,7 @@ export default ({
         return (
           <BottomTabBar
             {...props}
-            style={[{ borderTopColor: 'transparent' }, commonStyle.shadow]}
+            style={[themedStyle.barStyle, commonStyle.bottom_bar_container, commonStyle.shadow]}
           />
         )
       },
@@ -156,22 +173,25 @@ export default ({
       },
       tabBarIcon: ({ focused }) => {
         const { routeName } = navigation.state
-        return <TabarItem key={routeName} focused={focused} navigation={navigation} />
+        return <TabarItem key={routeName} focused={focused} navigation={navigation} style={themedStyle.tabBarStyle} />
       }
     }),
+    lazy: true,
+    height: TAB_BAR_HEIGHT,
     labeled: false,
-    animationEnabled: false,
-    height: 100,
-    initialRouteName: SCREENS.Home,
-    backBehavior: 'none',
     shifting: true,
-    barStyle: commonStyle.gbMenu,
+    swipeEnabled: false,
+    backBehavior: 'none',
+    animationEnabled: false,
+    // removeClippedSubviews: false,
+    initialRouteName: SCREENS.Home,
+    barStyle: themedStyle.barStyle,
     activeColor: commonStyle.activeMenu.color
   })
 
   let AppNavigator = null
-  if (appIntro) {
-    AppNavigator = createStackNavigator(
+  if (appIntro || Platform.OS === 'ios') {
+    AppNavigator = createNativeStackNavigator(
       {
         [SCREENS.Loading]: {
           screen: (props) => (
@@ -182,12 +202,16 @@ export default ({
               page={SCREENS.TabGroup}
               {...props}
             />
-          )
+          ),
+          ...customScreenOption
         },
-        [SCREENS.TabGroup]: { screen: TabGroup }
+        [SCREENS.TabGroup]: { screen: TabGroup, ...customScreenOption }
       },
       {
         headerMode: 'none',
+        cardShadowEnabled: false,
+        transitionConfig: () => fadeIn(),
+        cardStyle: themedStyle.mainNavigator,
         initialRouteName: SCREENS.Loading
       }
     )
@@ -206,7 +230,6 @@ export default ({
         [SCREENS.AppIntro]: { screen: AppIntroPage }
       },
       {
-        transitionConfig,
         headerMode: 'none',
         initialRouteName: SCREENS.LoadingPage,
         defaultNavigationOptions: { gesturesEnabled: false }

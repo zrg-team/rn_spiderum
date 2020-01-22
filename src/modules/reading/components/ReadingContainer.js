@@ -6,7 +6,7 @@ import {
   withStyles
 } from 'react-native-ui-kitten'
 import ViewPager from '@react-native-community/viewpager'
-import Reading from '../containers/Reading'
+import ReadingBeta from '../containers/ReadingBeta'
 
 class ReadingContainerComponent extends React.Component {
   constructor (props) {
@@ -33,7 +33,7 @@ class ReadingContainerComponent extends React.Component {
     try {
       this.refs.viewPager.setPageWithoutAnimation(page)
     } catch (err) {
-      console.log('error', err)
+      console.debug('[SET PAGE] Error', err)
     }
   }
 
@@ -64,7 +64,7 @@ class ReadingContainerComponent extends React.Component {
         {data.map((item, index) => {
           return (
             <View style={themedStyle.viewPagerItem} key={index}>
-              <Reading
+              <ReadingBeta
                 type={type}
                 noComment={page !== index}
                 noTransition={index !== inital}

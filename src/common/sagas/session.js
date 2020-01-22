@@ -23,10 +23,9 @@ function * onFetchSuccess ({ payload: { response, config } }) {
   // console.log('Fetch Success', config)
 }
 
-function * onFetchFailure ({ payload: { error, config } }) {
+function * onFetchFailure ({ payload: { error, config } }) { // eslint-disable-line
   yield ProgressBar.hide()
   // Notification.error(error.message)
-  console.log(error)
 }
 
 function * watchFetchStart () {

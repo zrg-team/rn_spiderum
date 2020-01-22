@@ -89,7 +89,6 @@ class BookmarkItemComponent extends React.Component {
               <Text
                 numberOfLines={2}
                 style={themedStyle.descriptionLabel}
-                category='h8'
               >
                 {article.decription}
               </Text>
@@ -120,7 +119,7 @@ export default withStyles(BookmarkItemComponent, (theme) => ({
   container: {
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme['background-basic-color-3'],
     marginTop: 5,
     marginHorizontal: 5,
     marginBottom: 5

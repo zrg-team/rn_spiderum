@@ -3,11 +3,15 @@ import PropTypes from 'prop-types'
 import {
   View,
   Animated,
-  ScrollView
+  Dimensions,
+  ScrollView,
+  StatusBar
 } from 'react-native'
 import { Transition } from 'react-navigation-fluid-transitions'
 import { SCREEN_HEIGHT, DEFAULT_WINDOW_MULTIPLIER } from './constants'
 import styles from './styles'
+
+const { width } = Dimensions.get('window')
 
 const ScrollViewPropTypes = ScrollView.propTypes
 
@@ -92,13 +96,119 @@ export default class ParallaxScrollView extends Component {
       return null
     }
 
+    const transform = [
+      {
+        translateX: scrollY.interpolate({
+          inputRange: [-windowHeight, 0, windowHeight],
+          outputRange: [windowHeight / 2, 0, -windowHeight / 3],
+          extrapolate: 'clamp'
+        })
+      }
+    ]
+
     const newNavBarHeight = navBarHeight || 60
     const newWindowHeight = windowHeight - newNavBarHeight
 
     return (
-      <View style={{ height: newWindowHeight, justifyContent: 'center', alignItems: 'center' }}>
-        {this.props.headerView && this.props.headerView(scrollY)}
-      </View>
+      <Animated.View
+        style={{
+          zIndex: 2,
+          height: newWindowHeight,
+          justifyContent: 'center',
+          alignItems: 'center',
+          transform
+        }}
+      />
+    )
+  }
+
+  renderScrollHeader () {
+    const { windowHeight, backgroundSource, headerView, scrollHeaderHeight } = this.props
+    const { scrollY } = this.state
+    if (!windowHeight || !backgroundSource || !headerView) {
+      return null
+    }
+
+    const transform = [
+      {
+        translateY: scrollY.interpolate({
+          inputRange: [-windowHeight, 0, windowHeight],
+          outputRange: [windowHeight / 2, 0, -windowHeight + scrollHeaderHeight - StatusBar.currentHeight],
+          extrapolate: 'clamp'
+        })
+      }
+    ]
+
+    const scale = scrollY.interpolate({
+      inputRange: [-windowHeight, 0, windowHeight],
+      outputRange: [1, 1, 0.8],
+      extrapolate: 'clamp'
+    })
+
+    const translateY = scrollY.interpolate({
+      inputRange: [0, windowHeight / 3, windowHeight * 0.8, windowHeight],
+      outputRange: [0, 0, 0, StatusBar.currentHeight],
+      extrapolate: 'clamp'
+    })
+
+    const smTranslateY = scrollY.interpolate({
+      inputRange: [0, windowHeight / 3, windowHeight * 0.8, windowHeight],
+      outputRange: [0, 0, 0, -15],
+      extrapolate: 'clamp'
+    })
+
+    const opacity = scrollY.interpolate({
+      inputRange: [-windowHeight, 0, windowHeight],
+      outputRange: [1, 1, 0],
+      extrapolate: 'clamp'
+    })
+
+    return (
+      <>
+        <Animated.View
+          style={[{
+            zIndex: 999,
+            height: windowHeight,
+            position: 'absolute',
+            transform
+          }]}
+        >
+          {headerView({
+            scale: { transform: [{ scale }] },
+            translateY: { transform: [{ translateY }] },
+            opacity: { opacity },
+            smTranslateY: { transform: [{ translateY: smTranslateY }] }
+          })}
+        </Animated.View>
+      </>
+    )
+  }
+
+  rendernavBar () {
+    const {
+      navBarView,
+      windowHeight,
+      backgroundSource,
+      navBarHeight
+    } = this.props
+    if (!windowHeight || !backgroundSource) {
+      return null
+    }
+
+    const newNavBarHeight = navBarHeight || 65
+
+    if (!navBarView) {
+      return null
+    }
+    return (
+      <Animated.View
+        style={{
+          height: newNavBarHeight,
+          width
+        }}
+      >
+        {navBarView({})}
+      </Animated.View>
     )
   }
 
@@ -108,7 +218,8 @@ export default class ParallaxScrollView extends Component {
     return (
       <View style={[styles.container, style]}>
         {this.renderBackground()}
-        <ScrollView
+        {this.renderScrollHeader()}
+        <Animated.ScrollView
           ref={component => {
             this._scrollView = component
           }}
@@ -116,14 +227,15 @@ export default class ParallaxScrollView extends Component {
           style={styles.scrollView}
           onScroll={Animated.event([
             { nativeEvent: { contentOffset: { y: this.state.scrollY } } }
-          ])}
+          ], { useNativeDriver: true })}
           scrollEventThrottle={16}
         >
+          {this.rendernavBar()}
           {this.renderHeaderView()}
           <View style={[styles.content, props.scrollableViewStyle]}>
             {this.props.children}
           </View>
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
     )
   }
@@ -132,8 +244,8 @@ export default class ParallaxScrollView extends Component {
 ParallaxScrollView.defaultProps = {
   backgroundSource: { uri: 'http://i.imgur.com/6Iej2c3.png' },
   windowHeight: SCREEN_HEIGHT * DEFAULT_WINDOW_MULTIPLIER,
-  leftIconOnPress: () => console.log('Left icon pressed'),
-  rightIconOnPress: () => console.log('Right icon pressed')
+  leftIconOnPress: () => console.debug('Left icon pressed'),
+  rightIconOnPress: () => console.debug('Right icon pressed')
 }
 
 ParallaxScrollView.propTypes = {

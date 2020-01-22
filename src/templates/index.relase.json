@@ -1,0 +1,30 @@
+{
+  "DEBUG": true,
+  "TIMEOUT": 15000,
+  "DEBUG_PAGE": true,
+  "LOG_LEVEL": "time",
+  "LOG_TERMINAL": false,
+  "DEFAULT_LANGUAGE": "en",
+  "STYLE_SHEET": {
+    "status_bar": {  "backgroundColor": "#024098" },
+    "bgPrimary": {},
+    "bgSecondary": {},
+    "carouselColor": {},
+    "txtPrimary" : {},
+    "txtSecondary" : {},
+    "h2": { "fontSize": 22, "fontWeight": "bold" },
+    "h3": { "fontSize": 20, "fontWeight": "bold" },
+    "h4": { "fontSize": 14 },
+    "gbMenu": {},
+    "activeMenu": {},
+    "bgHeader": {},
+    "txtHeader": {},
+    "btnPrimary": {},
+    "btnTxtPrimary": {},
+    "btnSecondary": {},
+    "btnTxtSecondary": {},
+    "btnDisable": {},
+    "bottom_bar_active_item": {}
+  },
+  "DEFAULT_HEADER_GRADIENT": ["#8DA0C8", "#024098"]
+}

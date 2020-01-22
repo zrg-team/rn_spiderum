@@ -17,11 +17,13 @@
     "please_wait": "Please wait.",
     "done": "Done",
     "update": "Update",
-    "hot_news": "Top News"
+    "hot_news": "Top News",
+    "search_result": "Result"
   },
   "messages": {
     "saved_news": "Saved.",
-    "removed_news": "Removed."
+    "removed_news": "Removed.",
+    "search_placeholder": "Search..."
   },
   "pages": {
     "hot": "Hot",
@@ -47,11 +49,19 @@
     "save_news": "Save",
     "share": "Share",
     "font_size": "Font size",
-    "close": "Close"
+    "close": "Close",
+    "remove": "Remove",
+    "open_source": "Source",
+    "swipe_to_read_more": "Swipe left or right to read more story ..."
   },
   "option": {
     "bookmark": "Bookmark",
     "about": "About",
-    "spiderum": "Spiderum"
+    "spiderum": "Spiderum",
+    "ui_normal_mode": "Light Mode",
+    "ui_dark_mode": "Dark Mode",
+    "version": "Version",
+    "build": "Build",
+    "debug": "Debug"
   }
 }

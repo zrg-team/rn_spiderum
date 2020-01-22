@@ -29,6 +29,7 @@ function createIconsMap () {
   return {
     home: IconProvider('home'),
     settings: IconProvider('settings'),
+    search: IconProvider('feature-search'),
     'arrow-left': IconProvider('arrow-left'),
     'alpha-t-box-outline': IconProvider('alpha-t-box-outline'),
     'alpha-n-box-outline': IconProvider('alpha-n-box-outline'),

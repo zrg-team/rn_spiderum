@@ -1,6 +1,8 @@
+import i18n from 'i18n-js'
 import React, { Component } from 'react'
 import { View } from 'react-native'
 import {
+  Button,
   withStyles
 } from 'react-native-ui-kitten'
 import {
@@ -10,7 +12,17 @@ import {
 class CommentListComponent extends Component {
   constructor (props) {
     super(props)
+    this.state = {
+      commentPage: 1,
+      loadingComment: true,
+      comments: []
+    }
     this.renderItem = this.renderItem.bind(this)
+    this.handleLoadMoreComments = this.handleLoadMoreComments.bind(this)
+    this.handleCommentsButtonPress = this.handleCommentsButtonPress.bind(this)
+  }
+
+  handleCommentsButtonPress () {
   }
 
   onItemMorePress (index) {
@@ -24,6 +36,56 @@ class CommentListComponent extends Component {
         data={item}
       />
     )
+  }
+
+  componentDidMount () {
+    setTimeout(() => {
+      const { noComment } = this.props
+      !noComment && this.getComments()
+    }, 300)
+  }
+
+  async getComments (page) {
+    const { article, getComments } = this.props
+    const { commentPage } = this.state
+    const next = page || commentPage
+    if (!article._id) {
+      return
+    }
+    const comments = await getComments(article._id, next)
+    if (comments) {
+      this.setState({
+        loadingComment: false,
+        commentPage: next,
+        comments: next === 1 ? comments : [...this.state.comments, ...comments]
+      })
+    }
+  }
+
+  shouldComponentUpdate (nextProps, nextStates) {
+    const { noComment } = this.props
+    const { loadingComment } = this.state
+    return noComment !== nextProps.noComment || loadingComment !== nextStates.loadingComment
+  }
+
+  handleLoadMoreComments () {
+    const { commentPage } = this.state
+    this.setState({
+      loadingComment: true
+    }, () => {
+      this.getComments(commentPage + 1)
+    })
+  }
+
+  componentWillReceiveProps (nextProps, nextState) {
+    const { noComment } = this.props
+    if (
+      noComment !== nextProps.noComment &&
+      !nextProps.noComment &&
+      (!nextState.comments || !nextState.comments.length)
+    ) {
+      this.getComments()
+    }
   }
 
   renderItem (item, index) {
@@ -48,15 +110,28 @@ class CommentListComponent extends Component {
   }
 
   render () {
-    const { data, themedStyle } = this.props
-
-    return (
-      <View style={themedStyle.container}>
-        {data && data.map((item, index) => {
+    const { comments = [], loadingComment } = this.state
+    const { themedStyle } = this.props
+    return [
+      <View key='comments' style={themedStyle.container}>
+        {comments && comments.map((item, index) => {
           return this.renderItem(item, index)
         })}
-      </View>
-    )
+      </View>,
+      comments && comments.length
+        ? (
+          <Button
+            key='commnet-load'
+            disabled={loadingComment}
+            onPress={this.handleLoadMoreComments}
+            style={themedStyle.button}
+            appearance='ghost'
+            status='info'
+          >
+            {i18n.t('reading.loading_more_comments')}
+          </Button>)
+        : null
+    ]
   }
 }
 
@@ -70,5 +145,11 @@ export const CommentList = withStyles(CommentListComponent, (theme) => ({
     paddingHorizontal: 16,
     paddingVertical: 10,
     backgroundColor: theme['border-basic-color-2']
+  },
+  button: {
+    marginTop: -5,
+    paddingTop: 26,
+    paddingBottom: 30,
+    backgroundColor: theme['border-basic-color-3']
   }
 }))

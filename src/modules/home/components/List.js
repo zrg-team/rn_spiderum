@@ -3,7 +3,6 @@ import {
   View
 } from 'react-native'
 import { List, withStyles } from 'react-native-ui-kitten'
-import * as Animatable from 'react-native-animatable'
 import { DefaultSkeleton } from '../../../libraries/components/Skeleton'
 import { navigationPush, screens } from '../../../common/utils/navigation'
 import NewsItem from './NewsItem'
@@ -39,14 +38,17 @@ class ListComponent extends Component {
   }
 
   componentDidMount () {
-    const { data } = this.props
-    this.getData(1)
-    if (data && data.length) {
+    const { data, lazy } = this.props
+    if (data && data.length && !lazy) {
       setTimeout(() => {
         this.setState({
           loading: false
+        }, () => {
+          this.getData(1)
         })
-      }, 1000)
+      }, 200)
+    } else {
+      this.getData(1)
     }
   }
 
@@ -62,7 +64,7 @@ class ListComponent extends Component {
 
   async getData (nextpage, callback) {
     const { page } = this.state
-    const { getNews, type, data } = this.props
+    const { getNews, type, data, onLoadingDone } = this.props
     const result = await getNews(nextpage || page, type)
     if (result || data.length) {
       this.showAnimationNewItem = 10
@@ -71,6 +73,7 @@ class ListComponent extends Component {
         loading: false
       }, () => {
         callback && callback(nextpage || page)
+        onLoadingDone && onLoadingDone()
       })
     }
   }
@@ -85,8 +88,9 @@ class ListComponent extends Component {
     this.showAnimationNewItem -= 1
     return (
       <NewsItem
+        key={item._id}
         itemIndex={index}
-        animationDeplay={(10 - this.showAnimationNewItem) * 140}
+        animationDeplay={(10 - this.showAnimationNewItem) * 240}
         shouldHaveAnimation={shouldHaveAnimation}
         style={themedStyle.item}
         onPress={this.handleReading}
@@ -139,17 +143,15 @@ class ListComponent extends Component {
     const { themedStyle } = this.props
     const { loading } = this.state
     return (
-      <Animatable.View
-        delay={100}
-        useNativeDriver
-        animation='slideInUp'
+      <View
         style={themedStyle.container}
       >
         <View style={themedStyle.listHistory}>
           {!loading
             ? this.renderContent()
             : (
-              <View style={{ paddingHorizontal: 20 }}>
+              <View style={themedStyle.loadingContainer}>
+                <DefaultSkeleton />
                 <DefaultSkeleton />
                 <DefaultSkeleton />
                 <DefaultSkeleton />
@@ -162,7 +164,7 @@ class ListComponent extends Component {
               </View>
             )}
         </View>
-      </Animatable.View>
+      </View>
     )
   }
 }
@@ -172,7 +174,8 @@ export default withStyles(ListComponent, (theme) => ({
     flex: 1
   },
   scroll: {
-    paddingBotton: 20
+    paddingBotton: 20,
+    backgroundColor: theme['background-basic-color-1']
   },
   listHistory: {
     flex: 1
@@ -186,5 +189,12 @@ export default withStyles(ListComponent, (theme) => ({
   },
   sliderContentContainer: {
     paddingVertical: 10 // for custom animation
+  },
+  contentContainer: {
+    backgroundColor: theme['background-basic-color-1']
+  },
+  loadingContainer: {
+    paddingHorizontal: 20,
+    backgroundColor: theme['background-basic-color-1']
   }
 }))

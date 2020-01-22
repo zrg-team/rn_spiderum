@@ -26,7 +26,7 @@ public class MainActivity extends ReactActivity {
           SplashScreen.show(currentActivity);
         }
       },
-      500
+      1200
     );
   }
 }

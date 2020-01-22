@@ -77,6 +77,9 @@ export const CommentListItem = withStyles(CommentListItemComponent, (theme) => (
     borderRadius: 10,
     backgroundColor: theme['background-basic-color-1']
   },
+  activityContainer: {
+    backgroundColor: theme['background-basic-color-2']
+  },
   authorContainer: {
     flexDirection: 'row',
     alignItems: 'center'
