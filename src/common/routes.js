@@ -52,7 +52,8 @@ const transitionConfig = {
 export default ({
   persistor = undefined,
   dispatch = null,
-  appIntro
+  appIntro,
+  themedStyle
 }) => {
   const OptionFlow = createStackNavigator({
     [SCREENS.OptionList]: { screen: OptionPage },
@@ -147,7 +148,7 @@ export default ({
         return (
           <BottomTabBar
             {...props}
-            style={[{ borderTopColor: 'transparent' }, commonStyle.shadow]}
+            style={[themedStyle.barStyle, { borderTopColor: 'transparent' }, commonStyle.shadow]}
           />
         )
       },
@@ -156,7 +157,7 @@ export default ({
       },
       tabBarIcon: ({ focused }) => {
         const { routeName } = navigation.state
-        return <TabarItem key={routeName} focused={focused} navigation={navigation} />
+        return <TabarItem key={routeName} focused={focused} navigation={navigation} style={themedStyle.tabBarStyle} />
       }
     }),
     labeled: false,
@@ -165,7 +166,7 @@ export default ({
     initialRouteName: SCREENS.Home,
     backBehavior: 'none',
     shifting: true,
-    barStyle: commonStyle.gbMenu,
+    barStyle: themedStyle.barStyle,
     activeColor: commonStyle.activeMenu.color
   })
 

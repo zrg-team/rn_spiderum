@@ -77,10 +77,10 @@ export default withStyles(CategoryItemComponent, (theme) => ({
     top: 10,
     left: 10,
     maxWidth: '80%',
-    color: 'white',
+    color: '#FFFFFF',
     ...textStyle.headline
   },
   activityBarLabel: {
-    color: 'white'
+    color: theme['text-basic-color']
   }
 }))

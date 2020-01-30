@@ -10,6 +10,9 @@ import {
   BackHandler,
   SafeAreaView
 } from 'react-native'
+import {
+  withStyles
+} from 'react-native-ui-kitten'
 import commonStyle, { appHeight } from '../../styles/common'
 import Modal from '../components/Widgets/Modal'
 import ProgressBar from '../components/Widgets/ProgressBar'
@@ -39,7 +42,7 @@ function getActiveRouteName (navigationState) {
 }
 
 let LazyComponent = null
-export default class MainPage extends Component {
+class MainPage extends Component {
   constructor (props) {
     super(props)
     this.network = false
@@ -78,12 +81,13 @@ export default class MainPage extends Component {
     if (`${appIntro}_${language}` === this.unique) {
       return this.AppNavigator
     }
-    const { persistor, dispatch } = this.props
+    const { persistor, dispatch, themedStyle } = this.props
     this.AppNavigator = LazyComponent({
       persistor,
       dispatch,
       appIntro,
-      setTopLevelNavigator
+      setTopLevelNavigator,
+      themedStyle
     })
     this.unique = `${appIntro}_${language}`
     return this.AppNavigator
@@ -141,14 +145,15 @@ export default class MainPage extends Component {
 
   initial () {
     LazyComponent = require('../routes').default
-    const { persistor, dispatch, appIntro, language } = this.props
+    const { persistor, dispatch, appIntro, language, themedStyle } = this.props
     // TODO: Loading page
     this.unique = `${appIntro}_${language}`
     this.AppNavigator = LazyComponent({
       persistor,
       dispatch,
       appIntro,
-      setTopLevelNavigator
+      setTopLevelNavigator,
+      themedStyle
     })
     splashScreen.hide()
     ProgressBar.hide()
@@ -159,7 +164,7 @@ export default class MainPage extends Component {
   }
 
   render () {
-    const { appIntro, language } = this.props
+    const { appIntro, language, themedStyle } = this.props
     const { loading } = this.state
     const AppNavigator = this.getNavigator(appIntro, language)
     return (
@@ -178,7 +183,9 @@ export default class MainPage extends Component {
                 marginTop: 0
               }
             }),
-            commonStyle.backgroundColor
+            !loading
+              ? themedStyle.backgroundColor
+              : themedStyle.backgroundTransparent
           ]}
         >
           <AppNavigator
@@ -200,3 +207,18 @@ export default class MainPage extends Component {
     )
   }
 }
+
+export default withStyles(MainPage, (theme) => ({
+  tabBarStyle: {
+    color: theme['text-basic-color']
+  },
+  barStyle: {
+    backgroundColor: theme['background-basic-color-4']
+  },
+  backgroundColor: {
+    backgroundColor: theme['background-basic-color-3']
+  },
+  backgroundTransparent: {
+    backgroundColor: 'transparent'
+  }
+}))

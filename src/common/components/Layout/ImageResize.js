@@ -21,6 +21,11 @@ class ImageResizeComponent extends React.Component {
     }
   }
 
+  shouldComponentUpdate (nextProps, nextState) {
+    const { loading } = this.state
+    return !nextState.loading && nextState.loading !== loading
+  }
+
   componentDidMount () {
     const { imageSize } = this.state
     const { uri, onImageLoaded } = this.props
@@ -33,7 +38,7 @@ class ImageResizeComponent extends React.Component {
       const result = {}
       const ratio = itemWidth / itemHeight
       result.width = (width - 20)
-      result.height = result.width / ratio
+      result.height = Math.round(result.width / ratio)
       this.setState({
         ...result,
         loading: false
@@ -59,8 +64,8 @@ class ImageResizeComponent extends React.Component {
     return (
       <FastImage
         style={[style, imageSize || { width, height }]}
-        resizeMode={FastImage.resizeMode.contain}
         source={{ uri }}
+        resizeMode={FastImage.resizeMode.stretch}
       />
     )
   }

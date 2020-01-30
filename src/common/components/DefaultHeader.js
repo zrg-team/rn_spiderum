@@ -1,11 +1,8 @@
 import React, { PureComponent } from 'react'
 // import i18n from 'i18n-js'
 import {
-  Platform,
-  StyleSheet
-} from 'react-native'
-import {
   Icon,
+  withStyles,
   TopNavigation,
   TopNavigationAction
 } from 'react-native-ui-kitten'
@@ -13,10 +10,9 @@ import LinearGradient from 'react-native-linear-gradient'
 // import * as Animatable from 'react-native-animatable'
 import commonStyles, { HEADER_GRADIENT } from '../../styles/common'
 import { navigationPop, navigationPopToTop } from '../utils/navigation'
-import { isIphoneX } from '../../libraries/iphonex'
 import NotificationPanel from '../components/Widgets/NotificationPanel'
 
-export default class DefaultHeader extends PureComponent {
+class DefaultHeader extends PureComponent {
   constructor (props) {
     super(props)
     this.handleBack = this.handleBack.bind(this)
@@ -92,7 +88,8 @@ export default class DefaultHeader extends PureComponent {
 
   render () {
     const {
-      title = ''
+      title = '',
+      themedStyle
       // leftTitle = ''
     } = this.props
     return (
@@ -101,13 +98,13 @@ export default class DefaultHeader extends PureComponent {
         end={{ x: 1, y: 0 }}
         colors={HEADER_GRADIENT}
         // locations={[0.1, 0.6, 1]}
-        style={[styles.linearGradient, commonStyles.shadow]}
+        style={[themedStyle.linearGradient, commonStyles.shadow]}
       >
         <TopNavigation
           title={title}
           alignment='center'
           titleStyle={{}}
-          style={[commonStyles.shadow]}
+          style={[themedStyle.header, commonStyles.shadow]}
           leftControl={this.renderLeftComponent()}
           rightControls={this.renderRightComponent()}
         />
@@ -116,51 +113,9 @@ export default class DefaultHeader extends PureComponent {
   }
 }
 
-const checkHeaderPaddingTop = () => {
-  if (isIphoneX()) {
-    return 20
-  }
-  if (Platform.OS === 'ios') {
-    return 0
-  }
-  return 0
-}
-
-const styles = StyleSheet.create({
-  wrapperContainer: {
-    width: '100%',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-    paddingTop: checkHeaderPaddingTop()
-  },
-  rowInLine: {
-    zIndex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'transparent'
-  },
-  txtHeader: {
-    position: 'absolute',
-    zIndex: 1,
-    color: '#fff',
-    fontSize: 17,
-    fontWeight: '600',
-    textAlign: 'center',
-    width: '100%'
-  },
-  posArrow: {
-    left: 0,
-    paddingLeft: 10
-  },
-  iconArrowLeft: {
-    color: '#fff',
-    fontSize: 30,
-    paddingRight: 32
-  },
-  txtMore: {
-    color: '#fff',
-    fontSize: 17
+export default withStyles(DefaultHeader, (theme) => ({
+  header: {
+    backgroundColor: theme['background-basic-color-4']
   },
   notification: {
     zIndex: 99,
@@ -172,4 +127,4 @@ const styles = StyleSheet.create({
     // justifyContent: 'flex-end',
     alignItems: 'flex-end'
   }
-})
+}))

@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/AntDesign'
 import commonStyles from '../../styles/common'
 
 const TABS = ['Home', 'HotList', 'News', 'NewsList', 'Top', 'TopList', 'Category', 'Categories', 'Option', 'OptionList']
-export default memo(({ focused, navigation, previousPage }) => {
+export default memo(({ style, focused, navigation, previousPage }) => {
   const { routeName } = navigation.state
   let source
   const render = []
@@ -69,6 +69,7 @@ export default memo(({ focused, navigation, previousPage }) => {
     render.push(
       <Icon
         key='icon'
+        style={style}
         name={source}
         size={22}
       />

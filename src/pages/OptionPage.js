@@ -5,7 +5,7 @@ import DefaultHeader from '../common/containers/DefaultHeader'
 import { Layout } from 'react-native-ui-kitten'
 import { navigate, screens } from '../common/utils/navigation'
 import Carousel from '../modules/user/containers/Carousel'
-import Option from '../modules/user/components/Option'
+import Options from '../modules/user/containers/Options'
 
 export default class OptionPage extends Component {
   render () {
@@ -26,7 +26,7 @@ export default class OptionPage extends Component {
           style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         >
           <Carousel />
-          <Option />
+          <Options navigation={navigation} />
         </Layout>
       </DefaultPage>
     )

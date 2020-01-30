@@ -4,7 +4,7 @@ import {
 } from 'react-native'
 import { withStyles } from 'react-native-ui-kitten'
 import Carousel from 'react-native-snap-carousel'
-// import { navigationPush, screens } from '../../../common/utils/navigation'
+import { navigationPush, screens } from '../../../common/utils/navigation'
 import SliderEntry, { sliderWidth, itemWidth } from './CarouselItem'
 
 class CarouselComponent extends Component {
@@ -18,6 +18,12 @@ class CarouselComponent extends Component {
     }
 
     this.renderItem = this.renderItem.bind(this)
+    this.handlePressItem = this.handlePressItem.bind(this)
+  }
+
+  handlePressItem (item) {
+    const { navigation } = this.props
+    navigationPush(navigation, screens().Reading, { article: item })
   }
 
   renderItem ({ item, index }, parallaxProps) {
@@ -27,6 +33,7 @@ class CarouselComponent extends Component {
         even={(index + 1) % 2 === 0}
         parallax
         parallaxProps={parallaxProps}
+        onPress={this.handlePressItem}
       />
     )
   }

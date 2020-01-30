@@ -57,6 +57,7 @@ class ReadingBetaComponent extends React.Component {
     this.handleShare = this.handleShare.bind(this)
     this.handleSave = this.handleSave.bind(this)
     this.handlePressLink = this.handlePressLink.bind(this)
+    this.handleOpenSource = this.handleOpenSource.bind(this)
     this.handleImageLoaded = this.handleImageLoaded.bind(this)
 
     this.createTagStyles()
@@ -65,17 +66,22 @@ class ReadingBetaComponent extends React.Component {
       blockquote: (item, children, css, passProps) => {
         const { themedStyle } = passProps
         return (
-          <View
-            style={themedStyle.blockquote}
-          >
+          <>
+            <View
+              style={themedStyle.blockquoteStart}
+            />
             {children}
-          </View>
+            <View
+              style={themedStyle.blockquoteEnd}
+            />
+          </>
         )
       },
       img: (item, children, css, passProps) => {
         const { themedStyle, imagesSize = {} } = passProps
         return (
           <ImageResize
+            key={item.src}
             uri={item.src}
             style={themedStyle.imageContent}
             imagesSize={imagesSize[item.src]}
@@ -105,20 +111,20 @@ class ReadingBetaComponent extends React.Component {
   }
 
   createTagStyles (nextProps) {
-    const { fontSize } = nextProps || this.props
+    const { fontSize, themedStyle } = nextProps || this.props
     if (nextProps && nextProps.fontSize === this.props.fontSize) {
       return
     }
     this.tagsStyles = {
-      div: { paddingVertical: 5, fontSize: fontSize },
-      a: { paddingVertical: 5, fontSize: fontSize },
-      p: { paddingVertical: 5, fontSize: fontSize },
-      h1: { paddingVertical: 5, fontSize: fontSize * 1.73 },
-      h2: { paddingVertical: 5, fontSize: fontSize * 1.58 },
-      h3: { paddingVertical: 5, fontSize: fontSize * 1.44 },
-      h4: { paddingVertical: 5, fontSize: fontSize * 1.3 },
-      h5: { paddingVertical: 5, fontSize: fontSize * 1.15 },
-      pre: { paddingVertical: 5, fontSize: fontSize }
+      div: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
+      a: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
+      p: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
+      h1: { paddingVertical: 5, fontSize: fontSize * 1.73, ...themedStyle.textColor },
+      h2: { paddingVertical: 5, fontSize: fontSize * 1.58, ...themedStyle.textColor },
+      h3: { paddingVertical: 5, fontSize: fontSize * 1.44, ...themedStyle.textColor },
+      h4: { paddingVertical: 5, fontSize: fontSize * 1.3, ...themedStyle.textColor },
+      h5: { paddingVertical: 5, fontSize: fontSize * 1.15, ...themedStyle.textColor },
+      pre: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor }
     }
 
     this.setState({
@@ -135,6 +141,14 @@ class ReadingBetaComponent extends React.Component {
   handlePressLink (e, href) {
     Linking
       .openURL(href)
+      .catch(() => {})
+  }
+
+  handleOpenSource () {
+    const { article } = this.props
+
+    Linking
+      .openURL(article.key)
       .catch(() => {})
   }
 
@@ -282,9 +296,12 @@ class ReadingBetaComponent extends React.Component {
 
     return (
       <ActionButton fixNativeFeedbackRadius key='1' buttonColor='rgba(231,76,60,1)'>
+        <ActionButton.Item key='2' buttonColor='#3498db' title={i18n.t('reading.open_source')} onPress={this.handleOpenSource}>
+          <Icon name='globe' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+        </ActionButton.Item>
         {type === 'bookmark'
           ? (
-            <ActionButton.Item key='1' buttonColor='#9b59b6' title={i18n.t('reading.close')} onPress={this.handleRemove}>
+            <ActionButton.Item key='1' buttonColor='#9b59b6' title={i18n.t('reading.remove')} onPress={this.handleRemove}>
               <Icon name='close' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
             </ActionButton.Item>
           ) : (
@@ -314,7 +331,14 @@ class ReadingBetaComponent extends React.Component {
     const { imagesSize, data, loadingComment, comments, loading } = this.state
     const imageSource = article.og_image_url ? { uri: article.og_image_url } : commonImages.default_image
     const readingTime = moment.duration(article.reading_time, 'seconds').minutes()
-
+    if (!loading && !data) {
+      return (
+        <WebView
+          source={{ uri: article.key }}
+          style={{ alignSelf: 'stretch', height, width }}
+        />
+      )
+    }
     return [
       <ParallaxScrollView
         key='0'
@@ -383,7 +407,7 @@ class ReadingBetaComponent extends React.Component {
           loading
             ? <ContentSkeleton />
             : (
-              <View style={{ paddingHorizontal: 10 }}>
+              <View style={themedStyle.htmlContainer}>
                 <Html
                   tagsStyles={this.tagsStyles}
                   html={data}
@@ -397,6 +421,8 @@ class ReadingBetaComponent extends React.Component {
               </View>
             )
         }
+        <View style={themedStyle.endingBlock} />
+        <Text style={themedStyle.readMoreText} category='h6'>{i18n.t('reading.swipe_to_read_more')}</Text>
         <ArticleActivityBar
           style={themedStyle.detailsContainer}
           comments={article.comment_count}
@@ -443,8 +469,15 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
   badge: {
     backgroundColor: theme['color-info-default']
   },
+  textColor: {
+    color: theme['text-basic-color']
+  },
   content: {
-    paddingTop: 60
+    paddingTop: 60,
+    backgroundColor: theme['background-basic-color-2']
+  },
+  htmlContainer: {
+    paddingHorizontal: 10
   },
   detailsContainer: {
     paddingHorizontal: 24,
@@ -474,14 +507,14 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
     zIndex: 999,
     borderWidth: 2,
     borderRadius: 100,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme['background-basic-color-2'],
     borderColor: theme['border-basic-color-2']
   },
   authorBar: {
     width: width - 74,
     left: 80,
     zIndex: 999,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme['background-basic-color-2'],
     position: 'absolute',
     top: 10
   },
@@ -544,10 +577,22 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
     marginHorizontal: 10,
     textDecorationLine: 'underline'
   },
-  blockquote: {
-    backgroundColor: '#f2f2f2',
-    borderLeftWidth: 4,
-    borderLeftColor: '#0099DF',
-    padding: 10
+  blockquoteStart: {
+    backgroundColor: theme['color-primary-500'],
+    height: 5
+  },
+  blockquoteEnd: {
+    backgroundColor: theme['color-primary-500'],
+    height: 5
+  },
+  endingBlock: {
+    backgroundColor: theme['color-success-500'],
+    height: 3
+  },
+  readMoreText: {
+    textAlign: 'center',
+    color: theme['color-primary-500'],
+    textDecorationLine: 'underline',
+    paddingVertical: 10
   }
 }))

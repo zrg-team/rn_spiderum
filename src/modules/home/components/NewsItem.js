@@ -137,9 +137,9 @@ export default withStyles(NewsItemComponent, (theme) => ({
   container: {
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
-    marginTop: 5,
-    marginHorizontal: 5
+    backgroundColor: theme['border-basic-color-3'],
+    marginTop: 8,
+    marginHorizontal: 8
   },
   badgeContainer: {
     marginRight: 5,
@@ -154,7 +154,7 @@ export default withStyles(NewsItemComponent, (theme) => ({
     paddingHorizontal: 16,
     paddingTop: 5,
     borderBottomWidth: 1,
-    borderBottomColor: theme['border-basic-color-2']
+    borderBottomColor: theme['border-basic-color-4']
   },
   tagContainer: {
     width: '100%',

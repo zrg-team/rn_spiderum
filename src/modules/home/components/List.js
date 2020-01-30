@@ -46,7 +46,7 @@ class ListComponent extends Component {
         this.setState({
           loading: false
         })
-      }, 440)
+      }, 200)
     }
   }
 
@@ -150,7 +150,7 @@ class ListComponent extends Component {
           {!loading
             ? this.renderContent()
             : (
-              <View style={{ paddingHorizontal: 20 }}>
+              <View style={themedStyle.loadingContainer}>
                 <DefaultSkeleton />
                 <DefaultSkeleton />
                 <DefaultSkeleton />
@@ -173,7 +173,8 @@ export default withStyles(ListComponent, (theme) => ({
     flex: 1
   },
   scroll: {
-    paddingBotton: 20
+    paddingBotton: 20,
+    backgroundColor: theme['background-basic-color-1']
   },
   listHistory: {
     flex: 1
@@ -187,5 +188,12 @@ export default withStyles(ListComponent, (theme) => ({
   },
   sliderContentContainer: {
     paddingVertical: 10 // for custom animation
+  },
+  contentContainer: {
+    backgroundColor: theme['background-basic-color-1']
+  },
+  loadingContainer: {
+    paddingHorizontal: 20,
+    backgroundColor: theme['background-basic-color-1']
   }
 }))

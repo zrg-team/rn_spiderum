@@ -6,37 +6,27 @@
 
 import React, { Component, memo } from 'react'
 import {
-  StyleSheet,
   View,
   ScrollView
 } from 'react-native'
+import { withStyles } from 'react-native-ui-kitten'
 import Markdown from 'react-native-markdown-renderer'
 import { DEFAULT_TERM } from '../../../assets/text/information'
 import { ContentSkeleton } from '../../../libraries/components/Skeleton'
 import commonStyles from '../../../styles/common'
 
-const MarkdownComponent = memo(({ source }) => {
+const MarkdownComponent = memo(({ themedStyle, source }) => {
   return (
-    <ScrollView style={styles.scroll}>
+    <ScrollView style={themedStyle.scroll}>
       <Markdown
-        style={styles}
-        markdownStyles={{
-          heading: commonStyles.txt_primary,
-          heading1: commonStyles.h2,
-          heading2: commonStyles.h3,
-          heading3: commonStyles.h4,
-          heading4: commonStyles.h5,
-          heading5: commonStyles.h6,
-          list_itemBullet: commonStyles.txt_primary,
-          list_item: commonStyles.txt_primary
-        }}
+        style={themedStyle}
       >
         {source}
       </Markdown>
     </ScrollView>
   )
 })
-export default class TermsAndConditions extends Component {
+class TermsAndConditionsComponent extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -56,26 +46,23 @@ export default class TermsAndConditions extends Component {
   }
 
   render () {
+    const { themedStyle } = this.props
     const { term, loading } = this.state
     return (
-      <View style={styles.content}>
-        <View style={styles.terms_conditions_content}>
+      <View style={themedStyle.content}>
+        <View style={themedStyle.terms_conditions_content}>
           {loading
             ? (
-              <View style={styles.loading_container}>
+              <View style={themedStyle.loading_container}>
                 <ContentSkeleton />
-              </View>) : (<MarkdownComponent source={term} />)}
+              </View>) : (<MarkdownComponent themedStyle={themedStyle} source={term} />)}
         </View>
       </View>
     )
   }
 }
 
-const styles = StyleSheet.create({
-  list_item: {
-    flex: 1,
-    flexWrap: 'wrap'
-  },
+export default withStyles(TermsAndConditionsComponent, (theme) => ({
   terms_conditions_content: {
     flex: 9,
     marginTop: 0,
@@ -84,7 +71,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 0,
     borderWidth: 0,
-    borderColor: 'rgba(232,236,240,1)',
+    borderColor: theme['border-basic-color-1'],
     overflow: 'hidden'
   },
   scroll: {
@@ -92,33 +79,20 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     paddingTop: 24
   },
-  txt_normal: {
-    color: 'rgba(46,62,69,1)',
-    lineHeight: 22,
-    fontSize: 15
-  },
-  txt_organ: {
-    textAlign: 'center',
-    fontWeight: 'bold',
-    lineHeight: 19,
-    color: 'rgba(241,134,0,1)'
-  },
-  view_text: {
-    flex: 1,
-    marginHorizontal: 30,
-    marginBottom: 20
-  },
   content: {
     flex: 1
-  },
-  footer: {
-    height: 30,
-    marginBottom: 30,
-    marginLeft: 30,
-    marginRight: 30
   },
   loading_container: {
     margin: 24,
     overflow: 'hidden'
-  }
-})
+  },
+  text: { color: theme['text-basic-color'] },
+  heading: { color: theme['text-basic-color'], ...commonStyles.txt_primary },
+  heading1: { color: theme['text-basic-color'], ...commonStyles.h2 },
+  heading2: { color: theme['text-basic-color'], ...commonStyles.h3 },
+  heading3: { color: theme['text-basic-color'], ...commonStyles.h4 },
+  heading4: { color: theme['text-basic-color'], ...commonStyles.h5 },
+  heading5: { color: theme['text-basic-color'], ...commonStyles.h6 },
+  list_itemBullet: { color: theme['text-basic-color'], ...commonStyles.txt_primary },
+  list_item: { color: theme['text-basic-color'], ...commonStyles.txt_primary }
+}))

@@ -5,6 +5,10 @@ import { images } from '../../../assets/elements'
 const { width: viewportWidth } = Dimensions.get('window')
 
 export default class SliderEntry extends Component {
+  shouldComponentUpdate () {
+    return false
+  }
+
   get image () {
     const { data: { og_image_url: ogImageUrl }, parallax, parallaxProps, even } = this.props
 
@@ -27,7 +31,8 @@ export default class SliderEntry extends Component {
   }
 
   render () {
-    const { data: { title, body }, even } = this.props
+    const { data, even, onPress } = this.props
+    const { title, body } = data
 
     const uppercaseTitle = title ? (
       <Text
@@ -41,6 +46,7 @@ export default class SliderEntry extends Component {
     return (
       <TouchableOpacity
         activeOpacity={1}
+        onPress={() => onPress(data)}
         style={styles.slideInnerContainer}
       >
         <View style={styles.shadow} />

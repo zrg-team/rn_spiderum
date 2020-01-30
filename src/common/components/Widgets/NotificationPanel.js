@@ -9,13 +9,15 @@ import {
   Dimensions,
   SafeAreaView,
   View,
-  StyleSheet,
   Animated,
   Image,
   StatusBar,
   findNodeHandle,
   TouchableOpacity
 } from 'react-native'
+import {
+  withStyles
+} from 'react-native-ui-kitten'
 import { connect } from 'react-redux'
 import FastImage from 'react-native-fast-image'
 import { BlurView } from '@react-native-community/blur'
@@ -127,7 +129,7 @@ class NotificationPanelComponent extends Component {
   }
 
   renderItem ({ item }) {
-    const { notificationTime } = this.props
+    const { themedStyle, notificationTime } = this.props
     let containerStyle = {}
     let textStyle = {}
     const isNews = +item.time > +notificationTime
@@ -144,22 +146,22 @@ class NotificationPanelComponent extends Component {
     return (
       <TouchableOpacity
         onPress={() => this.handlePressNew(item)}
-        style={[styles.item, containerStyle]}
+        style={[themedStyle.item, containerStyle]}
       >
-        <View style={styles.itemImage}>
+        <View style={themedStyle.itemImage}>
           <FastImage
             style={{ width: 60, height: 60 }}
             resizeMode={FastImage.resizeMode.cover}
             source={item.og_image_url ? { uri: item.og_image_url } : images.default_image}
           />
         </View>
-        <View style={styles.itemContent}>
+        <View style={themedStyle.itemContent}>
           <Text
-            style={[styles.itemMessage, textStyle]}
+            style={[themedStyle.itemMessage, textStyle]}
           >{item.title}
           </Text>
           <Text
-            style={styles.itemTime}
+            style={themedStyle.itemTime}
           >
             {`${moment(item.created_at).fromNow()} . ${readingTime} phút đọc`}
           </Text>
@@ -207,10 +209,10 @@ class NotificationPanelComponent extends Component {
   }
 
   renderBackground () {
-    const { appState } = this.props
+    const { themedStyle, appState } = this.props
     if (this.blurNode && appState === 'active') {
       return (
-        <TouchableOpacity onPress={this.handleHide} style={styles.overlay}>
+        <TouchableOpacity onPress={this.handleHide} style={themedStyle.overlay}>
           <BlurView
             viewRef={this.blurNode}
             blurType='dark'
@@ -220,36 +222,36 @@ class NotificationPanelComponent extends Component {
         </TouchableOpacity>
       )
     }
-    return <TouchableOpacity onPress={this.handleHide} style={styles.overlay_background} />
+    return <TouchableOpacity onPress={this.handleHide} style={themedStyle.overlay_background} />
   }
 
   render () {
-    const { notificationTime, notificationLatest, notifications } = this.props
+    const { themedStyle, notificationTime, notificationLatest, notifications } = this.props
     const { isShow } = this.state
     if (!isShow) {
       return null
     }
     const animationStyles = this.getAnimationStyle()
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={themedStyle.container}>
         {this.renderBackground()}
         <View
-          style={styles.overlayIcon}
+          style={themedStyle.overlayIcon}
         >
-          <MaterialCommunityIcons onPress={this.handleHide} name='book-open-variant' color='#000' size={29} />
+          <MaterialCommunityIcons onPress={this.handleHide} name='book-open-variant' color='#FFFFFF' size={29} />
           {+notificationLatest > +notificationTime
-            ? <View style={styles.notification} /> : null}
+            ? <View style={themedStyle.notification} /> : null}
         </View>
         <Animated.View
-          style={[styles.image, animationStyles.image]}
+          style={[themedStyle.image, animationStyles.image]}
         />
         <Animated.View
-          style={[styles.list, animationStyles.container, commonStyles.shadow]}
+          style={[themedStyle.list, animationStyles.container, commonStyles.shadow]}
         >
-          <View style={styles.titleContainer}>
+          <View style={themedStyle.titleContainer}>
             <AntDesignIcons name='solution1' size={22} />
             <Text
-              style={[styles.notificationTitle]}
+              style={[themedStyle.notificationTitle]}
             >
               {i18n.t('common.hot_news')}
             </Text>
@@ -264,7 +266,7 @@ class NotificationPanelComponent extends Component {
                   width: '100%',
                   height: undefined
                 }}
-                contentContainerStyle={styles.list_content}
+                contentContainerStyle={themedStyle.list_content}
               />)
             : (
               <View
@@ -277,7 +279,7 @@ class NotificationPanelComponent extends Component {
     )
   }
 }
-const styles = StyleSheet.create({
+const styles = (theme) => ({
   container: {
     flex: 1,
     position: 'absolute',
@@ -291,12 +293,12 @@ const styles = StyleSheet.create({
     fontSize: 15
   },
   notificationTitle: {
-    color: '#35474E',
+    color: theme['text-basic-color'],
     fontSize: 18,
     paddingLeft: 10
   },
   itemMessage: {
-    color: '#35474E',
+    color: theme['text-basic-color'],
     fontSize: 14
   },
   titleContainer: {
@@ -337,7 +339,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     position: 'absolute',
     zIndex: 9999,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme['background-basic-color-1'],
     borderRadius: 3,
     paddingVertical: 10,
     maxHeight: appHeight - 120,
@@ -358,7 +360,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderBottomColor: '#FFFFFF',
+    borderBottomColor: theme['background-basic-color-1'],
     marginTop: StatusBar.currentHeight
   },
   list_content: {
@@ -382,7 +384,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  no_notification_text: { color: '#35474E', fontSize: 18, marginTop: 10 },
+  no_notification_text: { color: theme['text-basic-color'], fontSize: 18, marginTop: 10 },
   overlay: {
     position: 'absolute',
     width: '100%',
@@ -406,8 +408,10 @@ function mapStateToProps (state) {
 }
 
 export default {
-  Component: connect(mapStateToProps, {
-  })(NotificationPanelComponent),
+  Component: connect(
+    mapStateToProps,
+    {}
+  )(withStyles(NotificationPanelComponent, styles)),
   show: () => {
     if (instance) {
       instance.show()

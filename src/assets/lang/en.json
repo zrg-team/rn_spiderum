@@ -47,11 +47,16 @@
     "save_news": "Save",
     "share": "Share",
     "font_size": "Font size",
-    "close": "Close"
+    "close": "Close",
+    "remove": "Remove",
+    "open_source": "Source",
+    "swipe_to_read_more": "Swipe left or righ to read more"
   },
   "option": {
     "bookmark": "Bookmark",
     "about": "About",
-    "spiderum": "Spiderum"
+    "spiderum": "Spiderum",
+    "ui_normal_mode": "Light Mode",
+    "ui_dark_mode": "Dark Mode"
   }
 }

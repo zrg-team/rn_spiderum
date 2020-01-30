@@ -26,8 +26,12 @@ class OptionsComponent extends Component {
   }
 
   onPressOption (option) {
-    const { navigation } = this.props
+    const { navigation, toggleUIMode } = this.props
+    console.log('toggleUIMode', toggleUIMode, option)
     switch (option) {
+      case 'UIMode':
+        toggleUIMode()
+        break
       case 'bookmark':
         navigationPush(navigation, screens().Bookmark)
         break
@@ -42,7 +46,7 @@ class OptionsComponent extends Component {
   }
 
   renderItemOption (option) {
-    const { themedStyle } = this.props
+    const { themedStyle, darkMode } = this.props
     let textOpt = ''
     let showArrow = ''
     let icon = ''
@@ -63,6 +67,12 @@ class OptionsComponent extends Component {
         showArrow = true
         special = true
         icon = 'Trophy'
+        break
+      case 'UIMode':
+        textOpt = darkMode ? i18n.t('option.ui_normal_mode') : i18n.t('option.ui_dark_mode')
+        showArrow = true
+        icon = 'mobile1'
+        break
     }
 
     return (
@@ -75,7 +85,6 @@ class OptionsComponent extends Component {
           <Icon
             style={themedStyle.styleIcon}
             name={icon}
-            color='#35474E'
             size={22}
           />
           <Text h={5} style={[themedStyle.textOption, special ? themedStyle.textSpecial : {}]}>
@@ -85,7 +94,6 @@ class OptionsComponent extends Component {
             <Icon
               style={themedStyle.styleIcon}
               name='right'
-              color='#35474E'
               size={18}
             />
           )}
@@ -99,6 +107,7 @@ class OptionsComponent extends Component {
     return (
       <View style={themedStyle.container}>
         {this.renderItemOption('bookmark')}
+        {this.renderItemOption('UIMode')}
         {this.renderItemOption('about')}
         {this.renderItemOption('spiderum')}
       </View>
@@ -122,12 +131,15 @@ export default withStyles(OptionsComponent, (theme) => ({
     lineHeight: 19,
     fontWeight: '600',
     flex: 1,
-    paddingLeft: 15
+    paddingLeft: 15,
+    color: theme['text-basic-color']
   },
   leftIcon: {
     paddingLeft: 4
   },
-  styleIcon: {},
+  styleIcon: {
+    color: theme['text-hint-color']
+  },
   containerOption: {
     flexDirection: 'row',
     marginTop: 1,
@@ -140,7 +152,7 @@ export default withStyles(OptionsComponent, (theme) => ({
   },
   bottomBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: '#ECF2F9'
+    borderBottomColor: theme['border-basic-color-4']
   },
   styleSwitch: {
     // marginRight: 17

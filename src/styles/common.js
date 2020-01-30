@@ -6,14 +6,10 @@ const { height } = Dimensions.get('window')
 const { height: screenHeight } = Dimensions.get('screen')
 
 export const DEFAULT_HEADER_HEIGHT = isIphoneX() ? 80 : 60
-export const DEFAULT_HEADER_COLOR = '#0061B1'
-export const DEFAULT_TEXT_COLOR = '#979797'
 export const HEADER_GRADIENT = DEFAULT_HEADER_GRADIENT
 
 export const isFixedSize = parseInt(height) === parseInt(screenHeight - StatusBar.currentHeight)
 export const appHeight = height - (!isFixedSize && StatusBar.currentHeight ? StatusBar.currentHeight : 0)
-
-console.log('appHeight', appHeight)
 
 const style = {
   defaultPage: {
@@ -23,10 +19,8 @@ const style = {
     flexDirection: 'column'
   },
   defaultBackgroundColor: {
-    backgroundColor: '#F8F8F8'
   },
   backgroundColor: {
-    backgroundColor: '#FFFFFF'
   },
   defaultHeaderHeight: {
     height: DEFAULT_HEADER_HEIGHT,
@@ -49,13 +43,13 @@ const style = {
     shadowRadius: 0.8 * 5
   },
   text: {},
-  btnPrimary: { backgroundColor: '#0061B1' },
-  btnDisable: { backgroundColor: '#B7C4CC' },
-  btnText: { color: '#FFFFFF' },
+  btnPrimary: {},
+  btnDisable: {},
+  btnText: {},
   alertSuccess: { color: 'blue' },
   alertDanger: { color: 'blue' },
   table: {},
-  txtHeader: { fontSize: 17, color: '#fff' },
+  txtHeader: { fontSize: 17 },
   input: {},
   colorPrimary: {},
   colorDisabled: {},
@@ -70,7 +64,6 @@ const style = {
     height: 52
   },
   bottom_bar_item_overlay: {
-    backgroundColor: 'background-color: rgba(73,126,204,0.05)',
     position: 'absolute',
     width: '100%',
     height: '100%'

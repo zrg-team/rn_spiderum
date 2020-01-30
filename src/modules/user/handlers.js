@@ -1,4 +1,4 @@
-import { saveNews, removeNews } from './actions'
+import { saveNews, removeNews, toggleUIMode } from './actions'
 import { updateAppIntro } from '../../common/actions/common'
 
 export default (dispatch, props) => ({
@@ -10,5 +10,9 @@ export default (dispatch, props) => ({
   },
   updateAppIntro: (result) => {
     dispatch(updateAppIntro(result))
+  },
+  toggleUIMode: () => {
+    console.log('toggleUIMode', toggleUIMode())
+    dispatch(toggleUIMode())
   }
 })
