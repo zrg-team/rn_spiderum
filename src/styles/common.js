@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { StyleSheet, Dimensions, StatusBar } from 'react-native'
+import { StyleSheet, Dimensions, StatusBar, Platform } from 'react-native'
 import { isIphoneX } from '../libraries/iphonex'
 import { STYLE_SHEET, DEFAULT_HEADER_GRADIENT } from '../configs'
 const { height } = Dimensions.get('window')
@@ -11,7 +11,9 @@ export const DEFAULT_TEXT_COLOR = '#979797'
 export const HEADER_GRADIENT = DEFAULT_HEADER_GRADIENT
 
 export const isFixedSize = parseInt(height) === parseInt(screenHeight - StatusBar.currentHeight)
-export const appHeight = height - (!isFixedSize ? StatusBar.currentHeight : 0)
+export const appHeight = height - (!isFixedSize && StatusBar.currentHeight ? StatusBar.currentHeight : 0)
+
+console.log('appHeight', appHeight)
 
 const style = {
   defaultPage: {
@@ -34,7 +36,10 @@ const style = {
     position: 'absolute',
     top: 0,
     width: '100%',
-    height: StatusBar.currentHeight
+    height: Platform.select({
+      android: StatusBar.currentHeight,
+      ios: 0
+    })
   },
   shadow: {
     elevation: 3,
@@ -82,27 +87,21 @@ export default StyleSheet.create(_.merge(style, STYLE_SHEET))
 
 export const textStyle = {
   headline: {
-    fontFamily: 'opensans-bold',
     fontWeight: 'normal'
   },
   subtitle: {
-    fontFamily: 'opensans-semibold',
     fontWeight: 'normal'
   },
   paragraph: {
-    fontFamily: 'opensans-regular',
     fontWeight: 'normal'
   },
   caption1: {
-    fontFamily: 'opensans-regular',
     fontWeight: 'normal'
   },
   caption2: {
-    fontFamily: 'opensans-semibold',
     fontWeight: 'normal'
   },
   label: {
-    fontFamily: 'opensans-bold',
     fontWeight: 'normal'
   },
   button: {

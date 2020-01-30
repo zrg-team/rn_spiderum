@@ -5,6 +5,7 @@ import {
   View,
   Linking,
   AppState,
+  Platform,
   StatusBar,
   BackHandler,
   SafeAreaView
@@ -12,7 +13,7 @@ import {
 import commonStyle, { appHeight } from '../../styles/common'
 import Modal from '../components/Widgets/Modal'
 import ProgressBar from '../components/Widgets/ProgressBar'
-import Camera from '../components/Widgets/Camera'
+// import Camera from '../components/Widgets/Camera'
 import Toast from '../components/Widgets/Toast'
 import CommonLoading from '../components/Widgets/CommonLoading'
 import NotificationPanel from '../components/Widgets/NotificationPanel'
@@ -167,10 +168,16 @@ export default class MainPage extends Component {
         <View
           ref={this.getNavigatorRef}
           style={[
-            {
-              height: !loading ? appHeight : 0,
-              marginTop: StatusBar.currentHeight
-            },
+            Platform.select({
+              android: {
+                height: !loading ? appHeight : 0,
+                marginTop: StatusBar.currentHeight
+              },
+              ios: {
+                height: '100%',
+                marginTop: 0
+              }
+            }),
             commonStyle.backgroundColor
           ]}
         >
@@ -187,7 +194,7 @@ export default class MainPage extends Component {
         <NotificationPanel.Component parentRef={this.navigatorRef} key='notification-panel' global />
         <ProgressBar.Component key='progress-bar' global />
         <CommonLoading.Component key='common-bar' global />
-        <Camera.Component key='app-camera' zIndex={5} global />
+        {/* <Camera.Component key='app-camera' zIndex={5} global /> */}
         <Toast.Component key='toast-bar' global />
       </SafeAreaView>
     )

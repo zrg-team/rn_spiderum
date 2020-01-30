@@ -118,10 +118,10 @@ export default class DefaultHeader extends PureComponent {
 
 const checkHeaderPaddingTop = () => {
   if (isIphoneX()) {
-    return 25
+    return 20
   }
   if (Platform.OS === 'ios') {
-    return 20
+    return 0
   }
   return 0
 }

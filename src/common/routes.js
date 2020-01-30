@@ -7,7 +7,7 @@ import {
 } from 'react-navigation'
 import { FluidNavigator } from 'react-navigation-fluid-transitions'
 // import { icons } from '../assets/elements'
-import { Animated, Easing } from 'react-native'
+import { Animated, Easing, Platform } from 'react-native'
 import commonStyle from '../styles/common'
 import TabarItem from './containers/TabarItem'
 
@@ -170,7 +170,7 @@ export default ({
   })
 
   let AppNavigator = null
-  if (appIntro) {
+  if (appIntro || Platform.OS === 'ios') {
     AppNavigator = createStackNavigator(
       {
         [SCREENS.Loading]: {

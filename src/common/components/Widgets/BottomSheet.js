@@ -180,7 +180,7 @@ class BottomSheetComponent extends PureComponent {
           isActive={show}
           openLarge
           onlyLarge
-          style={[commonStyles.shadow, extraStyles]}
+          style={[commonStyles.shadow, extraStyles || {}]}
           height={SNAPPOINTS[+level]}
           onClose={this.handleOnClose}
         >
