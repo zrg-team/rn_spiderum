@@ -118,7 +118,7 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  * on project.ext.react, JavaScript will not be compiled to Hermes Bytecode
  * and the benefits of using Hermes will therefore be sharply reduced.
  */
-def enableHermes = project.ext.react.get("enableHermes", false);
+def enableHermes = project.ext.react.get("enableHermes", true);
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -179,10 +179,6 @@ android {
 
         }
     }
-    packagingOptions {
-        // Make sure libjsc.so does not packed in APK
-        exclude "**/libjsc.so"
-    }
 }
 
 dependencies {
@@ -192,8 +188,6 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.0.2'
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
-    // Add v8-android - prebuilt libv8android.so into APK 
-    implementation 'org.chromium:v8-android:+'
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")

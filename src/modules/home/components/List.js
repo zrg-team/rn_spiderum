@@ -46,7 +46,7 @@ class ListComponent extends Component {
         this.setState({
           loading: false
         })
-      }, 340)
+      }, 440)
     }
   }
 
@@ -87,7 +87,7 @@ class ListComponent extends Component {
       <NewsItem
         key={item._id}
         itemIndex={index}
-        animationDeplay={(10 - this.showAnimationNewItem) * 140}
+        animationDeplay={(10 - this.showAnimationNewItem) * 240}
         shouldHaveAnimation={shouldHaveAnimation}
         style={themedStyle.item}
         onPress={this.handleReading}
@@ -141,7 +141,7 @@ class ListComponent extends Component {
     const { loading } = this.state
     return (
       <Animatable.View
-        delay={100}
+        delay={50}
         useNativeDriver
         animation='slideInUp'
         style={themedStyle.container}

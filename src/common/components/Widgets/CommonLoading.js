@@ -4,10 +4,10 @@ import {
   Easing,
   Animated,
   Dimensions,
-  StyleSheet
+  StyleSheet,
+  Image
 } from 'react-native'
-import LottieView from 'lottie-react-native'
-import { animations } from '../../../assets/elements'
+import { images } from '../../../assets/elements'
 
 const { width } = Dimensions.get('window')
 
@@ -134,7 +134,6 @@ class CommonLoadingComponent extends Component {
       isShow,
       blocking,
       showLoadingIcon,
-      iconProps,
       overlayStyles,
       overlayProps,
       animationIconOnly
@@ -165,13 +164,7 @@ class CommonLoadingComponent extends Component {
                   animationIconOnly ? this.getAnimationStyle() : {}
                 ]}
               >
-                <LottieView
-                  style={componentStyles.image}
-                  source={animations.loading_common}
-                  autoPlay
-                  loop
-                  {...iconProps}
-                />
+                <Image style={componentStyles.image} source={images.splash} />
               </Animated.View>
             ) : null}
         </View>
