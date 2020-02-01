@@ -28,7 +28,9 @@ export const images = {
   work: require('../assets/images/work.jpg'),
   music: require('../assets/images/music.jpg'),
   spiderum_banner: require('../assets/images/spiderum_banner.png'),
-  splash: require('../assets/images/splash.png')
+  splash: require('../assets/images/splash.png'),
+  default_parallax: require('../assets/images/default_parallax.jpg'),
+  no_result: require('../assets/images/no_result.png')
 }
 
 export const animations = {

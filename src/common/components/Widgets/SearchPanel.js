@@ -1,17 +1,17 @@
-import React, { Component } from 'react'
-import moment from 'moment'
+import React, { PureComponent } from 'react'
 import i18n from 'i18n-js'
 import {
   Text,
+  View,
+  Image,
   Easing,
   FlatList,
+  Animated,
   Platform,
+  TextInput,
+  StatusBar,
   Dimensions,
   SafeAreaView,
-  View,
-  Animated,
-  Image,
-  StatusBar,
   findNodeHandle,
   TouchableOpacity
 } from 'react-native'
@@ -19,40 +19,85 @@ import {
   withStyles
 } from 'react-native-ui-kitten'
 import { connect } from 'react-redux'
-import FastImage from 'react-native-fast-image'
 import { BlurView } from '@react-native-community/blur'
-import AntDesignIcons from 'react-native-vector-icons/AntDesign'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import commonStyles, { appHeight } from '../../../styles/common'
 import { images } from '../../../assets/elements'
 import { MODULE_NAME as MODULE_HOME } from '../../../modules/home/models'
 import { navigationPush, screens } from '../../utils/navigation'
+import homeHandlers from '../../../modules/home/handlers'
+
 const { width } = Dimensions.get('window')
 
 let instance = null
-class NotificationPanelComponent extends Component {
+class SearchPanelComponent extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
       isShow: false,
-      notification: false,
-      notificationLatest: props.notificationTime
+      page: 1,
+      searchText: ''
     }
 
     instance = this
     this.show = this.show.bind(this)
     this.handleHide = this.handleHide.bind(this)
     this.renderItem = this.renderItem.bind(this)
+    this.getInputRef = this.getInputRef.bind(this)
+    this.handleSearch = this.handleSearch.bind(this)
     this.runAnimation = this.runAnimation.bind(this)
     this.keyExtractor = this.keyExtractor.bind(this)
     this.handlePressNew = this.handlePressNew.bind(this)
+    this.handleLoadMore = this.handleLoadMore.bind(this)
+    this.handleChangeText = this.handleChangeText.bind(this)
     this.runHideAnimation = this.runHideAnimation.bind(this)
     this.getAnimationStyle = this.getAnimationStyle.bind(this)
 
     this.notificationInstance = null
     this.showAnimation = new Animated.Value(1)
     this.iconAnimation = new Animated.Value(0)
-    this.listenNotification()
+  }
+
+  handleChangeText (searchText) {
+    this.setState({
+      searchText
+    })
+  }
+
+  handleSearch () {
+    const { searchText } = this.state
+    if (!searchText || !`${searchText}`.trim()) {
+      return
+    }
+    this.getData(1)
+  }
+
+  handleLoadMore () {
+    // const { page, loading, searchText } = this.state
+    // if (!this.loadingMore && !loading && searchText) {
+    //   this.loadingMore = true
+    //   this.getData(page + 1, () => {
+    //     this.loadingMore = false
+    //   })
+    // }
+  }
+
+  async getData (nextpage, callback) {
+    const { page, searchText } = this.state
+    const { searchNews, data } = this.props
+    const result = await searchNews(nextpage || page, { q: searchText })
+    if (result || data.length) {
+      return this.setState({
+        page: nextpage || page,
+        loading: false
+      }, () => {
+        callback && callback(nextpage || page)
+      })
+    }
+  }
+
+  getInputRef (ref) {
+    this.inputRef = ref
   }
 
   handlePressNew (article) {
@@ -60,7 +105,7 @@ class NotificationPanelComponent extends Component {
     navigationPush(undefined, screens().Reading, { article, itemIndex: null })
   }
 
-  runAnimation () {
+  runAnimation (callback) {
     this.showAnimation.setValue(0)
     this.iconAnimation.setValue(0)
     return Animated.sequence([
@@ -76,7 +121,7 @@ class NotificationPanelComponent extends Component {
         duration: 150,
         easing: Easing.in()
       })
-    ]).start()
+    ]).start(callback)
   }
 
   runHideAnimation (calback) {
@@ -124,59 +169,29 @@ class NotificationPanelComponent extends Component {
     }
   }
 
-  keyExtractor (item) {
-    return item.id
+  keyExtractor (item, index) {
+    return `${item.key}_${index}`
   }
 
   renderItem ({ item }) {
-    const { themedStyle, notificationTime } = this.props
-    let containerStyle = {}
-    let textStyle = {}
-    const isNews = +item.time > +notificationTime
-    if (isNews) {
-      containerStyle = {
-        backgroundColor: '#EFF3F6'
-      }
-      textStyle = {
-        fontWeight: 'bold',
-        color: '#35474E'
-      }
-    }
-    const readingTime = moment.duration(item.reading_time, 'seconds').minutes()
+    const { themedStyle } = this.props
     return (
       <TouchableOpacity
         onPress={() => this.handlePressNew(item)}
-        style={[themedStyle.item, containerStyle]}
+        style={[themedStyle.item]}
       >
-        <View style={themedStyle.itemImage}>
-          <FastImage
-            style={{ width: 60, height: 60 }}
-            resizeMode={FastImage.resizeMode.cover}
-            source={item.og_image_url ? { uri: item.og_image_url } : images.default_image}
-          />
-        </View>
         <View style={themedStyle.itemContent}>
           <Text
-            style={[themedStyle.itemMessage, textStyle]}
-          >{item.title}
+            style={[themedStyle.itemMessage]}
+          >༄  {item.title}
           </Text>
           <Text
             style={themedStyle.itemTime}
           >
-            {`${moment(item.created_at).fromNow()} . ${readingTime} phút đọc`}
+            {item.time_formated}
           </Text>
         </View>
       </TouchableOpacity>)
-  }
-
-  listenNotification () {
-  }
-
-  getNotificationTimeStamp (time) {
-    if (isNaN(time)) {
-      return +moment(time).unix()
-    }
-    return +time
   }
 
   componentWillUnmount () {
@@ -191,7 +206,9 @@ class NotificationPanelComponent extends Component {
     this.setState({
       isShow: true
     }, () => {
-      this.runAnimation()
+      this.runAnimation(() => {
+        this.inputRef && this.inputRef.focus()
+      })
     })
   }
 
@@ -222,11 +239,11 @@ class NotificationPanelComponent extends Component {
         </TouchableOpacity>
       )
     }
-    return <TouchableOpacity onPress={this.handleHide} style={themedStyle.overlay_background} />
+    return <TouchableOpacity onPress={this.handleHide} style={themedStyle.overlayBackground} />
   }
 
   render () {
-    const { themedStyle, notificationTime, notificationLatest, notifications } = this.props
+    const { themedStyle, data } = this.props
     const { isShow } = this.state
     if (!isShow) {
       return null
@@ -236,11 +253,22 @@ class NotificationPanelComponent extends Component {
       <SafeAreaView style={themedStyle.container}>
         {this.renderBackground()}
         <View
+          style={themedStyle.textInputOverlay}
+        >
+          <TextInput
+            placeholder={i18n.t('messages.search_placeholder')}
+            onChangeText={this.handleChangeText}
+            onSubmitEditing={this.handleSearch}
+            style={themedStyle.textInput}
+            ref={this.getInputRef}
+            returnKeyType='search'
+            blurOnSubmit
+          />
+        </View>
+        <View
           style={themedStyle.overlayIcon}
         >
-          <MaterialCommunityIcons onPress={this.handleHide} name='book-open-variant' color='#FFFFFF' size={29} />
-          {+notificationLatest > +notificationTime
-            ? <View style={themedStyle.notification} /> : null}
+          <MaterialCommunityIcons onPress={this.handleHide} name='close-box-multiple' color='#FFFFFF' size={30} />
         </View>
         <Animated.View
           style={[themedStyle.image, animationStyles.image]}
@@ -249,30 +277,30 @@ class NotificationPanelComponent extends Component {
           style={[themedStyle.list, animationStyles.container, commonStyles.shadow]}
         >
           <View style={themedStyle.titleContainer}>
-            <AntDesignIcons name='solution1' size={22} />
+            <MaterialCommunityIcons style={themedStyle.iconResult} name='file-document-box-multiple' size={22} />
             <Text
               style={[themedStyle.notificationTitle]}
             >
-              {i18n.t('common.hot_news')}
+              {i18n.t('common.search_result')}
             </Text>
           </View>
-          {notifications && notifications.length
+          {data && data.length
             ? (
               <FlatList
-                data={notifications}
+                data={data}
                 renderItem={this.renderItem}
                 keyExtractor={this.keyExtractor}
-                style={{
-                  width: '100%',
-                  height: undefined
-                }}
-                contentContainerStyle={themedStyle.list_content}
+                style={themedStyle.flatlist}
+                contentContainerStyle={themedStyle.listContent}
+                onEndReached={this.handleLoadMore}
+                removeClippedSubviews
+                onEndThreshold={0.5}
               />)
             : (
               <View
-                style={styles.no_notification}
+                style={themedStyle.noNotification}
               >
-                <Image source={images.alarm} width={30} height={30} />
+                <Image source={images.no_result} resizeMode='contain' style={themedStyle.noImage} />
               </View>)}
         </Animated.View>
       </SafeAreaView>
@@ -280,6 +308,16 @@ class NotificationPanelComponent extends Component {
   }
 }
 const styles = (theme) => ({
+  flatlist: {
+    width: '100%',
+    height: undefined
+  },
+  iconItem: {
+    color: theme['color-primary-focus']
+  },
+  iconResult: {
+    color: theme['text-hint-color']
+  },
   container: {
     flex: 1,
     position: 'absolute',
@@ -293,7 +331,7 @@ const styles = (theme) => ({
     fontSize: 15
   },
   notificationTitle: {
-    color: theme['text-basic-color'],
+    color: theme['text-hint-color'],
     fontSize: 18,
     paddingLeft: 10
   },
@@ -319,7 +357,9 @@ const styles = (theme) => ({
     borderBottomWidth: 1
   },
   itemImage: {
-    width: 60
+    width: 40,
+    display: 'flex',
+    alignItems: 'center'
   },
   itemContent: {
     flex: 1,
@@ -363,7 +403,7 @@ const styles = (theme) => ({
     borderBottomColor: theme['background-basic-color-1'],
     marginTop: StatusBar.currentHeight
   },
-  list_content: {
+  listContent: {
     paddingVertical: 10
   },
   notification: {
@@ -376,42 +416,64 @@ const styles = (theme) => ({
     position: 'absolute',
     zIndex: 99
   },
-  no_notification: {
+  noNotification: {
     width: '100%',
     height: '100%',
     display: 'flex',
-    paddingVertical: 80,
+    paddingBottom: 40,
     justifyContent: 'center',
     alignItems: 'center'
   },
-  no_notification_text: { color: theme['text-basic-color'], fontSize: 18, marginTop: 10 },
+  noImage: {
+    width: 300,
+    height: 200
+  },
   overlay: {
     position: 'absolute',
     width: '100%',
     height: '100%'
   },
-  overlay_background: {
+  overlayBackground: {
     position: 'absolute',
     backgroundColor: '#000',
     opacity: 0.5,
     width: '100%',
     height: '100%',
     top: StatusBar.currentHeight
+  },
+  textInput: {
+    width: '100%',
+    fontSize: 16,
+    color: theme['text-basic-color'],
+    paddingHorizontal: 10,
+    paddingTop: 10
+  },
+  textInputOverlay: {
+    borderRadius: 5,
+    height: 40,
+    width: width - 70,
+    marginTop: StatusBar.currentHeight,
+    position: 'absolute',
+    left: 20,
+    top: 10,
+    zIndex: 99,
+    backgroundColor: theme['background-basic-color-1']
   }
 })
 
 function mapStateToProps (state) {
+  const searchResult = state[MODULE_HOME].search || {}
   return {
     appState: state.session.appState,
-    notifications: state[MODULE_HOME].top.top || []
+    data: searchResult.data || []
   }
 }
 
 export default {
   Component: connect(
     mapStateToProps,
-    {}
-  )(withStyles(NotificationPanelComponent, styles)),
+    homeHandlers
+  )(withStyles(SearchPanelComponent, styles)),
   show: () => {
     if (instance) {
       instance.show()

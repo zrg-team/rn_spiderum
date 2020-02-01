@@ -10,18 +10,18 @@ import LinearGradient from 'react-native-linear-gradient'
 // import * as Animatable from 'react-native-animatable'
 import commonStyles, { HEADER_GRADIENT } from '../../styles/common'
 import { navigationPop, navigationPopToTop } from '../utils/navigation'
-import NotificationPanel from '../components/Widgets/NotificationPanel'
+import SearchPanel from '../components/Widgets/SearchPanel'
 
 class DefaultHeader extends PureComponent {
   constructor (props) {
     super(props)
     this.handleBack = this.handleBack.bind(this)
-    this.handleNotification = this.handleNotification.bind(this)
+    this.handleSearch = this.handleSearch.bind(this)
     this.renderRightComponent = this.renderRightComponent.bind(this)
   }
 
-  handleNotification () {
-    NotificationPanel.show()
+  handleSearch () {
+    SearchPanel.show()
   }
 
   handleBack () {
@@ -71,14 +71,14 @@ class DefaultHeader extends PureComponent {
   }
 
   renderRightComponent () {
-    const { notification } = this.props
-    if (notification) {
+    const { search } = this.props
+    if (search) {
       return [
         <TopNavigationAction
-          key='notification'
-          onPress={this.handleNotification}
+          key='search'
+          onPress={this.handleSearch}
           icon={(style) => {
-            return (<Icon style={[style, { fontSize: 30, width: 28 }]} name='book-open-variant' />)
+            return (<Icon style={[style, { fontSize: 30, width: 28 }]} name='search' />)
           }}
         />
       ]

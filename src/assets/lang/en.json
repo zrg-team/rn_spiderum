@@ -17,11 +17,13 @@
     "please_wait": "Please wait.",
     "done": "Done",
     "update": "Update",
-    "hot_news": "Top News"
+    "hot_news": "Top News",
+    "search_result": "Result"
   },
   "messages": {
     "saved_news": "Saved.",
-    "removed_news": "Removed."
+    "removed_news": "Removed.",
+    "search_placeholder": "Search..."
   },
   "pages": {
     "hot": "Hot",
@@ -50,7 +52,7 @@
     "close": "Close",
     "remove": "Remove",
     "open_source": "Source",
-    "swipe_to_read_more": "Swipe left or righ to read more"
+    "swipe_to_read_more": "Swipe left or right to read more story ..."
   },
   "option": {
     "bookmark": "Bookmark",

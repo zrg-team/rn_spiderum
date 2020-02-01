@@ -45,6 +45,6 @@ export default connect(
   mapDispatchToProps
 )(withStyles(LoadingPage, (theme) => ({
   background: {
-    backgroundColor: theme['background-basic-color-4']
+    backgroundColor: theme['background-basic-color-0']
   }
 })))

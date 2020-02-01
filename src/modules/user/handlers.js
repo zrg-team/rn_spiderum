@@ -12,7 +12,6 @@ export default (dispatch, props) => ({
     dispatch(updateAppIntro(result))
   },
   toggleUIMode: () => {
-    console.log('toggleUIMode', toggleUIMode())
     dispatch(toggleUIMode())
   }
 })

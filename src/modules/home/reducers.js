@@ -5,7 +5,8 @@ import * as actions from './actions'
 const defaultState = {
   news: {},
   top: {},
-  hot: {}
+  hot: {},
+  search: {}
 }
 
 const handlers = {
@@ -53,6 +54,21 @@ const handlers = {
     return {
       ...state,
       top
+    }
+  },
+  [actions.setSearchResults]: (state, action) => {
+    const { page, results } = action.payload
+    if (page === 1) {
+      return {
+        ...state,
+        search: results
+      }
+    }
+    const { search } = state
+    search.data = [...search.data, ...results.data]
+    return {
+      ...state,
+      search
     }
   }
 }

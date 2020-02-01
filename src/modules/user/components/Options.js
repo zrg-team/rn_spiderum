@@ -27,7 +27,6 @@ class OptionsComponent extends Component {
 
   onPressOption (option) {
     const { navigation, toggleUIMode } = this.props
-    console.log('toggleUIMode', toggleUIMode, option)
     switch (option) {
       case 'UIMode':
         toggleUIMode()

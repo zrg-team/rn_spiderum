@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Spiderum for Community</string>
+    <string name="app_name">Spiderum</string>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="primary_dark">#000000</color>

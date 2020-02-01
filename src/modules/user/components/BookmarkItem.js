@@ -89,7 +89,6 @@ class BookmarkItemComponent extends React.Component {
               <Text
                 numberOfLines={2}
                 style={themedStyle.descriptionLabel}
-                category='h8'
               >
                 {article.decription}
               </Text>

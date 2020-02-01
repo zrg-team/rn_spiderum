@@ -119,7 +119,7 @@ export default ({
       }
     }
   })
-  const CategoryFlow = FluidNavigator({
+  const CategoryFlow = createStackNavigator({
     [SCREENS.Categories]: { screen: CategoriesPage },
     [SCREENS.CategoryDetail]: { screen: CategoryDetailPage },
     [SCREENS.Reading]: { screen: ReadingPage },
@@ -160,12 +160,15 @@ export default ({
         return <TabarItem key={routeName} focused={focused} navigation={navigation} style={themedStyle.tabBarStyle} />
       }
     }),
-    labeled: false,
-    animationEnabled: false,
+    lazy: true,
     height: 100,
-    initialRouteName: SCREENS.Home,
-    backBehavior: 'none',
+    labeled: false,
     shifting: true,
+    swipeEnabled: false,
+    backBehavior: 'none',
+    animationEnabled: false,
+    removeClippedSubviews: true,
+    initialRouteName: SCREENS.Home,
     barStyle: themedStyle.barStyle,
     activeColor: commonStyle.activeMenu.color
   })
@@ -189,6 +192,8 @@ export default ({
       },
       {
         headerMode: 'none',
+        cardShadowEnabled: false,
+        cardStyle: themedStyle.mainNavigator,
         initialRouteName: SCREENS.Loading
       }
     )

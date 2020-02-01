@@ -16,6 +16,20 @@ export function removeTags (body) {
   return body.replace(regex, '')
 }
 
+export function getBodyByDOM (body) {
+  const $ = cheerio.load(body)
+  const html = $('#post-content-view-edit').html()
+  return html
+}
+
+export function getNews (url) {
+  return requestLoading({
+    url
+  }).then(response => {
+    return getBodyByDOM(response.data)
+  })
+}
+
 export default (dispatch, props) => ({
   setFontSize: (size) => {
     dispatch(setFontSize(size))
@@ -36,6 +50,14 @@ export default (dispatch, props) => ({
       return null
     }
   },
+  getContentFromSource: async (url) => {
+    try {
+      const body = await getNews(url)
+      return body
+    } catch (err) {
+      return undefined
+    }
+  },
   getContent: async (item) => {
     try {
       let row = item
@@ -46,6 +68,16 @@ export default (dispatch, props) => ({
           where: [['key', key]]
         })
         row = rows.rows.item(0)
+      }
+      if (!row || !row.body) {
+        row = {}
+        row.body = await getNews(item.key)
+        database.model('article').insert({
+          key: item.key,
+          title: item.title,
+          body: row.body,
+          image: item.og_image_url
+        })
       }
 
       const data = []

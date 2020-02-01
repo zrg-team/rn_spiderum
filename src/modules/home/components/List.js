@@ -40,13 +40,18 @@ class ListComponent extends Component {
 
   componentDidMount () {
     const { data } = this.props
-    this.getData(1)
     if (data && data.length) {
       setTimeout(() => {
         this.setState({
           loading: false
+        }, () => {
+          setTimeout(() => {
+            this.getData(1)
+          }, 100)
         })
       }, 200)
+    } else {
+      this.getData(1)
     }
   }
 

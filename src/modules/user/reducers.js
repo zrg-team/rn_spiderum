@@ -28,7 +28,6 @@ const handlers = {
     }
   },
   [actions.toggleUIMode]: (state, action) => {
-    console.log('reducer darkMode', !state.darkMode)
     return {
       ...state,
       darkMode: !state.darkMode

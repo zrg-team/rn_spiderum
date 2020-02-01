@@ -17,6 +17,7 @@ class HomePage extends Component {
       <DefaultPage ref={ref => { this.viewRef = ref }}>
         <DefaultHeader
           notification
+          search
           noBack
           transition={false}
           title={i18n.t('pages.hot').toUpperCase()}

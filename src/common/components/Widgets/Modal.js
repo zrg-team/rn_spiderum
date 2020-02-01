@@ -124,8 +124,7 @@ const Content = (props, context) => {
       key='main'
       style={[
         styles.modalWrapper,
-        props.modalWrapper,
-        { backgroundColor: '#FFFFFF' }
+        props.modalWrapper
       ]}
     >
       <View style={[styles.modalHeader]}>{props.modalHeader}</View>

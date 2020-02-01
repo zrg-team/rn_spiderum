@@ -19,7 +19,7 @@ import ProgressBar from '../components/Widgets/ProgressBar'
 // import Camera from '../components/Widgets/Camera'
 import Toast from '../components/Widgets/Toast'
 import CommonLoading from '../components/Widgets/CommonLoading'
-import NotificationPanel from '../components/Widgets/NotificationPanel'
+import SearchPanel from '../components/Widgets/SearchPanel'
 import BottomSheet from '../components/Widgets/BottomSheet'
 import { setTopLevelNavigator } from '../utils/navigation'
 import {
@@ -133,7 +133,6 @@ class MainPage extends Component {
   }
 
   async componentDidMount () {
-    ProgressBar.show()
     NetInfo.isConnected.addEventListener(
       'connectionChange',
       this.handleFirstConnectivityChange.bind(this)
@@ -156,7 +155,6 @@ class MainPage extends Component {
       themedStyle
     })
     splashScreen.hide()
-    ProgressBar.hide()
     this.setState({
       lazy: false,
       loading: false
@@ -198,7 +196,7 @@ class MainPage extends Component {
         </View>
         <Modal.Component key='common-modal' global />
         <BottomSheet.Component zIndex={2} parentRef={this.navigatorRef} key='common-bottom-sheet' global />
-        <NotificationPanel.Component parentRef={this.navigatorRef} key='notification-panel' global />
+        <SearchPanel.Component parentRef={this.navigatorRef} key='search-panel' global />
         <ProgressBar.Component key='progress-bar' global />
         <CommonLoading.Component key='common-bar' global />
         {/* <Camera.Component key='app-camera' zIndex={5} global /> */}
@@ -220,5 +218,8 @@ export default withStyles(MainPage, (theme) => ({
   },
   backgroundTransparent: {
     backgroundColor: 'transparent'
+  },
+  mainNavigator: {
+    backgroundColor: theme['background-basic-color-3']
   }
 }))

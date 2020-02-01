@@ -14,17 +14,19 @@ export default class SliderEntry extends Component {
 
     return parallax ? (
       <ParallaxImage
-        source={ogImageUrl ? { uri: ogImageUrl } : images.default_image}
+        source={ogImageUrl ? { uri: ogImageUrl } : images.default_parallax}
         containerStyle={[styles.imageContainer, even ? styles.imageContainerEven : {}]}
         style={styles.image}
-        parallaxFactor={0.35}
+        parallaxFactor={0.23}
         showSpinner
+        resizeMode='contain'
         spinnerColor={even ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.25)'}
         {...parallaxProps}
       />
     ) : (
       <Image
-        source={ogImageUrl ? { uri: ogImageUrl } : images.default_image}
+        source={ogImageUrl ? { uri: ogImageUrl } : images.default_parallax}
+        resizeMode='contain'
         style={styles.image}
       />
     )

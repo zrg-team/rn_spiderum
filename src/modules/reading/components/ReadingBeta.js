@@ -64,16 +64,22 @@ class ReadingBetaComponent extends React.Component {
 
     this.renderers = {
       blockquote: (item, children, css, passProps) => {
-        const { themedStyle } = passProps
+        const { themedStyle, fontSize } = passProps
         return (
           <>
             <View
-              style={themedStyle.blockquoteStart}
-            />
+              style={themedStyle.blockquoteWrapper}
+            >
+              <Text style={[themedStyle.blockquoteText, { fontSize }]}>❝</Text>
+              <View style={themedStyle.blockquoteStart} />
+            </View>
             {children}
             <View
-              style={themedStyle.blockquoteEnd}
-            />
+              style={themedStyle.blockquoteWrapper}
+            >
+              <View style={themedStyle.blockquoteStart} />
+              <Text style={[themedStyle.blockquoteText, { fontSize }]}>❞</Text>
+            </View>
           </>
         )
       },
@@ -119,6 +125,7 @@ class ReadingBetaComponent extends React.Component {
       div: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
       a: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
       p: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
+      li: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
       h1: { paddingVertical: 5, fontSize: fontSize * 1.73, ...themedStyle.textColor },
       h2: { paddingVertical: 5, fontSize: fontSize * 1.58, ...themedStyle.textColor },
       h3: { paddingVertical: 5, fontSize: fontSize * 1.44, ...themedStyle.textColor },
@@ -281,6 +288,9 @@ class ReadingBetaComponent extends React.Component {
     const { article, getComments } = this.props
     const { commentPage } = this.state
     const next = page || commentPage
+    if (!article._id) {
+      return
+    }
     const comments = await getComments(article._id, next)
     if (comments) {
       this.setState({
@@ -292,31 +302,31 @@ class ReadingBetaComponent extends React.Component {
   }
 
   renderActions () {
-    const { type } = this.props
+    const { type, themedStyle } = this.props
 
     return (
       <ActionButton fixNativeFeedbackRadius key='1' buttonColor='rgba(231,76,60,1)'>
         <ActionButton.Item key='2' buttonColor='#3498db' title={i18n.t('reading.open_source')} onPress={this.handleOpenSource}>
-          <Icon name='globe' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+          <Icon name='globe' style={themedStyle.actionIcon} />
         </ActionButton.Item>
         {type === 'bookmark'
           ? (
             <ActionButton.Item key='1' buttonColor='#9b59b6' title={i18n.t('reading.remove')} onPress={this.handleRemove}>
-              <Icon name='close' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+              <Icon name='close' style={themedStyle.actionIcon} />
             </ActionButton.Item>
           ) : (
             <ActionButton.Item key='1' buttonColor='#9b59b6' title={i18n.t('reading.save_news')} onPress={this.handleSave}>
-              <Icon name='cloud-download' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+              <Icon name='cloud-download' style={themedStyle.actionIcon} />
             </ActionButton.Item>
           )}
         <ActionButton.Item key='2' buttonColor='#3498db' title={i18n.t('reading.share')} onPress={this.handleShare}>
-          <Icon name='share' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+          <Icon name='share' style={themedStyle.actionIcon} />
         </ActionButton.Item>
         <ActionButton.Item key='3' buttonColor='#1abc9c' title={i18n.t('reading.font_size')} onPress={this.handleIncreaseFont}>
-          <Icon name='magnifier-add' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+          <Icon name='magnifier-add' style={themedStyle.actionIcon} />
         </ActionButton.Item>
         <ActionButton.Item key='4' buttonColor='#1abc9c' title={i18n.t('reading.font_size')} onPress={this.handleReduceFont}>
-          <Icon name='magnifier-remove' style={{ fontSize: 20, height: 22, color: '#FFFFFF' }} />
+          <Icon name='magnifier-remove' style={themedStyle.actionIcon} />
         </ActionButton.Item>
       </ActionButton>
     )
@@ -326,17 +336,70 @@ class ReadingBetaComponent extends React.Component {
     const {
       noTransition,
       themedStyle,
-      article = {}
+      article = {},
+      fontSize
     } = this.props
-    const { imagesSize, data, loadingComment, comments, loading } = this.state
-    const imageSource = article.og_image_url ? { uri: article.og_image_url } : commonImages.default_image
+    const { imagesSize, data, loadingComment, comments, loading, images } = this.state
+    const imageSource = article.og_image_url
+      ? { uri: article.og_image_url }
+      : images && images[0] && images[0].data
+        ? { uri: images[0].data }
+        : commonImages.default_parallax
     const readingTime = moment.duration(article.reading_time, 'seconds').minutes()
+
     if (!loading && !data) {
       return (
         <WebView
           source={{ uri: article.key }}
           style={{ alignSelf: 'stretch', height, width }}
         />
+      )
+    }
+    if (!loading && imagesSize && Object.keys(imagesSize || {}).length > 28) {
+      return (
+        <View
+          style={themedStyle.wrapperContentLite}
+        >
+          <ScrollView
+            key='content'
+            style={themedStyle.contentLite}
+          >
+            <Text
+              key='title'
+              style={themedStyle.titleLabel}
+              category='h5'
+            >
+              {article.title}
+            </Text>
+            <View style={themedStyle.htmlContainer}>
+              <Html
+                tagsStyles={this.tagsStyles}
+                html={data}
+                onLinkPress={this.handlePressLink}
+                imagesMaxWidth={width - 20}
+                staticContentMaxWidth={width - 20}
+                renderers={this.renderers}
+                themedStyle={themedStyle}
+                imagesSize={imagesSize}
+                fontSize={fontSize}
+              />
+            </View>
+            {comments && comments.length ? <CommentList article={article} data={comments} /> : null}
+            {comments && comments.length
+              ? (
+                <Button
+                  disabled={loadingComment}
+                  onPress={this.handleLoadMoreComments}
+                  style={themedStyle.button}
+                  appearance='ghost'
+                  status='info'
+                >
+                  {i18n.t('reading.loading_more_comments')}
+                </Button>)
+              : null}
+          </ScrollView>
+          {this.renderActions()}
+        </View>
       )
     }
     return [
@@ -346,7 +409,6 @@ class ReadingBetaComponent extends React.Component {
         windowHeight={height * 0.4}
         backgroundSource={imageSource}
         style={themedStyle.container}
-        imageUrl={article.og_image_url}
         userImage={article.avatar}
         scrollableViewStyle={themedStyle.content}
         headerView={() => {
@@ -389,13 +451,16 @@ class ReadingBetaComponent extends React.Component {
           ]
         }}
       >
-        <ActivityAuthoring
-          noTransition
-          article={article}
-          style={[themedStyle.authorBar]}
-          name={article.creator_id.display_name}
-          date={`${moment(article.created_at).fromNow()} . ${readingTime} phút đọc`}
-        />
+        {article.creator_id
+          ? (
+            <ActivityAuthoring
+              noTransition
+              article={article}
+              style={[themedStyle.authorBar]}
+              name={`${article.creator_id.display_name}`.trim()}
+              date={`${moment(article.created_at).fromNow()} . ${readingTime} phút đọc`}
+            />
+          ) : null}
         <Text
           key='title'
           style={themedStyle.titleLabel}
@@ -417,6 +482,7 @@ class ReadingBetaComponent extends React.Component {
                   renderers={this.renderers}
                   themedStyle={themedStyle}
                   imagesSize={imagesSize}
+                  fontSize={fontSize}
                 />
               </View>
             )
@@ -577,13 +643,22 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
     marginHorizontal: 10,
     textDecorationLine: 'underline'
   },
-  blockquoteStart: {
-    backgroundColor: theme['color-primary-500'],
-    height: 5
+  blockquoteWrapper: {
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  blockquoteEnd: {
+  blockquoteText: {
+    color: theme['color-primary-500'],
+    fontWeight: 'bold',
+    paddingHorizontal: 5
+  },
+  blockquoteStart: {
+    flex: 1,
     backgroundColor: theme['color-primary-500'],
-    height: 5
+    height: 2
   },
   endingBlock: {
     backgroundColor: theme['color-success-500'],
@@ -594,5 +669,16 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
     color: theme['color-primary-500'],
     textDecorationLine: 'underline',
     paddingVertical: 10
-  }
+  },
+  wrapperContentLite: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    flex: 1
+  },
+  contentLite: {
+    width: '100%',
+    height: '100%',
+    display: 'flex'
+  },
+  actionIcon: { fontSize: 20, height: 22, color: '#FFFFFF' }
 }))
