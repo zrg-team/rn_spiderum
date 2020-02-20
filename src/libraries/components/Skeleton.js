@@ -6,14 +6,14 @@ import {
   Placeholder,
   PlaceholderMedia,
   PlaceholderLine,
-  ShineOverlay,
+  // ShineOverlay,
   Fade
 } from 'rn-placeholder'
 
 export const DefaultSkeleton = memo(function (props) {
   return (
     <Placeholder
-      Animation={ShineOverlay}
+      Animation={Fade}
       Left={() => <PlaceholderMedia isRound style={{ marginRight: 10 }} />}
       style={[{
         display: 'flex',
@@ -32,7 +32,7 @@ export const DefaultSkeleton = memo(function (props) {
 export const ContentSkeleton = memo(function (props) {
   return (
     <Placeholder
-      Animation={ShineOverlay}
+      Animation={Fade}
       style={[{
         display: 'flex',
         flexDirection: 'row',

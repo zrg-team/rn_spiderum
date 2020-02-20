@@ -10,7 +10,7 @@ export const icons = {
 
 export const images = {
   camera_focus: require('../assets/images/camera_focus.png'),
-  default_image: require('../assets/images/default_image.png'),
+  default_image: require('../assets/images/default_parallax.jpg'),
   default_user: require('../assets/images/default_user.png'),
   books: require('../assets/images/books.jpg'),
   business: require('../assets/images/business.jpg'),

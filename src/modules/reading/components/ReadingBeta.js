@@ -3,7 +3,6 @@ import i18n from 'i18n-js'
 import moment from 'moment'
 import {
   View,
-  Image,
   Linking,
   Dimensions,
   ScrollView
@@ -11,27 +10,27 @@ import {
 import {
   Text,
   Avatar,
-  Button,
   withStyles
 } from 'react-native-ui-kitten'
 import WebView from 'react-native-webview'
 import Share from 'react-native-share'
+import * as Animatable from 'react-native-animatable'
 import ActionButton from 'react-native-action-button'
 import Icon from 'react-native-vector-icons/SimpleLineIcons'
 import FastImage from 'react-native-fast-image'
 import { Transition } from 'react-navigation-fluid-transitions'
+import DefaultHeader from '../../../common/containers/DefaultHeader'
 import { CommentList } from './comments/CommentList'
 import { READING_URL } from '../models'
-import ImageResize from '../../../common/components/Layout/ImageResize'
 import Toast from '../../../common/components/Widgets/Toast'
 import { ActivityAuthoring } from '../../home/components/item/ActivityAuthoring'
 import { ArticleActivityBar } from '../../home/components/item/ArticleActivityBar'
-import commonStyles, { textStyle } from '../../../styles/common'
+import commonStyles, { textStyle, DEFAULT_HEADER_HEIGHT } from '../../../styles/common'
 import { images as commonImages } from '../../../assets/elements'
 import { ContentSkeleton } from '../../../libraries/components/Skeleton'
 import { navigationPop } from '../../../common/utils/navigation'
+import HtmlContent from './reading/HtmlContent'
 import ParallaxScrollView from '../../../libraries/components/Parallax/ParallaxScrollView'
-import Html from 'react-native-render-html'
 
 const { width, height } = Dimensions.get('window')
 
@@ -42,113 +41,25 @@ class ReadingBetaComponent extends React.Component {
       loading: true,
       data: [],
       webview: false,
-      commentPage: 1,
-      loadingComment: true,
-      comments: [],
       images: {}
     }
     this.handlePress = this.handlePress.bind(this)
-    this.handleCommentsButtonPress = this.handleCommentsButtonPress.bind(this)
+    this.renderView = this.renderView.bind(this)
     this.handleLikeButtonPress = this.handleLikeButtonPress.bind(this)
-    this.handleLoadMoreComments = this.handleLoadMoreComments.bind(this)
     this.handleIncreaseFont = this.handleIncreaseFont.bind(this)
     this.handleReduceFont = this.handleReduceFont.bind(this)
     this.handleRemove = this.handleRemove.bind(this)
     this.handleShare = this.handleShare.bind(this)
     this.handleSave = this.handleSave.bind(this)
-    this.handlePressLink = this.handlePressLink.bind(this)
     this.handleOpenSource = this.handleOpenSource.bind(this)
-    this.handleImageLoaded = this.handleImageLoaded.bind(this)
-
-    this.createTagStyles()
-
-    this.renderers = {
-      blockquote: (item, children, css, passProps) => {
-        const { themedStyle, fontSize } = passProps
-        return (
-          <>
-            <View
-              style={themedStyle.blockquoteWrapper}
-            >
-              <Text style={[themedStyle.blockquoteText, { fontSize }]}>❝</Text>
-              <View style={themedStyle.blockquoteStart} />
-            </View>
-            {children}
-            <View
-              style={themedStyle.blockquoteWrapper}
-            >
-              <View style={themedStyle.blockquoteStart} />
-              <Text style={[themedStyle.blockquoteText, { fontSize }]}>❞</Text>
-            </View>
-          </>
-        )
-      },
-      img: (item, children, css, passProps) => {
-        const { themedStyle, imagesSize = {} } = passProps
-        return (
-          <ImageResize
-            key={item.src}
-            uri={item.src}
-            style={themedStyle.imageContent}
-            imagesSize={imagesSize[item.src]}
-            onImageLoaded={this.handleImageLoaded}
-          />
-        )
-      },
-      iframe: (item, children) => {
-        const ratio = item.width / item.height
-        return (
-          <WebView
-            key={`yotube_${item.src}`}
-            source={{ uri: `https://${item.src}` }}
-            style={{ alignSelf: 'stretch', height: width / ratio, width }}
-          />
-        )
-      }
-    }
+    this.renderNavBarView = this.renderNavBarView.bind(this)
+    this.handleGoBack = this.handleGoBack.bind(this)
   }
 
-  handleImageLoaded (url, result) {
-    const { imagesSize = {} } = this.state
-    imagesSize[url] = result
-    this.setState({
-      imagesSize
-    })
-  }
+  handleGoBack () {
+    const { navigation } = this.props
 
-  createTagStyles (nextProps) {
-    const { fontSize, themedStyle } = nextProps || this.props
-    if (nextProps && nextProps.fontSize === this.props.fontSize) {
-      return
-    }
-    this.tagsStyles = {
-      div: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
-      a: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
-      p: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
-      li: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
-      h1: { paddingVertical: 5, fontSize: fontSize * 1.73, ...themedStyle.textColor },
-      h2: { paddingVertical: 5, fontSize: fontSize * 1.58, ...themedStyle.textColor },
-      h3: { paddingVertical: 5, fontSize: fontSize * 1.44, ...themedStyle.textColor },
-      h4: { paddingVertical: 5, fontSize: fontSize * 1.3, ...themedStyle.textColor },
-      h5: { paddingVertical: 5, fontSize: fontSize * 1.15, ...themedStyle.textColor },
-      pre: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor }
-    }
-
-    this.setState({
-      loading: true
-    }, () => {
-      setTimeout(() => {
-        this.setState({
-          loading: false
-        })
-      }, 100)
-    })
-  }
-
-  handlePressLink (e, href) {
-    Linking
-      .openURL(href)
-      .catch(() => {})
+    navigationPop(navigation)
   }
 
   handleOpenSource () {
@@ -168,13 +79,14 @@ class ReadingBetaComponent extends React.Component {
 
   handleSave () {
     const { article, saveNews } = this.props
-    const { imagesSize, images } = this.state
+    const { images } = this.state
+    // const { imagesSize, images } = this.state
     const news = { ...article }
     try {
       FastImage.preload(images.map(item => ({ uri: item.data })))
     } catch (err) {
     }
-    news.imagesSize = imagesSize
+    // news.imagesSize = imagesSize
     saveNews(news)
     Toast.show(i18n.t('messages.saved_news'))
   }
@@ -203,49 +115,7 @@ class ReadingBetaComponent extends React.Component {
   handlePress () {
   }
 
-  handleCommentsButtonPress () {
-  }
-
   handleLikeButtonPress () {
-  }
-
-  handleLoadMoreComments () {
-    const { commentPage } = this.state
-    this.setState({
-      loadingComment: true
-    }, () => {
-      this.getComments(commentPage + 1)
-    })
-  }
-
-  async handleImageSize (data) {
-    const { images: lastImages } = this.state
-    let images = await Promise.all(
-      data
-        .map(item => {
-          return new Promise((resolve, reject) => {
-            if (lastImages[item.data]) {
-              resolve(undefined)
-            }
-            Image.getSize(item.data, (itemWidth, itemHeight) => {
-              const result = {}
-              const ratio = itemWidth / itemHeight
-              result.width = (width - 20)
-              result.height = result.width / ratio
-              resolve({ [item.data]: { ...result } })
-            }, () => {
-              resolve(undefined)
-            })
-          })
-        })
-    )
-    images = images.reduce((all, item) => {
-      return { ...all, ...item }
-    }, {})
-    this.setState({
-      loading: false,
-      imagesSize: images
-    })
   }
 
   async componentDidMount () {
@@ -255,50 +125,12 @@ class ReadingBetaComponent extends React.Component {
     const newState = {
       images: result.images,
       data: result.body,
-      loadingComment: true,
       webview: false,
       loading: false
     }
-    if (article.imagesSize) {
-      newState.imagesSize = article.imagesSize
-    }
     setTimeout(() => {
-      const { noComment } = this.props
-      this.setState(newState, async () => {
-        !noComment && this.getComments()
-      })
-    }, 300)
-  }
-
-  componentWillReceiveProps (nextProps, nextState) {
-    const { noComment, fontSize } = this.props
-    if (
-      noComment !== nextProps.noComment &&
-      !nextProps.noComment &&
-      (!nextState.comments || !nextState.comments.length)
-    ) {
-      this.getComments()
-    }
-    if (fontSize !== nextProps.fontSize) {
-      this.createTagStyles(nextProps)
-    }
-  }
-
-  async getComments (page) {
-    const { article, getComments } = this.props
-    const { commentPage } = this.state
-    const next = page || commentPage
-    if (!article._id) {
-      return
-    }
-    const comments = await getComments(article._id, next)
-    if (comments) {
-      this.setState({
-        loadingComment: false,
-        commentPage: next,
-        comments: next === 1 ? comments : [...this.state.comments, ...comments]
-      })
-    }
+      this.setState(newState)
+    }, 200)
   }
 
   renderActions () {
@@ -328,8 +160,78 @@ class ReadingBetaComponent extends React.Component {
         <ActionButton.Item key='4' buttonColor='#1abc9c' title={i18n.t('reading.font_size')} onPress={this.handleReduceFont}>
           <Icon name='magnifier-remove' style={themedStyle.actionIcon} />
         </ActionButton.Item>
+        <ActionButton.Item key='5' buttonColor='#9b59b6' title={i18n.t('common.back')} onPress={this.handleGoBack}>
+          <Icon name='action-undo' style={themedStyle.actionIcon} />
+        </ActionButton.Item>
       </ActionButton>
     )
+  }
+
+  renderView () {
+    const {
+      themedStyle,
+      noTransition,
+      article = {}
+    } = this.props
+    let UserAvatarComponent = null
+    if (noTransition) {
+      UserAvatarComponent = (
+        <Avatar
+          style={themedStyle.authorPhoto}
+          size='large'
+          source={article.avatar ? { uri: article.avatar } : commonImages.default_user}
+        />
+      )
+    } else {
+      UserAvatarComponent = (
+        <Transition shared={`${article._id}_${article.avatar}_avatar`}>
+          <Avatar
+            style={themedStyle.authorPhoto}
+            size='large'
+            source={article.avatar ? { uri: article.avatar } : commonImages.default_user}
+          />
+        </Transition>
+      )
+    }
+    return [
+      <ScrollView horizontal key='info' style={themedStyle.tagContainer}>
+        {article.tags && article.tags.map(item => {
+          return (
+            <View
+              style={[themedStyle.badgeContainer, themedStyle.badge, commonStyles.shadow]}
+              key={item._id}
+            >
+              <Text style={themedStyle.textBadge}>{item.name}</Text>
+            </View>
+          )
+        })}
+      </ScrollView>,
+      <View key='avatar' style={[themedStyle.authorPhotoContainer]}>
+        {UserAvatarComponent}
+      </View>
+    ]
+  }
+
+  renderNavBarView () {
+    const { navigation } = this.props
+    return (
+      <DefaultHeader
+        transition={false}
+        title={i18n.t('pages.reading').toUpperCase()}
+        navigation={navigation}
+        headerContainer={{
+          backgroundColor: 'transparent',
+          width: '100%'
+        }}
+      />
+    )
+  }
+
+  getThemeColor () {
+    const { theme } = this.props
+
+    const baseColor = theme['background-basic-color-4'].replace('$', '')
+    return theme[baseColor]
   }
 
   render () {
@@ -337,9 +239,11 @@ class ReadingBetaComponent extends React.Component {
       noTransition,
       themedStyle,
       article = {},
-      fontSize
+      fontSize,
+      noComment,
+      getComments
     } = this.props
-    const { imagesSize, data, loadingComment, comments, loading, images } = this.state
+    const { data, loading, images } = this.state
     const imageSource = article.og_image_url
       ? { uri: article.og_image_url }
       : images && images[0] && images[0].data
@@ -355,7 +259,7 @@ class ReadingBetaComponent extends React.Component {
         />
       )
     }
-    if (!loading && imagesSize && Object.keys(imagesSize || {}).length > 28) {
+    if (!loading && images && images.length > 26) {
       return (
         <View
           style={themedStyle.wrapperContentLite}
@@ -371,32 +275,10 @@ class ReadingBetaComponent extends React.Component {
             >
               {article.title}
             </Text>
-            <View style={themedStyle.htmlContainer}>
-              <Html
-                tagsStyles={this.tagsStyles}
-                html={data}
-                onLinkPress={this.handlePressLink}
-                imagesMaxWidth={width - 20}
-                staticContentMaxWidth={width - 20}
-                renderers={this.renderers}
-                themedStyle={themedStyle}
-                imagesSize={imagesSize}
-                fontSize={fontSize}
-              />
-            </View>
-            {comments && comments.length ? <CommentList article={article} data={comments} /> : null}
-            {comments && comments.length
-              ? (
-                <Button
-                  disabled={loadingComment}
-                  onPress={this.handleLoadMoreComments}
-                  style={themedStyle.button}
-                  appearance='ghost'
-                  status='info'
-                >
-                  {i18n.t('reading.loading_more_comments')}
-                </Button>)
-              : null}
+            <HtmlContent
+              data={data}
+              fontSize={fontSize}
+            />
           </ScrollView>
           {this.renderActions()}
         </View>
@@ -406,50 +288,15 @@ class ReadingBetaComponent extends React.Component {
       <ParallaxScrollView
         key='0'
         noTransition={noTransition}
-        windowHeight={height * 0.4}
+        windowHeight={height * 0.35}
         backgroundSource={imageSource}
         style={themedStyle.container}
         userImage={article.avatar}
         scrollableViewStyle={themedStyle.content}
-        headerView={() => {
-          let UserAvatarComponent = null
-          if (noTransition) {
-            UserAvatarComponent = (
-              <Avatar
-                style={themedStyle.authorPhoto}
-                size='large'
-                source={article.avatar ? { uri: article.avatar } : commonImages.default_user}
-              />
-            )
-          } else {
-            UserAvatarComponent = (
-              <Transition shared={`${article._id}_${article.avatar}_avatar`}>
-                <Avatar
-                  style={themedStyle.authorPhoto}
-                  size='large'
-                  source={article.avatar ? { uri: article.avatar } : commonImages.default_user}
-                />
-              </Transition>
-            )
-          }
-          return [
-            <ScrollView horizontal key='info' style={themedStyle.tagContainer}>
-              {article.tags && article.tags.map(item => {
-                return (
-                  <View
-                    style={[themedStyle.badgeContainer, themedStyle.badge, commonStyles.shadow]}
-                    key={item._id}
-                  >
-                    <Text style={themedStyle.textBadge}>{item.name}</Text>
-                  </View>
-                )
-              })}
-            </ScrollView>,
-            <View key='avatar' style={[themedStyle.authorPhotoContainer]}>
-              {UserAvatarComponent}
-            </View>
-          ]
-        }}
+        headerView={this.renderView}
+        navBarView={this.renderNavBarView}
+        navBarHeight={DEFAULT_HEADER_HEIGHT}
+        navBarColor={this.getThemeColor()}
       >
         {article.creator_id
           ? (
@@ -470,21 +317,16 @@ class ReadingBetaComponent extends React.Component {
         </Text>
         {
           loading
-            ? <ContentSkeleton />
+            ? (
+              <Animatable.View useNativeDriver animation='fadeInUp'>
+                <ContentSkeleton />
+              </Animatable.View>
+            )
             : (
-              <View style={themedStyle.htmlContainer}>
-                <Html
-                  tagsStyles={this.tagsStyles}
-                  html={data}
-                  onLinkPress={this.handlePressLink}
-                  imagesMaxWidth={width - 20}
-                  staticContentMaxWidth={width - 20}
-                  renderers={this.renderers}
-                  themedStyle={themedStyle}
-                  imagesSize={imagesSize}
-                  fontSize={fontSize}
-                />
-              </View>
+              <HtmlContent
+                data={data}
+                fontSize={fontSize}
+              />
             )
         }
         <View style={themedStyle.endingBlock} />
@@ -504,16 +346,7 @@ class ReadingBetaComponent extends React.Component {
             </Text>
           </View>
         </ArticleActivityBar>
-        <CommentList article={article} data={comments} />
-        <Button
-          disabled={loadingComment}
-          onPress={this.handleLoadMoreComments}
-          style={themedStyle.button}
-          appearance='ghost'
-          status='info'
-        >
-          {i18n.t('reading.loading_more_comments')}
-        </Button>
+        <CommentList article={article} noComment={noComment} getComments={getComments} />
       </ParallaxScrollView>,
       this.renderActions()
     ]
@@ -535,15 +368,9 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
   badge: {
     backgroundColor: theme['color-info-default']
   },
-  textColor: {
-    color: theme['text-basic-color']
-  },
   content: {
     paddingTop: 60,
     backgroundColor: theme['background-basic-color-2']
-  },
-  htmlContainer: {
-    paddingHorizontal: 10
   },
   detailsContainer: {
     paddingHorizontal: 24,
@@ -604,15 +431,6 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
     marginLeft: 8,
     ...textStyle.paragraph
   },
-  dateIcon: {
-    width: 24,
-    height: 24,
-    tintColor: theme['text-hint-color']
-  },
-  imageContent: {
-    marginVertical: 10,
-    marginHorizontal: 0
-  },
   tagContainer: {
     flexDirection: 'row',
     paddingVertical: 10,
@@ -642,27 +460,6 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
   contentLinkText: {
     marginHorizontal: 10,
     textDecorationLine: 'underline'
-  },
-  blockquoteWrapper: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  blockquoteText: {
-    color: theme['color-primary-500'],
-    fontWeight: 'bold',
-    paddingHorizontal: 5
-  },
-  blockquoteStart: {
-    flex: 1,
-    backgroundColor: theme['color-primary-500'],
-    height: 2
-  },
-  endingBlock: {
-    backgroundColor: theme['color-success-500'],
-    height: 3
   },
   readMoreText: {
     textAlign: 'center',

@@ -6,15 +6,10 @@ import { Layout } from 'react-native-ui-kitten'
 import Categories from '../modules/category/containers/Categories'
 
 export default class CategoriesPage extends Component {
-  constructor (props) {
-    super(props)
-    this.viewRef = null
-  }
-
   render () {
     const { navigation } = this.props
     return (
-      <DefaultPage ref={ref => { this.viewRef = ref }}>
+      <DefaultPage>
         <DefaultHeader
           noBack
           transition={false}

@@ -3,11 +3,14 @@ import PropTypes from 'prop-types'
 import {
   View,
   Animated,
+  Dimensions,
   ScrollView
 } from 'react-native'
 import { Transition } from 'react-navigation-fluid-transitions'
 import { SCREEN_HEIGHT, DEFAULT_WINDOW_MULTIPLIER } from './constants'
 import styles from './styles'
+
+const { width } = Dimensions.get('window')
 
 const ScrollViewPropTypes = ScrollView.propTypes
 
@@ -102,12 +105,49 @@ export default class ParallaxScrollView extends Component {
     )
   }
 
+  rendernavBar () {
+    const {
+      navBarView,
+      windowHeight,
+      backgroundSource,
+      navBarColor,
+      navBarHeight
+    } = this.props
+    const { scrollY } = this.state
+    if (!windowHeight || !backgroundSource) {
+      return null
+    }
+
+    const newNavBarHeight = navBarHeight || 65
+
+    if (!navBarView) {
+      return null
+    }
+    return (
+      <Animated.View
+        style={{
+          height: newNavBarHeight,
+          width,
+          flexDirection: 'row',
+          backgroundColor: scrollY.interpolate({
+            inputRange: [-windowHeight, windowHeight * DEFAULT_WINDOW_MULTIPLIER, windowHeight * 0.8],
+            outputRange: ['transparent', 'transparent', navBarColor || 'rgba(0, 0, 0, 1.0)'],
+            extrapolate: 'clamp'
+          })
+        }}
+      >
+        {navBarView()}
+      </Animated.View>
+    )
+  }
+
   render () {
     const { style, ...props } = this.props
 
     return (
       <View style={[styles.container, style]}>
         {this.renderBackground()}
+        {this.rendernavBar()}
         <ScrollView
           ref={component => {
             this._scrollView = component

@@ -11,6 +11,8 @@ export const HEADER_GRADIENT = DEFAULT_HEADER_GRADIENT
 export const isFixedSize = parseInt(height) === parseInt(screenHeight - StatusBar.currentHeight)
 export const appHeight = height - (!isFixedSize && StatusBar.currentHeight ? StatusBar.currentHeight : 0)
 
+export const TAB_BAR_HEIGHT = 52
+
 const style = {
   defaultPage: {
     flex: 1,
@@ -61,7 +63,7 @@ const style = {
   modalHeader: {},
   bottom_bar_container: {
     borderTopColor: 'transparent',
-    height: 52
+    height: TAB_BAR_HEIGHT
   },
   bottom_bar_item_overlay: {
     position: 'absolute',

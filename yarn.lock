@@ -5991,10 +5991,10 @@ react-native-safe-area-view@^0.14.1, react-native-safe-area-view@^0.14.6:
   dependencies:
     debounce "^1.2.0"
 
-react-native-screens@^2.0.0-alpha.32:
-  version "2.0.0-alpha.32"
-  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.0.0-alpha.32.tgz#a23e0458e24984e3a1bd130292f9ad8a118b1e15"
-  integrity sha512-dMw+dGL8UfcS+RQXfUGpdduSkmQN/8l3CJg9+YAwgrgejUpE1YYFnr2gP4GPhie0sBLBdfLj0svNwY1vhnO0Tg==
+react-native-screens@^2.0.0-beta.2:
+  version "2.0.0-beta.4"
+  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.0.0-beta.4.tgz#650e61d238a92b8a173e695124365f7181767870"
+  integrity sha512-wrbhTSNVcgdNcdby3h4CzrYKAA3bf/86UR2vEUIcp8gydzVxi2FQiopBavIrcwFJ9PvwXrERB5rF0VYUkzHpIw==
   dependencies:
     debounce "^1.2.0"
 
@@ -6059,13 +6059,6 @@ react-native-ui-kitten@^4.2.0:
     fecha "3.0.3"
     hoist-non-react-statics "^3.2.1"
     lodash.merge "^4.6.1"
-
-"react-native-v8@>=0.60.0-patch.0 <0.60.1":
-  version "0.60.0"
-  resolved "https://registry.yarnpkg.com/react-native-v8/-/react-native-v8-0.60.0.tgz#60e33b54f7edb44eb3ad1421e5f9b557b6ba6360"
-  integrity sha512-bPPa4dHq2KfWls103gqG5ulLbvl+rXVY53TlLlKBTRPb77aT5M2y21SMU/R0qfN5RHT9u0gQNalhr+c2ly5lFg==
-  dependencies:
-    v8-android "^7.5.1"
 
 react-native-vector-icons@^6.6.0:
   version "6.6.0"
@@ -7492,11 +7485,6 @@ uuid@^3.3.2:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
   integrity sha512-pW0No1RGHgzlpHJO1nsVrHKpOEIxkGg1xB+v0ZmdNH5OAeAwzAVrCnI2/6Mtx+Uys6iaylxa+D3g4j63IKKjSQ==
-
-v8-android@^7.5.1:
-  version "7.8.2"
-  resolved "https://registry.yarnpkg.com/v8-android/-/v8-android-7.8.2.tgz#cab9196d2afad6b931630dcfa8ab3609ca18864e"
-  integrity sha512-LZLtehBxj4rLgf3+gWs3ITTmnVvlD3KQubLzFmtdI+l3G9tbi8ckWm6tJv7KQXZu3L/ok5M2bZz1AGnofPiMfQ==
 
 v8-compile-cache@^2.0.3:
   version "2.1.0"

@@ -3,7 +3,6 @@ import {
   View
 } from 'react-native'
 import { List, withStyles } from 'react-native-ui-kitten'
-import * as Animatable from 'react-native-animatable'
 import { DefaultSkeleton } from '../../../libraries/components/Skeleton'
 import { navigationPush, screens } from '../../../common/utils/navigation'
 import NewsItem from './NewsItem'
@@ -39,15 +38,13 @@ class ListComponent extends Component {
   }
 
   componentDidMount () {
-    const { data } = this.props
-    if (data && data.length) {
+    const { data, lazy } = this.props
+    if (data && data.length && !lazy) {
       setTimeout(() => {
         this.setState({
           loading: false
         }, () => {
-          setTimeout(() => {
-            this.getData(1)
-          }, 100)
+          this.getData(1)
         })
       }, 200)
     } else {
@@ -67,7 +64,7 @@ class ListComponent extends Component {
 
   async getData (nextpage, callback) {
     const { page } = this.state
-    const { getNews, type, data } = this.props
+    const { getNews, type, data, onLoadingDone } = this.props
     const result = await getNews(nextpage || page, type)
     if (result || data.length) {
       this.showAnimationNewItem = 10
@@ -76,6 +73,7 @@ class ListComponent extends Component {
         loading: false
       }, () => {
         callback && callback(nextpage || page)
+        onLoadingDone && onLoadingDone()
       })
     }
   }
@@ -145,10 +143,7 @@ class ListComponent extends Component {
     const { themedStyle } = this.props
     const { loading } = this.state
     return (
-      <Animatable.View
-        delay={50}
-        useNativeDriver
-        animation='slideInUp'
+      <View
         style={themedStyle.container}
       >
         <View style={themedStyle.listHistory}>
@@ -165,10 +160,11 @@ class ListComponent extends Component {
                 <DefaultSkeleton />
                 <DefaultSkeleton />
                 <DefaultSkeleton />
+                <DefaultSkeleton />
               </View>
             )}
         </View>
-      </Animatable.View>
+      </View>
     )
   }
 }

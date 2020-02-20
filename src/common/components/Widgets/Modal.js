@@ -58,10 +58,23 @@ class Modal extends PureComponent {
     BackHandler.addEventListener('hardwareBackPress', this.onBack)
     this.setState({
       show: true,
+      fullscreen: false,
       formComponent,
       touchOutSideToHide,
       enableAnimation,
       backButtonClose
+    })
+  }
+
+  showFullScreen (formComponent) {
+    BackHandler.addEventListener('hardwareBackPress', this.onBack)
+    this.setState({
+      show: true,
+      fullscreen: true,
+      formComponent,
+      touchOutSideToHide: false,
+      enableAnimation: false,
+      backButtonClose: false
     })
   }
 
@@ -73,9 +86,17 @@ class Modal extends PureComponent {
   }
 
   render () {
-    const { show, enableAnimation } = this.state
+    const { show, enableAnimation, fullscreen, formComponent } = this.state
     if (!show) {
       return null
+    }
+
+    if (fullscreen) {
+      return (
+        <View style={styles.fullscreenContainer}>
+          {formComponent}
+        </View>
+      )
     }
 
     if (this.state.formComponent != null) {
@@ -112,7 +133,7 @@ class Modal extends PureComponent {
             activeOpacity={1}
             onPress={this.handleTouchOutSide}
           />
-          {this.state.formComponent}
+          {formComponent}
         </Animated.View>
       </View>
     )
@@ -151,12 +172,18 @@ const Content = (props, context) => {
 const styles = StyleSheet.create({
   container: {
     zIndex: 998,
+    flex: 1,
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
     height: '100%',
     backgroundColor: 'rgba(0,0,0,0.4)'
+  },
+  fullscreenContainer: {
+    zIndex: 998,
+    position: 'absolute',
+    width
   },
   formContainer: {
     justifyContent: 'center',
@@ -201,6 +228,9 @@ const ModalPage = {
   show (formComponent, touchOutSideToHide = false, backButtonClose = false, enableAnimation = true) {
     instance &&
       instance.show(formComponent, touchOutSideToHide, backButtonClose, enableAnimation)
+  },
+  showFullScreen (formComponent) {
+    instance.showFullScreen(formComponent)
   },
   hide (callback = () => {}) {
     instance && instance.isShow() && instance.hide(callback)

@@ -61,7 +61,7 @@ class NewsItemComponent extends React.Component {
     let wrapperProps = {}
     if (shouldHaveAnimation) {
       Wrapper = Animatable.View
-      wrapperProps = { delay: animationDeplay, duration: 360, useNativeDriver: true, animation: 'fadeInRight', easing: 'ease-in-out-sine' }
+      wrapperProps = { delay: animationDeplay, duration: 360, useNativeDriver: true, animation: 'zoomInUp', easing: 'ease-in-out-sine' }
     }
     return (
       <Wrapper {...wrapperProps}>

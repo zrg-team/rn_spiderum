@@ -89,9 +89,24 @@ class DefaultHeader extends PureComponent {
   render () {
     const {
       title = '',
-      themedStyle
+      themedStyle,
+      linearGradient,
+      headerContainer = {}
       // leftTitle = ''
     } = this.props
+
+    if (!linearGradient) {
+      return (
+        <TopNavigation
+          title={title}
+          alignment='center'
+          titleStyle={{}}
+          style={[themedStyle.header, commonStyles.shadow, headerContainer]}
+          leftControl={this.renderLeftComponent()}
+          rightControls={this.renderRightComponent()}
+        />
+      )
+    }
     return (
       <LinearGradient
         start={{ x: 0, y: 0 }}
@@ -104,7 +119,7 @@ class DefaultHeader extends PureComponent {
           title={title}
           alignment='center'
           titleStyle={{}}
-          style={[themedStyle.header, commonStyles.shadow]}
+          style={[themedStyle.header, commonStyles.shadow, headerContainer]}
           leftControl={this.renderLeftComponent()}
           rightControls={this.renderRightComponent()}
         />

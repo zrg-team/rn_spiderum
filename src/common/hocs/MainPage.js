@@ -171,16 +171,7 @@ class MainPage extends Component {
         <View
           ref={this.getNavigatorRef}
           style={[
-            Platform.select({
-              android: {
-                height: !loading ? appHeight : 0,
-                marginTop: StatusBar.currentHeight
-              },
-              ios: {
-                height: '100%',
-                marginTop: 0
-              }
-            }),
+            themedStyle.mainContent,
             !loading
               ? themedStyle.backgroundColor
               : themedStyle.backgroundTransparent
@@ -221,5 +212,15 @@ export default withStyles(MainPage, (theme) => ({
   },
   mainNavigator: {
     backgroundColor: theme['background-basic-color-3']
-  }
+  },
+  mainContent: Platform.select({
+    android: {
+      height: appHeight,
+      marginTop: StatusBar.currentHeight
+    },
+    ios: {
+      height: '100%',
+      marginTop: 0
+    }
+  })
 }))

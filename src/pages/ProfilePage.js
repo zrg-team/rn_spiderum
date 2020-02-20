@@ -6,16 +6,11 @@ import { Layout } from 'react-native-ui-kitten'
 import Profile from '../modules/profile/containers/Profile'
 
 export default class ProfilePage extends Component {
-  constructor (props) {
-    super(props)
-    this.viewRef = null
-  }
-
   render () {
     const { navigation } = this.props
     const profileId = navigation.getParam('profileId')
     return (
-      <DefaultPage ref={ref => { this.viewRef = ref }}>
+      <DefaultPage>
         <DefaultHeader
           transition={false}
           title={i18n.t('pages.profile').toUpperCase()}

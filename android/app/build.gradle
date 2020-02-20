@@ -132,8 +132,8 @@ android {
         applicationId "com.zrgteam.awesome"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4
-        versionName "1.0.4"
+        versionCode 8
+        versionName "1.0.8"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
     }
@@ -193,8 +193,8 @@ dependencies {
     implementation project(':react-native-vector-icons')
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.annotation:annotation:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     if (enableHermes) {

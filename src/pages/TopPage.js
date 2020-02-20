@@ -6,15 +6,10 @@ import { Layout } from 'react-native-ui-kitten'
 import List from '../modules/home/containers/List'
 
 export default class TopPage extends Component {
-  constructor (props) {
-    super(props)
-    this.viewRef = null
-  }
-
   render () {
     const { navigation } = this.props
     return (
-      <DefaultPage ref={ref => { this.viewRef = ref }}>
+      <DefaultPage>
         <DefaultHeader
           noBack
           transition={false}

@@ -3,18 +3,33 @@ import i18n from 'i18n-js'
 import DefaultPage from '../common/hocs/DefaultPage'
 import DefaultHeader from '../common/containers/DefaultHeader'
 import { Layout } from 'react-native-ui-kitten'
+import Modal from '../common/components/Widgets/Modal'
+import ContentLoadingPage from './ContentLoadingPage'
 import List from '../modules/home/containers/List'
 
 class HomePage extends Component {
   constructor (props) {
     super(props)
-    this.viewRef = null
+    Modal.showFullScreen(<ContentLoadingPage />)
+    this.handleLoadingDone = this.handleLoadingDone.bind(this)
   }
+
+  handleLoadingDone () {
+    setTimeout(() => {
+      Modal.hide()
+    }, 100)
+  }
+
+  // componentDidMount () {
+  //   setTimeout(() => {
+  //     Modal.hide()
+  //   }, 5000)
+  // }
 
   render () {
     const { navigation } = this.props
     return (
-      <DefaultPage ref={ref => { this.viewRef = ref }}>
+      <DefaultPage>
         <DefaultHeader
           notification
           search
@@ -24,7 +39,7 @@ class HomePage extends Component {
           navigation={navigation}
         />
         <Layout style={[{ flexGrow: 1 }]} level='2'>
-          <List type='hot' navigation={navigation} />
+          <List type='hot' navigation={navigation} lazy onLoadingDone={this.handleLoadingDone} />
         </Layout>
       </DefaultPage>
     )

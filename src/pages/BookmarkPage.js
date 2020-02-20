@@ -6,15 +6,10 @@ import { Layout } from 'react-native-ui-kitten'
 import Bookmark from '../modules/user/containers/Bookmark'
 
 export default class BookmarkPage extends Component {
-  constructor (props) {
-    super(props)
-    this.viewRef = null
-  }
-
   render () {
     const { navigation } = this.props
     return (
-      <DefaultPage ref={ref => { this.viewRef = ref }}>
+      <DefaultPage>
         <DefaultHeader
           transition={false}
           title={i18n.t('pages.bookmark').toUpperCase()}

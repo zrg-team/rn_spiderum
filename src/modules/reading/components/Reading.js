@@ -391,7 +391,7 @@ class ReadingComponent extends React.Component {
       <ParallaxScrollView
         key='0'
         noTransition={noTransition}
-        windowHeight={height * 0.4}
+        windowHeight={height * 0.2}
         backgroundSource={imageSource}
         style={themedStyle.container}
         imageUrl={article.og_image_url}
