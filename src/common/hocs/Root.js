@@ -5,7 +5,6 @@ import MaterialCommunityPack from '../../libraries/icons/MaterialCommunityPack'
 import { mapping, light as lightTheme, dark as darkTheme } from '@eva-design/eva'
 import { ApplicationProvider, IconRegistry } from 'react-native-ui-kitten'
 import initialize from '../utils/initialize'
-import logger from '../utils/logger'
 import database from '../../libraries/Database'
 import MainPage from './MainPage'
 
@@ -38,14 +37,13 @@ class Root extends Component {
     const { dispatch, language } = this.props
     try {
       await database.init()
-      await logger.init()
     } catch (err) {
-      console.log('logger Error. Cannot Initialize logger.', err)
+      console.debug('logger Error. Cannot Initialize logger.', err)
     }
     try {
       await initialize(dispatch, language || undefined)
     } catch (error) {
-      console.log('Fatal Error. Cannot Initialize.', error)
+      console.debug('Fatal Error. Cannot Initialize.', error)
     }
   }
 

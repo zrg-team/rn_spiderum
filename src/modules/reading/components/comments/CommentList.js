@@ -62,9 +62,10 @@ class CommentListComponent extends Component {
     }
   }
 
-  shouldComponentUpdate (nextProps) {
+  shouldComponentUpdate (nextProps, nextStates) {
     const { noComment } = this.props
-    return noComment !== nextProps.noComment
+    const { loadingComment } = this.state
+    return noComment !== nextProps.noComment || loadingComment !== nextStates.loadingComment
   }
 
   handleLoadMoreComments () {
@@ -111,7 +112,6 @@ class CommentListComponent extends Component {
   render () {
     const { comments = [], loadingComment } = this.state
     const { themedStyle } = this.props
-
     return [
       <View key='comments' style={themedStyle.container}>
         {comments && comments.map((item, index) => {

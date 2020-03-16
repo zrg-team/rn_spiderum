@@ -24,7 +24,7 @@ export function parseHtml (page, data) {
           // const itemDOM = cheerio.load(item.body)
           // item.decription = itemDOM.text().substring(0, 256)
           const regex = /(<([^>]+)>)/ig
-          item.decription = `${item.body}`.substring(0, 480).replace(regex, '')
+          item.decription = `${item.body}`.substring(0, 1000).replace(regex, '')
           item.avatar = item.creator_id.avatar ? `${AVATAR_URL}${item.creator_id.avatar}` : null
           const url = decodeURIComponent(`${item.fb_share_url}`.replace('https://www.facebook.com/sharer/sharer.php?u=', ''))
           items.push({
@@ -64,7 +64,7 @@ export function parseHtml (page, data) {
   }).then((response) => {
     return database.model('article').bulkInsert(items)
   }).catch((error) => {
-    console.log('error', error)
+    console.debug('parseHtml', error)
   })
 
   return results
@@ -173,7 +173,7 @@ export default (dispatch, props) => ({
       }
       return results
     } catch (err) {
-      console.log('error', err)
+      console.debug('getNews', err)
       return undefined
     }
   },
@@ -183,7 +183,7 @@ export default (dispatch, props) => ({
       dispatch(setSearchResults({ page, results }))
       return results
     } catch (err) {
-      console.log('error', err)
+      console.debug('searchNews', err)
       return undefined
     }
   }

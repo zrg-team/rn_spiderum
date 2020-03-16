@@ -44,7 +44,7 @@ export default class SliderEntry extends Component {
         {title.toUpperCase()}
       </Text>
     ) : false
-    const decription = body.substring(0, 480).replace(/(<([^>]+)>)/ig, '')
+    const decription = body.substring(0, 1000).replace(/(<([^>]+)>)/ig, '')
     return (
       <TouchableOpacity
         activeOpacity={1}

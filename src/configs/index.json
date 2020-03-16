@@ -1,6 +1,8 @@
 {
   "DEBUG": true,
   "TIMEOUT": 15000,
+  "LOG_LEVEL": "info",
+  "LOG_TERMINAL": true,
   "DEFAULT_LANGUAGE": "en",
   "STYLE_SHEET": {
     "status_bar": {  "backgroundColor": "#024098" },

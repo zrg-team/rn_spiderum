@@ -74,7 +74,7 @@ class QRCodeScan extends Component {
         this.hide()
       }
     } catch (err) {
-      console.show('>>>>>>>err', err)
+      console.debug('[CAMERA] handleCapture', err)
     }
   }
 
@@ -107,7 +107,7 @@ class QRCodeScan extends Component {
 
   cameraRequest () {
     Permissions.check(Permissions.PERMISSIONS.ANDROID.CAMERA).then(response => {
-      console.log('Permissions', response)
+      console.info('Permissions', response)
       if (response === Permissions.RESULTS.GRANTED) {
         this.setState({ cameraAvailable: true })
       } else {

@@ -1,7 +1,7 @@
 import redux from '../store'
 
 function defaultDispatch () {
-  console.log('Missing store')
+  console.debug('Missing store')
 }
 
 class StoreAccessible {

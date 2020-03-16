@@ -21,7 +21,7 @@ export async function overlay (overlayProcess) {
     return ret
   } catch (error) {
     CommonLoading.hide()
-    console.log('ERROR', error)
+    console.debug('[OVERLAY]', error)
     throw error
   }
 }
@@ -41,7 +41,7 @@ export async function splash (splashProcess) {
     return ret
   } catch (error) {
     CommonLoading.hide()
-    console.log('ERROR', error)
+    console.debug('[SPLASH]', error)
     throw error
   }
 }
@@ -58,7 +58,7 @@ export async function loading (fetchingProcess, done = undefined) {
     return ret
   } catch (error) {
     dispatch(loadEnd({ config: { key: 'loading' } }))
-    console.log('ERROR', error)
+    console.debug('[LOADING]', error)
     throw error
   }
 }
@@ -74,7 +74,7 @@ export async function fetchLoading (fetchingProcess, done = undefined) {
     return ret
   } catch (error) {
     ProgressBar.hide()
-    console.log('ERROR', error)
+    console.debug('[FETCH LOADING]', error)
     throw error
   }
 }

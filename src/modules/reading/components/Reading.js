@@ -102,8 +102,8 @@ class ReadingComponent extends React.Component {
       message: article.title,
       url: `${READING_URL}${article.slug}`
     })
-      .then((res) => { console.log(res) })
-      .catch((err) => { err && console.log(err) })
+      .then((res) => { console.info(res) })
+      .catch((err) => { err && console.debug(err) })
   }
 
   handleIncreaseFont () {

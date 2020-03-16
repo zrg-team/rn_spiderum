@@ -15,7 +15,7 @@ class ContentLoadingPage extends Component {
   }
 
   render () {
-    const { navigation, themedStyle } = this.props
+    const { navigation, themedStyle, title } = this.props
     return (
       <DefaultPage
         containerStyle={themedStyle.container}
@@ -25,7 +25,7 @@ class ContentLoadingPage extends Component {
           search
           noBack
           transition={false}
-          title={i18n.t('pages.hot').toUpperCase()}
+          title={(title || i18n.t('pages.hot')).toUpperCase()}
           navigation={navigation}
         />
         <Layout style={[{ flexGrow: 1 }]} level='2'>

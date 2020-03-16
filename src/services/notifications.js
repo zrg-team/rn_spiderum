@@ -1,3 +1,3 @@
 export default function NotificationService () {
-  console.log('Receiving HeartBeat!')
+  console.info('Receiving HeartBeat!')
 }

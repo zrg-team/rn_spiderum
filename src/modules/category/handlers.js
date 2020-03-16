@@ -37,7 +37,7 @@ export default (dispatch, props) => ({
       }
       return results
     } catch (err) {
-      console.log('error', err)
+      console.debug('getNews', err)
       return undefined
     }
   }

@@ -14,7 +14,6 @@ import {
 } from 'react-native-ui-kitten'
 import WebView from 'react-native-webview'
 import Share from 'react-native-share'
-import * as Animatable from 'react-native-animatable'
 import ActionButton from 'react-native-action-button'
 import Icon from 'react-native-vector-icons/SimpleLineIcons'
 import FastImage from 'react-native-fast-image'
@@ -27,7 +26,6 @@ import { ActivityAuthoring } from '../../home/components/item/ActivityAuthoring'
 import { ArticleActivityBar } from '../../home/components/item/ArticleActivityBar'
 import commonStyles, { textStyle, DEFAULT_HEADER_HEIGHT } from '../../../styles/common'
 import { images as commonImages } from '../../../assets/elements'
-import { ContentSkeleton } from '../../../libraries/components/Skeleton'
 import { navigationPop } from '../../../common/utils/navigation'
 import HtmlContent from './reading/HtmlContent'
 import ParallaxScrollView from '../../../libraries/components/Parallax/ParallaxScrollView'
@@ -98,8 +96,8 @@ class ReadingBetaComponent extends React.Component {
       message: article.title,
       url: `${READING_URL}${article.slug}`
     })
-      .then((res) => { console.log(res) })
-      .catch((err) => { err && console.log(err) })
+      .then((res) => { console.info(res) })
+      .catch((err) => { err && console.debug(err) })
   }
 
   handleIncreaseFont () {
@@ -231,7 +229,7 @@ class ReadingBetaComponent extends React.Component {
     const { theme } = this.props
 
     const baseColor = theme['background-basic-color-4'].replace('$', '')
-    return theme[baseColor]
+    return baseColor
   }
 
   render () {
@@ -277,8 +275,10 @@ class ReadingBetaComponent extends React.Component {
             </Text>
             <HtmlContent
               data={data}
+              loading={loading}
               fontSize={fontSize}
             />
+            <CommentList article={article} noComment={noComment} getComments={getComments} />
           </ScrollView>
           {this.renderActions()}
         </View>
@@ -315,20 +315,11 @@ class ReadingBetaComponent extends React.Component {
         >
           {article.title}
         </Text>
-        {
-          loading
-            ? (
-              <Animatable.View useNativeDriver animation='fadeInUp'>
-                <ContentSkeleton />
-              </Animatable.View>
-            )
-            : (
-              <HtmlContent
-                data={data}
-                fontSize={fontSize}
-              />
-            )
-        }
+        <HtmlContent
+          data={data}
+          loading={loading}
+          fontSize={fontSize}
+        />
         <View style={themedStyle.endingBlock} />
         <Text style={themedStyle.readMoreText} category='h6'>{i18n.t('reading.swipe_to_read_more')}</Text>
         <ArticleActivityBar

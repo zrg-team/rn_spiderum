@@ -21,12 +21,11 @@
         <item name="android:windowEnterAnimation">@null</item>
         <item name="android:windowExitAnimation">@null</item>
         <item name="android:windowActionBar">false</item>
-        <item name="android:statusBarColor">@color/primary_dark</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- <item name="android:navigationBarColor">@android:color/transparent</item> -->
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
+        <!-- <item name="android:windowTranslucentNavigation">true</item> -->
     </style>
 
 </resources>

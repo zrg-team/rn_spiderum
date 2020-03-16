@@ -33,7 +33,7 @@ class ReadingContainerComponent extends React.Component {
     try {
       this.refs.viewPager.setPageWithoutAnimation(page)
     } catch (err) {
-      console.log('error', err)
+      console.debug('setPage', err)
     }
   }
 

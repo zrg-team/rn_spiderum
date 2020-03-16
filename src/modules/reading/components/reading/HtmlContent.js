@@ -9,10 +9,12 @@ import {
   Text,
   withStyles
 } from 'react-native-ui-kitten'
+import * as Animatable from 'react-native-animatable'
 import Html from 'react-native-render-html'
 import WebView from 'react-native-webview'
 import Share from 'react-native-share'
 import { READING_URL } from '../../models'
+import { ContentSkeleton } from '../../../../libraries/components/Skeleton'
 import ImageResize from '../../../../common/components/Layout/ImageResize'
 
 const { width } = Dimensions.get('window')
@@ -21,7 +23,7 @@ class ReadingBetaComponent extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      loading: true,
+      loading: false,
       imagesSize: {}
     }
 
@@ -88,9 +90,6 @@ class ReadingBetaComponent extends React.Component {
 
   createTagStyles (nextProps) {
     const { fontSize, themedStyle } = nextProps || this.props
-    if (nextProps && nextProps.fontSize === this.props.fontSize) {
-      return
-    }
     this.tagsStyles = {
       div: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
       a: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor },
@@ -103,7 +102,6 @@ class ReadingBetaComponent extends React.Component {
       h5: { paddingVertical: 5, fontSize: fontSize * 1.15, ...themedStyle.textColor },
       pre: { paddingVertical: 5, fontSize: fontSize, ...themedStyle.textColor }
     }
-
     this.setState({
       loading: true
     }, () => {
@@ -136,8 +134,8 @@ class ReadingBetaComponent extends React.Component {
       message: article.title,
       url: `${READING_URL}${article.slug}`
     })
-      .then((res) => { console.log(res) })
-      .catch((err) => { err && console.log(err) })
+      .then((res) => { console.info(res) })
+      .catch((err) => { err && console.debug(err) })
   }
 
   async handleImageSize (data) {
@@ -181,10 +179,18 @@ class ReadingBetaComponent extends React.Component {
     const {
       themedStyle,
       fontSize,
-      data
+      data,
+      loading
     } = this.props
-    const { imagesSize } = this.state
+    const { imagesSize, loading: internalLoading } = this.state
 
+    if (loading || internalLoading) {
+      return (
+        <Animatable.View useNativeDriver animation='fadeInUp'>
+          <ContentSkeleton />
+        </Animatable.View>
+      )
+    }
     return (
       <View style={themedStyle.htmlContainer}>
         <Html

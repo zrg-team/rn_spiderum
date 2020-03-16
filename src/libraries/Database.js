@@ -1,7 +1,6 @@
 import SQLite from 'react-native-sqlite-storage'
-import { DEBUG } from '../configs'
 
-SQLite.DEBUG(DEBUG)
+SQLite.DEBUG(false)
 SQLite.enablePromise(true)
 
 const SCHEMES = {
@@ -11,6 +10,12 @@ const SCHEMES = {
     title: 'TEXT NOT NULL',
     image: 'TEXT',
     body: 'TEXT'
+  },
+  logs: {
+    id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
+    timestamp: 'INTEGER',
+    data: 'TEXT',
+    module: 'TEXT'
   }
 }
 
@@ -275,17 +280,17 @@ class Database {
           )
             .then(async instance => {
               this.database = instance
-              console.log('Database OPEN')
+              console.info('Database OPEN')
               await this.createTables()
               resolve(this.database)
             })
             .catch(error => {
-              console.log(error)
+              console.info(error)
               resolve(error)
             })
         })
         .catch(error => {
-          console.log('init error', error)
+          console.debug('init error', error)
           resolve(error)
         })
     })
@@ -295,13 +300,13 @@ class Database {
     if (this.database) {
       this.database.close()
         .then(status => {
-          console.log('Database CLOSED')
+          console.info('Database CLOSED')
         })
         .catch(error => {
           this.errorCB(error)
         })
     } else {
-      console.log('Database was not OPENED')
+      console.info('Database was not OPENED')
     }
   }
 }

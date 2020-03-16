@@ -26,7 +26,7 @@ function * onFetchSuccess ({ payload: { response, config } }) {
 function * onFetchFailure ({ payload: { error, config } }) {
   yield ProgressBar.hide()
   // Notification.error(error.message)
-  console.log(error)
+  console.debug(error)
 }
 
 function * watchFetchStart () {

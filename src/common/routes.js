@@ -1,15 +1,14 @@
 import React from 'react'
 import {
   createAppContainer,
-  createStackNavigator,
   createBottomTabNavigator,
   BottomTabBar
 } from 'react-navigation'
-// import createNativeStackNavigator from 'react-native-screens/createNativeStackNavigator'
+import createNativeStackNavigator from 'react-native-screens/createNativeStackNavigator'
 import { FluidNavigator } from 'react-navigation-fluid-transitions'
 import { fadeIn } from 'react-navigation-transitions'
 // import { icons } from '../assets/elements'
-import { Animated, Easing, Platform } from 'react-native'
+import { Platform } from 'react-native'
 import commonStyle, { TAB_BAR_HEIGHT } from '../styles/common'
 import TabarItem from './containers/TabarItem'
 
@@ -45,10 +44,10 @@ export const SCREENS = {
   AppIntro: 'AppIntro'
 }
 
-const transitionConfig = {
-  duration: 300,
-  timing: Animated.timing,
-  easing: Easing.easing
+const customScreenOption = {
+  navigationOptions: {
+    stackAnimation: 'fade'
+  }
 }
 
 export default ({
@@ -57,13 +56,12 @@ export default ({
   appIntro,
   themedStyle
 }) => {
-  const OptionFlow = createStackNavigator({
-    [SCREENS.OptionList]: { screen: OptionPage },
-    [SCREENS.Bookmark]: { screen: BookmarkPage },
-    [SCREENS.Reading]: { screen: ReadingPage }
+  const OptionFlow = createNativeStackNavigator({
+    [SCREENS.OptionList]: { screen: OptionPage, ...customScreenOption },
+    [SCREENS.Bookmark]: { screen: BookmarkPage, ...customScreenOption },
+    [SCREENS.Reading]: { screen: ReadingPage, ...customScreenOption }
   }, {
     headerMode: 'none',
-    transitionConfig: () => fadeIn(),
     navigationOptions: ({ navigation }) => {
       let tabBarVisible = true
       if (navigation.state.index > 0) {
@@ -122,14 +120,13 @@ export default ({
       }
     }
   })
-  const CategoryFlow = createStackNavigator({
-    [SCREENS.Categories]: { screen: CategoriesPage },
-    [SCREENS.CategoryDetail]: { screen: CategoryDetailPage },
-    [SCREENS.Reading]: { screen: ReadingPage },
-    [SCREENS.Profile]: { screen: ProfilePage }
+  const CategoryFlow = createNativeStackNavigator({
+    [SCREENS.Categories]: { screen: CategoriesPage, ...customScreenOption },
+    [SCREENS.CategoryDetail]: { screen: CategoryDetailPage, ...customScreenOption },
+    [SCREENS.Reading]: { screen: ReadingPage, ...customScreenOption },
+    [SCREENS.Profile]: { screen: ProfilePage, ...customScreenOption }
   }, {
     headerMode: 'none',
-    transitionConfig: () => fadeIn(),
     navigationOptions: ({ navigation }) => {
       let tabBarVisible = true
       if (navigation.state.index > 0) {
@@ -164,7 +161,7 @@ export default ({
         return <TabarItem key={routeName} focused={focused} navigation={navigation} style={themedStyle.tabBarStyle} />
       }
     }),
-    lazy: false,
+    lazy: true,
     height: TAB_BAR_HEIGHT,
     labeled: false,
     shifting: true,
@@ -179,7 +176,7 @@ export default ({
 
   let AppNavigator = null
   if (appIntro || Platform.OS === 'ios') {
-    AppNavigator = createStackNavigator(
+    AppNavigator = createNativeStackNavigator(
       {
         [SCREENS.Loading]: {
           screen: (props) => (
@@ -190,9 +187,10 @@ export default ({
               page={SCREENS.TabGroup}
               {...props}
             />
-          )
+          ),
+          ...customScreenOption
         },
-        [SCREENS.TabGroup]: { screen: TabGroup }
+        [SCREENS.TabGroup]: { screen: TabGroup, ...customScreenOption }
       },
       {
         headerMode: 'none',
@@ -217,7 +215,6 @@ export default ({
         [SCREENS.AppIntro]: { screen: AppIntroPage }
       },
       {
-        transitionConfig,
         headerMode: 'none',
         initialRouteName: SCREENS.LoadingPage,
         defaultNavigationOptions: { gesturesEnabled: false }

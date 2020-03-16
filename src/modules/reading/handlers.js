@@ -102,7 +102,7 @@ export default (dispatch, props) => ({
       })
       return { body: row.body, images: data }
     } catch (err) {
-      console.log('getContent err', err)
+      console.debug('getContent', err)
       return undefined
     }
   },
@@ -243,7 +243,7 @@ export default (dispatch, props) => ({
 
       return data
     } catch (err) {
-      console.log('dataItem err', err)
+      console.debug('dataItem', err)
       return []
     }
   }

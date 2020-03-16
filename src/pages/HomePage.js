@@ -17,7 +17,7 @@ class HomePage extends Component {
   handleLoadingDone () {
     setTimeout(() => {
       Modal.hide()
-    }, 100)
+    }, 10)
   }
 
   // componentDidMount () {
