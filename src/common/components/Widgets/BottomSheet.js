@@ -4,7 +4,8 @@ import {
   BackHandler,
   findNodeHandle,
   StatusBar,
-  TouchableOpacity
+  TouchableOpacity,
+  Platform
 } from 'react-native'
 import { connect } from 'react-redux'
 import { withStyles } from 'react-native-ui-kitten'
@@ -70,8 +71,13 @@ class BottomSheetComponent extends PureComponent {
     return this.state.show
   }
 
-  handleHide () {
+  handleHide (options = {}) {
     const { onCloseCallback } = this.state
+    const nextState = {}
+    if (options.forceHide) {
+      nextState.component = null
+      this.blurNode = null
+    }
     this.setState({
       level: 0,
       show: false,
@@ -79,13 +85,16 @@ class BottomSheetComponent extends PureComponent {
       onTouchOut: null,
       onCloseCallback: null,
       temporaryHide: false,
-      prevertTouchOut: false
+      prevertTouchOut: false,
+      ...nextState
     }, () => {
       this.closeTimeout = setTimeout(() => {
-        this.blurNode = null
-        this.setState({
-          component: null
-        })
+        if (this.state.component !== null) {
+          this.blurNode = null
+          this.setState({
+            component: null
+          })
+        }
       }, 400)
     })
     onCloseCallback && onCloseCallback()
@@ -152,7 +161,7 @@ class BottomSheetComponent extends PureComponent {
 
   renderBackground () {
     const { appState, themedStyle } = this.props
-    if (this.blurNode && appState === 'active') {
+    if (this.blurNode && appState === 'active' && Platform.OS === 'android') {
       return (
         <TouchableOpacity onPress={this.handleTouchOutside} style={themedStyle.overlay}>
           <BlurView
@@ -172,7 +181,7 @@ class BottomSheetComponent extends PureComponent {
     const { show, level, component, temporaryHide } = this.state
     const extraStyles = temporaryHide ? { height: 0, overflow: 'hidden' } : {}
     return (
-      <View style={themedStyle.container}>
+      <View style={[themedStyle.container, !show && !component ? { height: 0 } : {}]}>
         {(show || component)
           ? this.renderBackground()
           : null}
@@ -198,7 +207,8 @@ const styles = (theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    height: '100%'
+    height: '100%',
+    zIndex: 3
   },
   panel: {
     backgroundColor: theme['background-basic-color-1']

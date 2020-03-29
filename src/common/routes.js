@@ -1,14 +1,16 @@
 import React from 'react'
+import { Platform } from 'react-native'
 import {
   createAppContainer,
   createBottomTabNavigator,
-  BottomTabBar
+  BottomTabBar,
+  createStackNavigator
 } from 'react-navigation'
-import createNativeStackNavigator from 'react-native-screens/createNativeStackNavigator'
+
+import createScreensStackNavigator from 'react-native-screens/createNativeStackNavigator'
 import { FluidNavigator } from 'react-navigation-fluid-transitions'
 import { fadeIn } from 'react-navigation-transitions'
 // import { icons } from '../assets/elements'
-import { Platform } from 'react-native'
 import commonStyle, { TAB_BAR_HEIGHT } from '../styles/common'
 import TabarItem from './containers/TabarItem'
 
@@ -51,6 +53,10 @@ const customScreenOption = {
     stackAnimation: 'fade'
   }
 }
+
+const createNativeStackNavigator = Platform.OS !== 'ios'
+  ? createScreensStackNavigator
+  : createStackNavigator
 
 export default ({
   persistor = undefined,
@@ -158,7 +164,7 @@ export default ({
         return (
           <BottomTabBar
             {...props}
-            style={[themedStyle.barStyle, { borderTopColor: 'transparent' }, commonStyle.shadow]}
+            style={[themedStyle.barStyle, commonStyle.bottom_bar_container, commonStyle.shadow]}
           />
         )
       },

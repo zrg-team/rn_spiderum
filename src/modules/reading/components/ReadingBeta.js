@@ -43,9 +43,7 @@ class ReadingBetaComponent extends React.Component {
       webview: false,
       images: {}
     }
-    this.handlePress = this.handlePress.bind(this)
     this.renderView = this.renderView.bind(this)
-    this.handleLikeButtonPress = this.handleLikeButtonPress.bind(this)
     this.handleIncreaseFont = this.handleIncreaseFont.bind(this)
     this.handleReduceFont = this.handleReduceFont.bind(this)
     this.handleRemove = this.handleRemove.bind(this)
@@ -113,12 +111,6 @@ class ReadingBetaComponent extends React.Component {
   handleReduceFont () {
     const { setFontSize, fontSize } = this.props
     setFontSize(fontSize - 1)
-  }
-
-  handlePress () {
-  }
-
-  handleLikeButtonPress () {
   }
 
   static getDerivedStateFromError (error) { // eslint-disable-line
@@ -439,7 +431,7 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
   authorBar: {
     width: width - 74,
     left: 80,
-    zIndex: 999,
+    zIndex: 9999,
     backgroundColor: theme['background-basic-color-2'],
     position: 'absolute',
     top: 10

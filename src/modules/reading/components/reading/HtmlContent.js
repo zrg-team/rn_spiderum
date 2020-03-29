@@ -9,13 +9,13 @@ import {
   Text,
   withStyles
 } from 'react-native-ui-kitten'
-import * as Animatable from 'react-native-animatable'
-import Html from 'react-native-render-html'
 import WebView from 'react-native-webview'
-import Share from 'react-native-share'
-import { READING_URL } from '../../models'
+import Html from 'react-native-render-html'
+import LottieView from 'lottie-react-native'
+import * as Animatable from 'react-native-animatable'
 import { ContentSkeleton } from '../../../../libraries/components/Skeleton'
 import ImageResize from '../../../../common/components/Layout/ImageResize'
+import { animations } from '../../../../assets/elements'
 
 const { width } = Dimensions.get('window')
 
@@ -28,7 +28,6 @@ class ReadingBetaComponent extends React.Component {
     }
 
     this.handlePressLink = this.handlePressLink.bind(this)
-    this.handleOpenSource = this.handleOpenSource.bind(this)
     this.handleImageLoaded = this.handleImageLoaded.bind(this)
 
     this.createTagStyles()
@@ -69,10 +68,11 @@ class ReadingBetaComponent extends React.Component {
       },
       iframe: (item, children) => {
         const ratio = item.width / item.height
+        const uri = `https://${item.src}`.replace('////', '//')
         return (
           <WebView
             key={`yotube_${item.src}`}
-            source={{ uri: `https://${item.src}` }}
+            source={{ uri }}
             style={{ alignSelf: 'stretch', height: width / ratio, width }}
           />
         )
@@ -119,25 +119,6 @@ class ReadingBetaComponent extends React.Component {
       .catch(() => {})
   }
 
-  handleOpenSource () {
-    const { article } = this.props
-
-    Linking
-      .openURL(article.key)
-      .catch(() => {})
-  }
-
-  handleShare () {
-    const { article } = this.props
-    Share.open({
-      title: article.title,
-      message: article.title,
-      url: `${READING_URL}${article.slug}`
-    })
-      .then((res) => { console.info(res) })
-      .catch((err) => { err && console.debug(err) })
-  }
-
   async handleImageSize (data) {
     const { images: lastImages } = this.state
     let images = await Promise.all(
@@ -173,6 +154,29 @@ class ReadingBetaComponent extends React.Component {
     if (fontSize !== nextProps.fontSize) {
       this.createTagStyles(nextProps)
     }
+  }
+
+  static getDerivedStateFromError (error) { // eslint-disable-line
+    return { componentError: true }
+  }
+
+  componentDidCatch (error, errorInfo) {
+    console.debug('[READING RENDER] ERROR', error)
+    console.debug('[READING RENDER] ERROR INFO', errorInfo)
+  }
+
+  renderError () {
+    const { themedStyle } = this.props
+    return (
+      <>
+        <LottieView
+          style={themedStyle.errorImage}
+          source={animations.loading}
+          autoPlay
+          loop
+        />
+      </>
+    )
   }
 
   render () {

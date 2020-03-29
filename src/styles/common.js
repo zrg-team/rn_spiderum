@@ -1,25 +1,39 @@
 import _ from 'lodash'
-import { StyleSheet, Dimensions, StatusBar } from 'react-native'
+import { StyleSheet, Dimensions, StatusBar, Platform } from 'react-native'
 import { isIphoneX } from '../libraries/iphonex'
 import { STYLE_SHEET, DEFAULT_HEADER_GRADIENT } from '../configs'
 const { height } = Dimensions.get('window')
 const { height: screenHeight } = Dimensions.get('screen')
 
-export const DEFAULT_HEADER_HEIGHT = isIphoneX() ? 80 : 60
+export const DEFAULT_HEADER_HEIGHT = 60
 export const HEADER_GRADIENT = DEFAULT_HEADER_GRADIENT
 
 export const isFixedSize = parseInt(height) === parseInt(screenHeight - StatusBar.currentHeight)
 export const appHeight = height
 
-export const TAB_BAR_HEIGHT = 52
+export const TAB_BAR_HEIGHT = isIphoneX() ? 62 : 52
 
 const style = {
+  mainContent: {
+    ...Platform.select({
+      android: {
+        height: '100%'
+      },
+      ios: {
+        height: appHeight - 20
+      }
+    })
+  },
   defaultPage: {
     flex: 1,
     display: 'flex',
     height: appHeight,
     flexDirection: 'column',
-    paddingTop: StatusBar.currentHeight
+    ...Platform.select({
+      android: {
+        paddingTop: StatusBar.currentHeight
+      }
+    })
   },
   defaultBackgroundColor: {
   },
@@ -29,11 +43,17 @@ const style = {
     height: DEFAULT_HEADER_HEIGHT,
     width: '100%'
   },
-  status_bar: {
-    position: 'absolute',
-    top: 0,
+  statusBar: {
+    // position: 'absolute',
     width: '100%',
-    height: 0
+    ...Platform.select({
+      ios: {
+        height: isIphoneX() ? 44 : 20
+      },
+      android: {
+        height: 0
+      }
+    })
     // height: Platform.select({
     //   android: StatusBar.currentHeight,
     //   ios: 0

@@ -5,8 +5,7 @@ import {
   View,
   Linking,
   AppState,
-  BackHandler,
-  SafeAreaView
+  BackHandler
 } from 'react-native'
 import {
   withStyles
@@ -161,12 +160,13 @@ class MainPage extends Component {
     const { loading } = this.state
     const AppNavigator = this.getNavigator(appIntro, language)
     return (
-      <SafeAreaView>
-        <View style={commonStyle.status_bar} />
+      <>
+        <View style={[commonStyle.statusBar, themedStyle.statusBar]} />
         <View
           ref={this.getNavigatorRef}
           style={[
             themedStyle.mainContent,
+            commonStyle.mainContent,
             themedStyle.backgroundColor,
             { opacity: loading ? 0 : 1 }
           ]}
@@ -186,7 +186,7 @@ class MainPage extends Component {
         <CommonLoading.Component key='common-bar' global />
         {/* <Camera.Component key='app-camera' zIndex={5} global /> */}
         <Toast.Component key='toast-bar' global />
-      </SafeAreaView>
+      </>
     )
   }
 }
@@ -208,6 +208,9 @@ export default withStyles(MainPage, (theme) => ({
     backgroundColor: theme['background-basic-color-3']
   },
   mainContent: {
-    height: '100%'
+    zIndex: 1
+  },
+  statusBar: {
+    backgroundColor: theme['background-basic-color-4']
   }
 }))

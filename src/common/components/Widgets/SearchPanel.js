@@ -21,14 +21,16 @@ import {
 import { connect } from 'react-redux'
 import { BlurView } from '@react-native-community/blur'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import commonStyles, { appHeight } from '../../../styles/common'
-import { images } from '../../../assets/elements'
 import { MODULE_NAME as MODULE_HOME } from '../../../modules/home/models'
+import commonStyles, { appHeight } from '../../../styles/common'
 import { navigationPush, screens } from '../../utils/navigation'
 import homeHandlers from '../../../modules/home/handlers'
+import { isIphoneX } from '../../../libraries/iphonex'
+import { images } from '../../../assets/elements'
 
 const { width } = Dimensions.get('window')
 
+const additionHeight = isIphoneX() ? 24 : 0
 let instance = null
 class SearchPanelComponent extends PureComponent {
   constructor (props) {
@@ -227,7 +229,7 @@ class SearchPanelComponent extends PureComponent {
 
   renderBackground () {
     const { themedStyle, appState } = this.props
-    if (this.blurNode && appState === 'active') {
+    if (this.blurNode && appState === 'active' && Platform.OS === 'android') {
       return (
         <TouchableOpacity onPress={this.handleHide} style={themedStyle.overlay}>
           <BlurView
@@ -319,6 +321,7 @@ const styles = (theme) => ({
     color: theme['text-hint-color']
   },
   container: {
+    zIndex: 2,
     flex: 1,
     position: 'absolute',
     width,
@@ -371,8 +374,8 @@ const styles = (theme) => ({
     marginTop: StatusBar.currentHeight,
     position: 'absolute',
     right: 13,
-    top: Platform.OS === 'ios' ? 35 : 12,
-    zIndex: 99
+    top: Platform.OS === 'ios' ? additionHeight + 30 : 12,
+    zIndex: 999
   },
   list: {
     width: width - 10,
@@ -383,7 +386,7 @@ const styles = (theme) => ({
     borderRadius: 3,
     paddingVertical: 10,
     maxHeight: appHeight - 120,
-    top: Platform.OS === 'ios' ? 88 : 70,
+    top: Platform.OS === 'ios' ? additionHeight + 88 : 70,
     marginTop: StatusBar.currentHeight
   },
   image: {
@@ -396,7 +399,7 @@ const styles = (theme) => ({
     borderRightWidth: 15,
     borderBottomWidth: 30,
     right: 17,
-    top: Platform.OS === 'ios' ? 74 : 52,
+    top: Platform.OS === 'ios' ? additionHeight + 70 : 52,
     position: 'absolute',
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
@@ -452,12 +455,19 @@ const styles = (theme) => ({
     borderRadius: 5,
     height: 40,
     width: width - 70,
-    marginTop: StatusBar.currentHeight,
     position: 'absolute',
     left: 20,
     top: 10,
     zIndex: 99,
-    backgroundColor: theme['background-basic-color-1']
+    backgroundColor: theme['background-basic-color-1'],
+    ...Platform.select({
+      ios: {
+        marginTop: additionHeight + 15
+      },
+      android: {
+        marginTop: StatusBar.currentHeight
+      }
+    })
   }
 })
 

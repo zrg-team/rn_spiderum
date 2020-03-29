@@ -7,7 +7,6 @@ const DefaultPage = memo((props) => {
   const {
     children,
     containerStyle = {},
-    header = true,
     headerColor = DEFAULT_HEADER_COLOR,
     themedStyle
   } = props
@@ -16,7 +15,7 @@ const DefaultPage = memo((props) => {
     <SafeAreaView
       style={[commonStyles.defaultPage, themedStyle.backgroundColor, containerStyle]}
     >
-      {header && <StatusBar backgroundColor={headerColor} barStyle='light-content' />}
+      <StatusBar backgroundColor={headerColor} barStyle='light-content' />
       {children}
     </SafeAreaView>
   )

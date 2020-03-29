@@ -71,7 +71,7 @@ export default class Debug extends Component {
     try {
       const { state } = this.props
       await wait(400)
-      CommonLoading.show(true, { title: 'THANK YOU, DOCTOR.' })
+      CommonLoading.show(true, { title: 'Thank you, doctors, nurses, and other medical personnel who are on the front lines of this pandemic' })
       await wait(0)
       this.getDataLogs()
       this.getInfo()
@@ -305,7 +305,7 @@ ${buildFile.gradle}
   }
 
   render () {
-    const { build, detail, logs, info, loading, query, config, state } = this.state
+    const { build, detail, logs, info, loading, query, config } = this.state
     if (loading) {
       return null
     }
@@ -351,16 +351,6 @@ ZRG-TEAM
                 highlighter='hljs'
               >
                 {config || ''}
-              </SyntaxHighlighter>
-            </View>
-          </CollapsibleComponent>
-          <CollapsibleComponent title='REDUX'>
-            <View style={[styles.detail]}>
-              <SyntaxHighlighter
-                language='javascript'
-                highlighter='hljs'
-              >
-                {state || ''}
               </SyntaxHighlighter>
             </View>
           </CollapsibleComponent>

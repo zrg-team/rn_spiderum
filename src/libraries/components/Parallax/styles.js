@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover'
   },
   content: {
+    zIndex: 1,
     shadowColor: '#222',
     shadowOpacity: 0.3,
     shadowRadius: 2,

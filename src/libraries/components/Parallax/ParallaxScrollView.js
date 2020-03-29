@@ -99,7 +99,7 @@ export default class ParallaxScrollView extends Component {
     const newWindowHeight = windowHeight - newNavBarHeight
 
     return (
-      <View style={{ height: newWindowHeight, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ zIndex: 2, height: newWindowHeight, justifyContent: 'center', alignItems: 'center' }}>
         {this.props.headerView && this.props.headerView(scrollY)}
       </View>
     )
