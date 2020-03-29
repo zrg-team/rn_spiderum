@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import i18n from 'i18n-js'
-import { Dimensions, StatusBar } from 'react-native'
+import { Dimensions } from 'react-native'
 import * as Animatable from 'react-native-animatable'
 import DefaultPage from '../common/hocs/DefaultPage'
 import DefaultHeader from '../common/containers/DefaultHeader'
 import { Layout, withStyles } from 'react-native-ui-kitten'
 import { DefaultSkeleton } from '../libraries/components/Skeleton'
-import { TAB_BAR_HEIGHT } from '../styles/common'
-const { width, height } = Dimensions.get('window')
+import { appHeight, TAB_BAR_HEIGHT } from '../styles/common'
+const { width } = Dimensions.get('window')
 
 class ContentLoadingPage extends Component {
   shouldComponentUpdate () {
@@ -15,14 +15,13 @@ class ContentLoadingPage extends Component {
   }
 
   render () {
-    const { navigation, themedStyle, title } = this.props
+    const { navigation, themedStyle, title, noSearch } = this.props
     return (
       <DefaultPage
         containerStyle={themedStyle.container}
       >
         <DefaultHeader
-          notification
-          search
+          search={!noSearch}
           noBack
           transition={false}
           title={(title || i18n.t('pages.hot')).toUpperCase()}
@@ -51,8 +50,7 @@ export default withStyles(ContentLoadingPage, (theme) => ({
   container: {
     width: width,
     overflow: 'hidden',
-    height: height - StatusBar.currentHeight - TAB_BAR_HEIGHT,
-    marginTop: StatusBar.currentHeight,
+    height: appHeight - TAB_BAR_HEIGHT,
     backgroundColor: 'transparent'
   },
   loadingContainer: {

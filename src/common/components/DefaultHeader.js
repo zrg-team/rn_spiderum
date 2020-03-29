@@ -91,7 +91,8 @@ class DefaultHeader extends PureComponent {
       title = '',
       themedStyle,
       linearGradient,
-      headerContainer = {}
+      headerContainer = {},
+      headerWrapperContainer = {}
       // leftTitle = ''
     } = this.props
 
@@ -113,7 +114,7 @@ class DefaultHeader extends PureComponent {
         end={{ x: 1, y: 0 }}
         colors={HEADER_GRADIENT}
         // locations={[0.1, 0.6, 1]}
-        style={[themedStyle.linearGradient, commonStyles.shadow]}
+        style={[themedStyle.linearGradient, commonStyles.shadow, headerWrapperContainer]}
       >
         <TopNavigation
           title={title}

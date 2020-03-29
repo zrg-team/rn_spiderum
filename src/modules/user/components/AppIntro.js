@@ -40,7 +40,7 @@ export default class AppIntro extends React.Component {
             source={item.image}
             resizeMode='contain'
           />)}
-        <View>
+        <View style={styles.title_container}>
           <Text style={styles.title}>{item.title}</Text>
           <Text style={styles.text}>{item.text}</Text>
         </View>
@@ -81,6 +81,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     textAlign: 'center',
     marginBottom: 16
+  },
+  title_container: {
+    paddingBottom: 30
   }
 })
 

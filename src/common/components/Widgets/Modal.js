@@ -4,8 +4,6 @@ import {
   StyleSheet,
   Animated,
   Easing,
-  Text,
-  ScrollView,
   Dimensions,
   TouchableOpacity,
   BackHandler
@@ -139,35 +137,6 @@ class Modal extends PureComponent {
     )
   }
 }
-const Content = (props, context) => {
-  return [
-    <View
-      key='main'
-      style={[
-        styles.modalWrapper,
-        props.modalWrapper
-      ]}
-    >
-      <View style={[styles.modalHeader]}>{props.modalHeader}</View>
-      <ScrollView bounces={false}>
-        <View style={[styles.modalBody, props.modalBodyStyle]}>{props.modalBody}</View>
-      </ScrollView>
-      <View style={[styles.modalFooter, props.modalFooter || {}]}>
-        {props.primaryAction && <View style={[{ marginBottom: 24 }, props.primaryStyle || {}]}>{props.primaryAction}</View>}
-        {props.handleCancelAction ? (
-          <View style={styles.buttonCancelWrapper}>
-            <TouchableOpacity onPress={props.handleCancelAction}>
-              <Text align='center' weight='500'>
-                {props.titleSecondary ? props.titleSecondary : 'Cancel'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ) : null}
-      </View>
-    </View>,
-    props.outComponent || null
-  ]
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -201,25 +170,6 @@ const styles = StyleSheet.create({
     opacity: 0.2,
     left: 0,
     top: 0
-  },
-  modalWrapper: {
-    borderRadius: 8,
-    marginHorizontal: 24,
-    height: '70%'
-  },
-  modalBody: {
-    paddingVertical: 24
-  },
-  buttonCancelWrapper: {
-    paddingBottom: 24
-  },
-  modalFooter: {
-    marginTop: 10
-  },
-  modalHeader: {
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    overflow: 'hidden'
   }
 })
 
@@ -230,12 +180,11 @@ const ModalPage = {
       instance.show(formComponent, touchOutSideToHide, backButtonClose, enableAnimation)
   },
   showFullScreen (formComponent) {
-    instance.showFullScreen(formComponent)
+    instance && instance.showFullScreen(formComponent)
   },
   hide (callback = () => {}) {
     instance && instance.isShow() && instance.hide(callback)
   },
-  Content: props => <Content {...props} />,
   isShow () { return instance.isShow() }
 }
 

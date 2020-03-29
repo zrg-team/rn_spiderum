@@ -59,6 +59,9 @@
     "about": "About",
     "spiderum": "Spiderum",
     "ui_normal_mode": "Light Mode",
-    "ui_dark_mode": "Dark Mode"
+    "ui_dark_mode": "Dark Mode",
+    "version": "Version",
+    "build": "Build",
+    "debug": "Debug"
   }
 }

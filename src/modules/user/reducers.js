@@ -3,8 +3,7 @@ import { clearAll } from '../../common/actions/common'
 import * as actions from './actions'
 
 const defaultState = {
-  bookmark: [],
-  darkMode: true
+  bookmark: []
 }
 
 const handlers = {
@@ -25,12 +24,6 @@ const handlers = {
     return {
       ...state,
       bookmark
-    }
-  },
-  [actions.toggleUIMode]: (state, action) => {
-    return {
-      ...state,
-      darkMode: !state.darkMode
     }
   }
 }

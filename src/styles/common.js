@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { StyleSheet, Dimensions, StatusBar, Platform } from 'react-native'
+import { StyleSheet, Dimensions, StatusBar } from 'react-native'
 import { isIphoneX } from '../libraries/iphonex'
 import { STYLE_SHEET, DEFAULT_HEADER_GRADIENT } from '../configs'
 const { height } = Dimensions.get('window')
@@ -9,7 +9,7 @@ export const DEFAULT_HEADER_HEIGHT = isIphoneX() ? 80 : 60
 export const HEADER_GRADIENT = DEFAULT_HEADER_GRADIENT
 
 export const isFixedSize = parseInt(height) === parseInt(screenHeight - StatusBar.currentHeight)
-export const appHeight = height - (!isFixedSize && StatusBar.currentHeight ? StatusBar.currentHeight : 0)
+export const appHeight = height
 
 export const TAB_BAR_HEIGHT = 52
 
@@ -18,7 +18,8 @@ const style = {
     flex: 1,
     display: 'flex',
     height: appHeight,
-    flexDirection: 'column'
+    flexDirection: 'column',
+    paddingTop: StatusBar.currentHeight
   },
   defaultBackgroundColor: {
   },
@@ -32,10 +33,11 @@ const style = {
     position: 'absolute',
     top: 0,
     width: '100%',
-    height: Platform.select({
-      android: StatusBar.currentHeight,
-      ios: 0
-    })
+    height: 0
+    // height: Platform.select({
+    //   android: StatusBar.currentHeight,
+    //   ios: 0
+    // })
   },
   shadow: {
     elevation: 3,

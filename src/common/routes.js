@@ -12,6 +12,7 @@ import { Platform } from 'react-native'
 import commonStyle, { TAB_BAR_HEIGHT } from '../styles/common'
 import TabarItem from './containers/TabarItem'
 
+import DebugPage from '../pages/DebugPage'
 import HomePage from '../pages/HomePage'
 import NewsPage from '../pages/NewsPage'
 import TopPage from '../pages/TopPage'
@@ -41,7 +42,8 @@ export const SCREENS = {
   CategoryDetail: 'CategoryDetail',
   Profile: 'Profile',
   Bookmark: 'Bookmark',
-  AppIntro: 'AppIntro'
+  AppIntro: 'AppIntro',
+  Debug: 'Debug'
 }
 
 const customScreenOption = {
@@ -56,10 +58,12 @@ export default ({
   appIntro,
   themedStyle
 }) => {
+  // Option flow
   const OptionFlow = createNativeStackNavigator({
     [SCREENS.OptionList]: { screen: OptionPage, ...customScreenOption },
     [SCREENS.Bookmark]: { screen: BookmarkPage, ...customScreenOption },
-    [SCREENS.Reading]: { screen: ReadingPage, ...customScreenOption }
+    [SCREENS.Reading]: { screen: ReadingPage, ...customScreenOption },
+    [SCREENS.Debug]: { screen: DebugPage, ...customScreenOption }
   }, {
     headerMode: 'none',
     navigationOptions: ({ navigation }) => {
@@ -72,6 +76,7 @@ export default ({
       }
     }
   })
+  // Option Home flow
   const HomeFlow = FluidNavigator({
     [SCREENS.HotList]: { screen: HomePage },
     [SCREENS.Reading]: { screen: ReadingPage },
@@ -88,6 +93,7 @@ export default ({
       }
     }
   })
+  // News Home flow
   const NewsFlow = FluidNavigator({
     [SCREENS.NewsList]: { screen: NewsPage },
     [SCREENS.Reading]: { screen: ReadingPage },
@@ -104,6 +110,7 @@ export default ({
       }
     }
   })
+  // Top Home flow
   const TopFlow = FluidNavigator({
     [SCREENS.TopList]: { screen: TopPage },
     [SCREENS.Reading]: { screen: ReadingPage },
@@ -120,6 +127,7 @@ export default ({
       }
     }
   })
+  // Category Home flow
   const CategoryFlow = createNativeStackNavigator({
     [SCREENS.Categories]: { screen: CategoriesPage, ...customScreenOption },
     [SCREENS.CategoryDetail]: { screen: CategoryDetailPage, ...customScreenOption },
@@ -137,6 +145,7 @@ export default ({
       }
     }
   })
+  // Tab navigator
   const TabGroup = createBottomTabNavigator({
     [SCREENS.Home]: HomeFlow,
     [SCREENS.News]: NewsFlow,

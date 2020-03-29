@@ -75,7 +75,7 @@ const mapStateToProps = state => {
     message: state.session.message,
     language: state.common.language,
     appIntro: state.common.appIntro,
-    darkMode: state.user.darkMode
+    darkMode: state.option.darkMode
   }
 }
 

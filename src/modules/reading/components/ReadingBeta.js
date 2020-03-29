@@ -5,7 +5,8 @@ import {
   View,
   Linking,
   Dimensions,
-  ScrollView
+  ScrollView,
+  StatusBar
 } from 'react-native'
 import {
   Text,
@@ -217,9 +218,13 @@ class ReadingBetaComponent extends React.Component {
         transition={false}
         title={i18n.t('pages.reading').toUpperCase()}
         navigation={navigation}
+        headerWrapperContainer={{
+          height: DEFAULT_HEADER_HEIGHT + StatusBar.currentHeight
+        }}
         headerContainer={{
           backgroundColor: 'transparent',
-          width: '100%'
+          width: '100%',
+          marginTop: StatusBar.currentHeight
         }}
       />
     )
@@ -295,7 +300,7 @@ class ReadingBetaComponent extends React.Component {
         scrollableViewStyle={themedStyle.content}
         headerView={this.renderView}
         navBarView={this.renderNavBarView}
-        navBarHeight={DEFAULT_HEADER_HEIGHT}
+        navBarHeight={DEFAULT_HEADER_HEIGHT + StatusBar.currentHeight}
         navBarColor={this.getThemeColor()}
       >
         {article.creator_id

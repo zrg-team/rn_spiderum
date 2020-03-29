@@ -1,6 +1,5 @@
 import React, { memo } from 'react'
 import * as Animatable from 'react-native-animatable'
-import { NeomorphBox } from 'react-native-neomorph-shadows'
 import Icon from 'react-native-vector-icons/AntDesign'
 import commonStyles from '../../styles/common'
 
@@ -48,27 +47,11 @@ export default memo(({ style, focused, navigation, previousPage }) => {
         delay={0}
         animation='bounceIn'
       >
-        <NeomorphBox
-          key='icon'
-          inner // <- enable shadow inside of neomorph
-          swapShadowLevel // <- change zIndex of each shadow color
-          style={{
-            shadowRadius: 6,
-            borderRadius: 10,
-            width: ['home', 'setting'].includes(source) ? 90 : 80,
-            height: 56,
-            backgroundColor: '#FFFFFF',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-        >
-          <Icon
-            name={source}
-            color='#ff9024'
-            size={22}
-          />
-        </NeomorphBox>
+        <Icon
+          name={source}
+          color='#ff9024'
+          size={22}
+        />
       </Animatable.View>
     )
   } else {

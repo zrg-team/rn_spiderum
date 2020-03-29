@@ -52,7 +52,9 @@ export default class NewsPage extends Component {
     const { page, article, itemIndex, type, category, dataIndex } = this.state
 
     return (
-      <DefaultPage>
+      <DefaultPage
+        containerStyle={{ paddingTop: 0 }}
+      >
         {itemIndex !== null
           ? (
             <ReadingContainer

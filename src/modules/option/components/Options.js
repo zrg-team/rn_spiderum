@@ -4,10 +4,13 @@ import {
   View,
   Text,
   Linking,
+  ScrollView,
   TouchableOpacity
 } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
 import Icon from 'react-native-vector-icons/AntDesign'
 import { withStyles } from 'react-native-ui-kitten'
+import { DEBUG_PAGE } from '../../../configs'
 import BottomSheet from '../../../common/components/Widgets/BottomSheet'
 import Information from './Information'
 import { navigationPush, screens } from '../../../common/utils/navigation'
@@ -37,6 +40,9 @@ class OptionsComponent extends Component {
       case 'about':
         BottomSheet.show(<Information />)
         break
+      case 'debug':
+        navigationPush(navigation, screens().Debug)
+        break
       case 'spiderum':
         Linking.openURL('https://spiderum.com/')
           .catch(() => {})
@@ -50,6 +56,7 @@ class OptionsComponent extends Component {
     let showArrow = ''
     let icon = ''
     let special = false
+    let boder = true
     switch (option) {
       case 'bookmark':
         textOpt = i18n.t('option.bookmark')
@@ -67,6 +74,17 @@ class OptionsComponent extends Component {
         special = true
         icon = 'Trophy'
         break
+      case 'debug':
+        textOpt = i18n.t('option.debug')
+        showArrow = true
+        icon = 'tool'
+        break
+      case 'version':
+        textOpt = `${i18n.t('option.version')} ${DeviceInfo.getVersion()} ${i18n.t('option.build')} ${DeviceInfo.getBuildNumber()}`
+        showArrow = false
+        icon = null
+        boder = false
+        break
       case 'UIMode':
         textOpt = darkMode ? i18n.t('option.ui_normal_mode') : i18n.t('option.ui_dark_mode')
         showArrow = true
@@ -80,13 +98,20 @@ class OptionsComponent extends Component {
           this.onPressOption(option)
         }}
       >
-        <View style={[themedStyle.containerOption, themedStyle.bottomBorder]}>
-          <Icon
-            style={themedStyle.styleIcon}
-            name={icon}
-            size={22}
-          />
-          <Text h={5} style={[themedStyle.textOption, special ? themedStyle.textSpecial : {}]}>
+        <View style={[themedStyle.containerOption, boder ? themedStyle.bottomBorder : {}]}>
+          {icon ? (
+            <Icon
+              style={themedStyle.styleIcon}
+              name={icon}
+              size={22}
+            />) : null}
+          <Text
+            h={5}
+            style={[
+              themedStyle.textOption, special ? themedStyle.textSpecial : {},
+              icon ? {} : { paddingLeft: 5 }
+            ]}
+          >
             {textOpt}
           </Text>
           {showArrow && (
@@ -104,12 +129,14 @@ class OptionsComponent extends Component {
   render () {
     const { themedStyle } = this.props
     return (
-      <View style={themedStyle.container}>
+      <ScrollView style={themedStyle.container}>
         {this.renderItemOption('bookmark')}
         {this.renderItemOption('UIMode')}
         {this.renderItemOption('about')}
         {this.renderItemOption('spiderum')}
-      </View>
+        {DEBUG_PAGE ? this.renderItemOption('debug') : null}
+        {this.renderItemOption('version')}
+      </ScrollView>
     )
   }
 }

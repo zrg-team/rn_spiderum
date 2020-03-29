@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Animated, Dimensions, Easing, StyleSheet } from 'react-native'
+import { View, Animated, Dimensions, Easing, StyleSheet, StatusBar } from 'react-native'
 const { width } = Dimensions.get('window')
 
 let instance = null
@@ -135,7 +135,8 @@ const componentStyles = StyleSheet.create({
     width: '100%',
     overflow: 'hidden',
     position: 'absolute',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    marginTop: StatusBar.currentHeight
   },
   fill: {
     height: 2,

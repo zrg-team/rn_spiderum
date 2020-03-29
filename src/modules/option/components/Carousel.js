@@ -60,7 +60,7 @@ class CarouselComponent extends Component {
 
 export default withStyles(CarouselComponent, (theme) => ({
   carousel: {
-    height: 200
+    height: 120
   },
   slider: {
     height: 100,

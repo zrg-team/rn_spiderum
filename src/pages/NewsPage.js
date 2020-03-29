@@ -10,14 +10,12 @@ import List from '../modules/home/containers/List'
 export default class NewsPage extends Component {
   constructor (props) {
     super(props)
-    Modal.showFullScreen(<ContentLoadingPage title={i18n.t('pages.news')} />)
+    Modal.showFullScreen(<ContentLoadingPage noSearch title={i18n.t('pages.news')} />)
     this.handleLoadingDone = this.handleLoadingDone.bind(this)
   }
 
   handleLoadingDone () {
-    setTimeout(() => {
-      Modal.hide()
-    }, 10)
+    Modal.hide()
   }
 
   render () {
@@ -27,11 +25,11 @@ export default class NewsPage extends Component {
         <DefaultHeader
           noBack
           transition={false}
-          title={i18n.t('pages.news').toUpperCase()}
           navigation={navigation}
+          title={i18n.t('pages.news').toUpperCase()}
         />
         <Layout style={[{ flexGrow: 1 }]} level='2'>
-          <List noCarousel type='news' navigation={navigation} lazy onLoadingDone={this.handleLoadingDone} />
+          <List type='news' navigation={navigation} lazy onLoadingDone={this.handleLoadingDone} />
         </Layout>
       </DefaultPage>
     )

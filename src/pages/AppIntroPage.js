@@ -5,7 +5,9 @@ import AppIntro from '../modules/user/containers/AppIntro'
 export default class AppIntroPage extends React.Component {
   render () {
     return (
-      <DefaultPage>
+      <DefaultPage
+        containerStyle={{ paddingTop: 0 }}
+      >
         <AppIntro />
       </DefaultPage>
     )

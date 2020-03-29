@@ -9,7 +9,9 @@
     "test": "jest",
     "lint": "eslint .",
     "jetify": "npx jetify",
-    "analyze": "./node_modules/.bin/react-native-bundle-visualizer"
+    "analyze": "./node_modules/.bin/react-native-bundle-visualizer",
+    "config_dev": "node ./scripts/index.js ENV=dev DEBUG_PAGE=true",
+    "config_release": "node ./scripts/index.js ENV=release"
   },
   "dependencies": {
     "@eva-design/eva": "^1.2.0",
@@ -31,7 +33,9 @@
     "react-native-app-intro-slider": "^3.0.0",
     "react-native-camera": "^3.7.2",
     "react-native-cheerio": "^1.0.0-rc.4",
+    "react-native-collapsible": "^1.5.1",
     "react-native-copilot": "^2.4.6",
+    "react-native-device-info": "^5.5.3",
     "react-native-exception-handler": "^2.10.8",
     "react-native-fast-image": "^7.0.2",
     "react-native-gesture-handler": "^1.4.1",
@@ -48,6 +52,7 @@
     "react-native-splash-screen": "^3.2.0",
     "react-native-sqlite-storage": "^4.1.0",
     "react-native-svg": "9.13.3",
+    "react-native-syntax-highlighter": "^2.1.0",
     "react-native-ui-kitten": "^4.2.0",
     "react-native-v8": ">=v0.61.5-patch.2",
     "react-native-vector-icons": "^6.6.0",

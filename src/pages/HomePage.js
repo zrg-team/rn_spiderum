@@ -15,28 +15,20 @@ class HomePage extends Component {
   }
 
   handleLoadingDone () {
-    setTimeout(() => {
-      Modal.hide()
-    }, 10)
+    Modal.hide()
   }
-
-  // componentDidMount () {
-  //   setTimeout(() => {
-  //     Modal.hide()
-  //   }, 5000)
-  // }
 
   render () {
     const { navigation } = this.props
     return (
       <DefaultPage>
         <DefaultHeader
-          notification
           search
           noBack
+          notification
           transition={false}
-          title={i18n.t('pages.hot').toUpperCase()}
           navigation={navigation}
+          title={i18n.t('pages.hot').toUpperCase()}
         />
         <Layout style={[{ flexGrow: 1 }]} level='2'>
           <List type='hot' navigation={navigation} lazy onLoadingDone={this.handleLoadingDone} />

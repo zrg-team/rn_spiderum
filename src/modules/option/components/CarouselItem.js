@@ -53,7 +53,7 @@ export default class SliderEntry extends Component {
       >
         <View style={styles.shadow} />
         <View style={[styles.imageContainer, even ? styles.imageContainerEven : {}]}>
-          {this.image}
+          {/* this.image */}
           <View style={[styles.radiusMask, even ? styles.radiusMaskEven : {}]} />
         </View>
         <View style={[styles.textContainer, even ? styles.textContainerEven : {}]}>
@@ -77,7 +77,7 @@ function wp (percentage) {
   return Math.round(value)
 }
 
-const slideHeight = 180
+const slideHeight = 95
 const slideWidth = wp(100)
 
 export const sliderWidth = viewportWidth
