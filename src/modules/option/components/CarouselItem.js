@@ -34,7 +34,7 @@ export default class SliderEntry extends Component {
 
   render () {
     const { data, even, onPress } = this.props
-    const { title, body } = data
+    const { title, decription } = data
 
     const uppercaseTitle = title ? (
       <Text
@@ -44,7 +44,6 @@ export default class SliderEntry extends Component {
         {title.toUpperCase()}
       </Text>
     ) : false
-    const decription = body.substring(0, 1000).replace(/(<([^>]+)>)/ig, '')
     return (
       <TouchableOpacity
         activeOpacity={1}

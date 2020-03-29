@@ -13,22 +13,23 @@ import {
   Avatar,
   withStyles
 } from 'react-native-ui-kitten'
-import WebView from 'react-native-webview'
 import Share from 'react-native-share'
+import WebView from 'react-native-webview'
+import LottieView from 'lottie-react-native'
+import FastImage from 'react-native-fast-image'
 import ActionButton from 'react-native-action-button'
 import Icon from 'react-native-vector-icons/SimpleLineIcons'
-import FastImage from 'react-native-fast-image'
 import { Transition } from 'react-navigation-fluid-transitions'
-import DefaultHeader from '../../../common/containers/DefaultHeader'
-import { CommentList } from './comments/CommentList'
 import { READING_URL } from '../models'
+import HtmlContent from './reading/HtmlContent'
+import { CommentList } from './comments/CommentList'
 import Toast from '../../../common/components/Widgets/Toast'
+import { navigationPop } from '../../../common/utils/navigation'
+import DefaultHeader from '../../../common/containers/DefaultHeader'
+import { images as commonImages, animations } from '../../../assets/elements'
 import { ActivityAuthoring } from '../../home/components/item/ActivityAuthoring'
 import { ArticleActivityBar } from '../../home/components/item/ArticleActivityBar'
 import commonStyles, { textStyle, DEFAULT_HEADER_HEIGHT } from '../../../styles/common'
-import { images as commonImages } from '../../../assets/elements'
-import { navigationPop } from '../../../common/utils/navigation'
-import HtmlContent from './reading/HtmlContent'
 import ParallaxScrollView from '../../../libraries/components/Parallax/ParallaxScrollView'
 
 const { width, height } = Dimensions.get('window')
@@ -73,6 +74,7 @@ class ReadingBetaComponent extends React.Component {
     const { article, removeNews, navigation } = this.props
     removeNews(article)
     Toast.show(i18n.t('messages.removed_news'))
+    console.info(`[READING PAGE] Removed: ${article.key}`)
     navigationPop(navigation)
   }
 
@@ -84,9 +86,11 @@ class ReadingBetaComponent extends React.Component {
     try {
       FastImage.preload(images.map(item => ({ uri: item.data })))
     } catch (err) {
+      console.debug(`[READING PAGE] Save error ${article.key}`)
     }
     // news.imagesSize = imagesSize
     saveNews(news)
+    console.info(`[READING PAGE] Saved ${article.key}`)
     Toast.show(i18n.t('messages.saved_news'))
   }
 
@@ -117,6 +121,15 @@ class ReadingBetaComponent extends React.Component {
   handleLikeButtonPress () {
   }
 
+  static getDerivedStateFromError (error) { // eslint-disable-line
+    return { componentError: true }
+  }
+
+  componentDidCatch (error, errorInfo) {
+    console.debug('[READING RENDER] ERROR', error)
+    console.debug('[READING RENDER] ERROR INFO', errorInfo)
+  }
+
   async componentDidMount () {
     const { article, getContent } = this.props
     let result = await getContent(article)
@@ -130,6 +143,13 @@ class ReadingBetaComponent extends React.Component {
     setTimeout(() => {
       this.setState(newState)
     }, 200)
+  }
+
+  getThemeColor () {
+    const { theme } = this.props
+
+    const baseColor = theme['background-basic-color-4'].replace('$', '')
+    return baseColor
   }
 
   renderActions () {
@@ -192,23 +212,25 @@ class ReadingBetaComponent extends React.Component {
         </Transition>
       )
     }
-    return [
-      <ScrollView horizontal key='info' style={themedStyle.tagContainer}>
-        {article.tags && article.tags.map(item => {
-          return (
-            <View
-              style={[themedStyle.badgeContainer, themedStyle.badge, commonStyles.shadow]}
-              key={item._id}
-            >
-              <Text style={themedStyle.textBadge}>{item.name}</Text>
-            </View>
-          )
-        })}
-      </ScrollView>,
-      <View key='avatar' style={[themedStyle.authorPhotoContainer]}>
-        {UserAvatarComponent}
-      </View>
-    ]
+    return (
+      <>
+        <ScrollView horizontal key='info' style={themedStyle.tagContainer}>
+          {article.tags && article.tags.map(item => {
+            return (
+              <View
+                style={[themedStyle.badgeContainer, themedStyle.badge, commonStyles.shadow]}
+                key={item._id}
+              >
+                <Text style={themedStyle.textBadge}>{item.name}</Text>
+              </View>
+            )
+          })}
+        </ScrollView>
+        <View key='avatar' style={[themedStyle.authorPhotoContainer]}>
+          {UserAvatarComponent}
+        </View>
+      </>
+    )
   }
 
   renderNavBarView () {
@@ -230,11 +252,19 @@ class ReadingBetaComponent extends React.Component {
     )
   }
 
-  getThemeColor () {
-    const { theme } = this.props
-
-    const baseColor = theme['background-basic-color-4'].replace('$', '')
-    return baseColor
+  renderError () {
+    const { themedStyle } = this.props
+    return (
+      <>
+        <LottieView
+          style={themedStyle.errorImage}
+          source={animations.loading}
+          autoPlay
+          loop
+        />
+        <Text style={themedStyle.readMoreText} category='h6'>{i18n.t('reading.swipe_to_read_more')}</Text>
+      </>
+    )
   }
 
   render () {
@@ -246,14 +276,11 @@ class ReadingBetaComponent extends React.Component {
       noComment,
       getComments
     } = this.props
-    const { data, loading, images } = this.state
-    const imageSource = article.og_image_url
-      ? { uri: article.og_image_url }
-      : images && images[0] && images[0].data
-        ? { uri: images[0].data }
-        : commonImages.default_parallax
-    const readingTime = moment.duration(article.reading_time, 'seconds').minutes()
+    const { componentError, data, loading, images } = this.state
 
+    if (componentError) {
+      return this.renderError()
+    }
     if (!loading && !data) {
       return (
         <WebView
@@ -283,12 +310,22 @@ class ReadingBetaComponent extends React.Component {
               loading={loading}
               fontSize={fontSize}
             />
+            <View style={themedStyle.endingBlock} />
+            <Text style={themedStyle.readMoreText} category='h6'>{i18n.t('reading.swipe_to_read_more')}</Text>
             <CommentList article={article} noComment={noComment} getComments={getComments} />
           </ScrollView>
           {this.renderActions()}
         </View>
       )
     }
+
+    const imageSource = article.og_image_url
+      ? { uri: article.og_image_url }
+      : images && images[0] && images[0].data
+        ? { uri: images[0].data }
+        : commonImages.default_parallax
+    const readingTime = moment.duration(article.reading_time, 'seconds').minutes()
+
     return [
       <ParallaxScrollView
         key='0'
@@ -473,5 +510,10 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
     height: '100%',
     display: 'flex'
   },
-  actionIcon: { fontSize: 20, height: 22, color: '#FFFFFF' }
+  actionIcon: { fontSize: 20, height: 22, color: '#FFFFFF' },
+  errorImage: {
+    width: 180,
+    height: 180,
+    alignSelf: 'center'
+  }
 }))

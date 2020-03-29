@@ -2,7 +2,7 @@
   "DEBUG": true,
   "TIMEOUT": 15000,
   "DEBUG_PAGE": true,
-  "LOG_LEVEL": "debug",
+  "LOG_LEVEL": "time",
   "LOG_TERMINAL": false,
   "DEFAULT_LANGUAGE": "en",
   "STYLE_SHEET": {

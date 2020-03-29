@@ -7,4 +7,6 @@ export const ENPOINTS = {
   search: 'https://spiderum.com/tim-kiem'
 }
 
+export const DEFAULT_POST_URL = 'https://spiderum.com/bai-dang'
+
 export const AVATAR_URL = 'https://s3-ap-southeast-1.amazonaws.com/img.spiderum.com/sp-xs-avatar/'

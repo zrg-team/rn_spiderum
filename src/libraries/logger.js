@@ -8,7 +8,8 @@ export const logLevel = {
   fatal: 0,
   debug: 1,
   info: 4,
-  time: 5
+  time: 5,
+  request: 6
 }
 
 async function writeLog (level, message, ...options) {
@@ -44,7 +45,7 @@ async function writeLog (level, message, ...options) {
 }
 
 class Logger {
-  async init () {
+  constructor () {
     try {
       this.setupLog()
       this._writablelogLevel = logLevel.DEBUG
@@ -52,7 +53,9 @@ class Logger {
       setNativeExceptionHandler(
         this.exceptionhandler.bind(this)
       )
+      console.info('[LOGGER] init')
     } catch (err) {
+      console.debug('[LOGGER] init error', err)
     }
   }
 
@@ -72,56 +75,66 @@ class Logger {
       console.info = function () {}
       console.debug = function () {}
       console.time = function () {}
+      console.request = function () {}
       console.timeEnd = function () {}
     } else {
       console.info = function (message, ...options) { // eslint-disable-line
-        console.log(
-          '\x1b[32m💬',
-          message,
-          ...options
-        )
         if (logLevel[LOG_LEVEL] >= logLevel.info) {
+          console.log(
+            '\x1b[32m💬',
+            message,
+            ...options
+          )
           writeLog('INFO', message, ...options)
         }
       }
+      console.request = function (message, ...options) { // eslint-disable-line
+        if (logLevel[LOG_LEVEL] >= logLevel.request) {
+          console.log(
+            '\x1b[35m📤',
+            message,
+            ...options
+          )
+          writeLog('REQUEST', message, ...options)
+        }
+      }
       console.debug = function (message, ...options) { // eslint-disable-line
-        console.log(
-          '\x1b[31m🚨',
-          message,
-          ...options
-        )
         if (logLevel[LOG_LEVEL] >= logLevel.debug) {
+          console.log(
+            '\x1b[31m🚨',
+            message,
+            ...options
+          )
           writeLog('DEBUG', message, ...options)
         }
       }
       const logTimes = {}
       console.time = function (label) { // eslint-disable-line
-        const start = Date.now()
-        console.log(
-          '\x1b[36m🚀',
-          label,
-          '🚀'
-        )
-        logTimes[label] = start
-        // if (logLevel[LOG_LEVEL] >= logLevel.time) {
-        //   writeLog('TIME', `🚀 ${label} 🚀`)
-        // }
+        if (logLevel[LOG_LEVEL] >= logLevel.time) {
+          const start = Date.now()
+          console.log(
+            '\x1b[36m🚀',
+            label,
+            '🚀'
+          )
+          logTimes[label] = start
+        }
       }
       console.timeEnd = function (label, ...args) { // eslint-disable-line
-        const end = Date.now()
-        const work = (end - logTimes[label]) / 1000
-        console.log(
-          '\x1b[36m🚀',
-          label,
-          ' ====> ',
-          `${work} seconds`,
-          '🚀'
-        )
-        delete logTimes[label]
         if (logLevel[LOG_LEVEL] >= logLevel.time) {
+          const end = Date.now()
+          const work = (end - logTimes[label]) / 1000
+          console.log(
+            '\x1b[36m🚀',
+            label,
+            ' ====> ',
+            `${work} seconds`,
+            '🚀'
+          )
+          delete logTimes[label]
           writeLog('TIME', `🚀 ${label} ${work} seconds 🚀`, ...args)
+          return work
         }
-        return work
       }
     }
   }

@@ -30,6 +30,10 @@ PODS:
   - libwebp/mux (1.1.0):
     - libwebp/demux
   - libwebp/webp (1.1.0)
+  - lottie-ios (3.1.3)
+  - lottie-react-native (3.3.2):
+    - lottie-ios (~> 3.1.3)
+    - React
   - RCTRequired (0.61.5)
   - RCTTypeSafety (0.61.5):
     - FBLazyVector (= 0.61.5)
@@ -198,15 +202,15 @@ PODS:
   - React-jsinspector (0.61.5)
   - react-native-blur (0.8.0):
     - React
-  - react-native-camera (3.9.0):
+  - react-native-camera (3.19.0):
     - React
-    - react-native-camera/RCT (= 3.9.0)
-    - react-native-camera/RN (= 3.9.0)
-  - react-native-camera/RCT (3.9.0):
+    - react-native-camera/RCT (= 3.19.0)
+    - react-native-camera/RN (= 3.19.0)
+  - react-native-camera/RCT (3.19.0):
     - React
-  - react-native-camera/RN (3.9.0):
+  - react-native-camera/RN (3.19.0):
     - React
-  - react-native-netinfo (4.6.0):
+  - react-native-netinfo (4.7.0):
     - React
   - react-native-splash-screen (3.2.0):
     - React
@@ -214,7 +218,7 @@ PODS:
     - React
   - react-native-viewpager (2.0.2):
     - React
-  - react-native-webview (7.4.3):
+  - react-native-webview (7.6.0):
     - React
   - React-RCTActionSheet (0.61.5):
     - React-Core/RCTActionSheetHeaders (= 0.61.5)
@@ -253,15 +257,19 @@ PODS:
     - ReactCommon/jscallinvoker (= 0.61.5)
   - ReactNativeExceptionHandler (2.10.8):
     - React
-  - RNCAsyncStorage (1.6.2):
+  - RNCAsyncStorage (1.8.1):
+    - React
+  - RNDeviceInfo (5.5.3):
     - React
   - RNFastImage (7.0.2):
     - React
     - SDWebImage (~> 5.0)
     - SDWebImageWebPCoder (~> 0.2.3)
-  - RNGestureHandler (1.5.0):
+  - RNGestureHandler (1.6.0):
     - React
-  - RNPermissions (2.0.3):
+  - RNPermissions (2.0.9):
+    - React
+  - RNScreens (2.2.0):
     - React
   - RNShare (2.0.0):
     - React
@@ -285,6 +293,8 @@ DEPENDENCIES:
   - FBReactNativeSpec (from `../node_modules/react-native/Libraries/FBReactNativeSpec`)
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - lottie-ios (from `../node_modules/lottie-ios`)
+  - lottie-react-native (from `../node_modules/lottie-react-native`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
   - RCTYouTube (from `../node_modules/react-native-youtube`)
@@ -317,9 +327,11 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - ReactNativeExceptionHandler (from `../node_modules/react-native-exception-handler`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
+  - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFastImage (from `../node_modules/react-native-fast-image`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
+  - RNScreens (from `../node_modules/react-native-screens`)
   - RNShare (from `../node_modules/react-native-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -346,6 +358,10 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/Folly.podspec"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
+  lottie-ios:
+    :path: "../node_modules/lottie-ios"
+  lottie-react-native:
+    :path: "../node_modules/lottie-react-native"
   RCTRequired:
     :path: "../node_modules/react-native/Libraries/RCTRequired"
   RCTTypeSafety:
@@ -404,12 +420,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-exception-handler"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-community/async-storage"
+  RNDeviceInfo:
+    :path: "../node_modules/react-native-device-info"
   RNFastImage:
     :path: "../node_modules/react-native-fast-image"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
+  RNScreens:
+    :path: "../node_modules/react-native-screens"
   RNShare:
     :path: "../node_modules/react-native-share"
   RNSVG:
@@ -428,9 +448,11 @@ SPEC CHECKSUMS:
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
   libwebp: 946cb3063cea9236285f7e9a8505d806d30e07f3
+  lottie-ios: 496ac5cea1bbf1a7bd1f1f472f3232eb1b8d744b
+  lottie-react-native: 2a1a82bb326ae51331a5520de0cf706733c6db69
   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
-  RCTYouTube: 57458fe8653bb696b7d7585326d735d01b871af8
+  RCTYouTube: 5e94bfa005371c41d307f3f93c51b3e8eabfb0c8
   React: b6a59ef847b2b40bb6e0180a97d0ca716969ac78
   React-Core: 688b451f7d616cc1134ac95295b593d1b5158a04
   React-CoreModules: d04f8494c1a328b69ec11db9d1137d667f916dcb
@@ -439,12 +461,12 @@ SPEC CHECKSUMS:
   React-jsiexecutor: d5525f9ed5f782fdbacb64b9b01a43a9323d2386
   React-jsinspector: fa0ecc501688c3c4c34f28834a76302233e29dc0
   react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
-  react-native-camera: c529629e3ecd017dcdacfd0355576ef489d9d198
-  react-native-netinfo: fa32a5bb986924e9be82a261c262039042dde81e
+  react-native-camera: 1a62f163f06c7e54811fc9396cdb80269a665238
+  react-native-netinfo: 3dd993921571d01b78a8f91f1caaffcab7a1e1c7
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
-  react-native-sqlite-storage: f06bfba10f67f989c00b6a699b9c2b80a816edbe
-  react-native-viewpager: 88f4269c19d626d2ccd5f7c7f5f7f76422ddb9e3
-  react-native-webview: 82d6456dfae1b3ef70c3939135536342afc96373
+  react-native-sqlite-storage: bb10beb2407e5fc21f3f1bcd86bacbfd6edcc818
+  react-native-viewpager: bbba55db2dc7554b88f986a88f8440bf2e624419
+  react-native-webview: 711cef318a554093b09a5b871894011435d87a8d
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72
@@ -456,10 +478,12 @@ SPEC CHECKSUMS:
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
   ReactNativeExceptionHandler: 8025d98049c25f186835a3af732dd7c9974d6dce
-  RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
+  RNCAsyncStorage: 00bdf63f7f1e0f11d3323533dba4f222e58bf092
+  RNDeviceInfo: 67607dfe9cfbed105838144c40187a8392aa404d
   RNFastImage: 9b0c22643872bb7494c8d87bbbb66cc4c0d9e7a2
-  RNGestureHandler: a4ddde1ffc6e590c8127b8b7eabfdade45475c74
-  RNPermissions: 9e437a90de84a5402ff689d4da233730b81556c2
+  RNGestureHandler: dde546180bf24af0b5f737c8ad04b6f3fa51609a
+  RNPermissions: 6db7e0a4d94c9c02390d11020b1d3d187aaf77e5
+  RNScreens: 812b79d384e2bea7eebc4ec981469160d4948fd5
   RNShare: 8b171d4b43c1d886917fdd303bf7a4b87167b05c
   RNSVG: f6177f8d7c095fada7cfee2e4bb7388ba426064c
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
@@ -468,6 +492,6 @@ SPEC CHECKSUMS:
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
   YoutubePlayer-in-WKWebView: af2f5929fc78882d94bfdfeea999b661b78d9717
 
-PODFILE CHECKSUM: 8595d243a224a3c51e73d7e9ce4d4f4cce9dfe63
+PODFILE CHECKSUM: 5e7fa1d3a51306cc36b226b4780795cf3d0f1a5e
 
 COCOAPODS: 1.8.4

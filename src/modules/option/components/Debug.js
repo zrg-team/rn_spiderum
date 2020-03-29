@@ -9,7 +9,6 @@ import CommonLoading from '../../../common/components/Widgets/CommonLoading'
 import { Button, Text } from 'react-native-ui-kitten'
 import { wait } from '../../../common/utils/async'
 import CollapsibleComponent from './CollapsibleComponent'
-import storage from '../../../libraries/storage'
 import SyntaxHighlighter from 'react-native-syntax-highlighter'
 
 const COLORS = {
@@ -20,7 +19,8 @@ const COLORS = {
 const ICONS = {
   INFO: '💬',
   TIME: '🚀',
-  DEBUG: '🚨'
+  DEBUG: '🚨',
+  REQUEST: '📤'
 }
 export default class Debug extends Component {
   constructor (props) {
@@ -71,9 +71,8 @@ export default class Debug extends Component {
     try {
       const { state } = this.props
       await wait(400)
-      CommonLoading.show()
+      CommonLoading.show(true, { title: 'THANK YOU, DOCTOR.' })
       await wait(0)
-      this.getDataStorage()
       this.getDataLogs()
       this.getInfo()
       const commit = buildFile.commit
@@ -182,30 +181,6 @@ ${buildFile.gradle}
           Version: version,
           'Javascript Engine': jsEngine
         }, null, 2)
-      })
-    } catch (err) {
-    }
-  }
-
-  async getDataStorage () {
-    try {
-      const keys = await storage.getAllKeys()
-      const results = await storage.multiGet(keys)
-      this.setState({
-        storages: results.map(req => {
-          const items = Array.from(req)
-          try {
-            return {
-              title: items[0],
-              data: JSON.stringify(JSON.parse(decodeURIComponent(items[1])), null, 2)
-            }
-          } catch (err) {
-            return {
-              title: items[0],
-              data: ''
-            }
-          }
-        })
       })
     } catch (err) {
     }
@@ -330,11 +305,10 @@ ${buildFile.gradle}
   }
 
   render () {
-    const { build, detail, logs, info, loading, query } = this.state
+    const { build, detail, logs, info, loading, query, config, state } = this.state
     if (loading) {
       return null
     }
-    console.info('info', info)
     return (
       <View style={styles.container}>
         <ScrollView
@@ -345,7 +319,6 @@ ${buildFile.gradle}
             {
               `
 ZRG-TEAM
-
 🇻🇳 👨‍💻 🇻🇳
 🅵🅾🆁 🅳🅴🆅🅴🅻🅾🅿🅴🆁
               `
@@ -368,6 +341,26 @@ ZRG-TEAM
                 highlighter='hljs'
               >
                 {build || ''}
+              </SyntaxHighlighter>
+            </View>
+          </CollapsibleComponent>
+          <CollapsibleComponent title='CONFIG'>
+            <View style={[styles.detail]}>
+              <SyntaxHighlighter
+                language='javascript'
+                highlighter='hljs'
+              >
+                {config || ''}
+              </SyntaxHighlighter>
+            </View>
+          </CollapsibleComponent>
+          <CollapsibleComponent title='REDUX'>
+            <View style={[styles.detail]}>
+              <SyntaxHighlighter
+                language='javascript'
+                highlighter='hljs'
+              >
+                {state || ''}
               </SyntaxHighlighter>
             </View>
           </CollapsibleComponent>
@@ -425,5 +418,8 @@ const styles = StyleSheet.create({
     width: '100%',
     height: undefined,
     backgroundColor: '#000000'
+  },
+  default_text: {
+    color: '#107C10'
   }
 })

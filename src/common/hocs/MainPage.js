@@ -5,15 +5,13 @@ import {
   View,
   Linking,
   AppState,
-  Platform,
-  StatusBar,
   BackHandler,
   SafeAreaView
 } from 'react-native'
 import {
   withStyles
 } from 'react-native-ui-kitten'
-import commonStyle, { appHeight } from '../../styles/common'
+import commonStyle from '../../styles/common'
 import Modal from '../components/Widgets/Modal'
 import ProgressBar from '../components/Widgets/ProgressBar'
 // import Camera from '../components/Widgets/Camera'
@@ -66,11 +64,6 @@ class MainPage extends Component {
     const { dispatch } = this.props
     // Should dispatch to redux network status
     dispatch(setApplicationState(currentAppState))
-    switch (currentAppState) {
-      case 'inactive':
-      case 'background':
-      case 'active':
-    }
   }
 
   getNavigator (appIntro, language) {
@@ -90,6 +83,7 @@ class MainPage extends Component {
       themedStyle
     })
     this.unique = `${appIntro}_${language}`
+    console.info(`[MAIN PAGE] Navigation reloaded. Keys: ${this.unique}`)
     return this.AppNavigator
   }
 
@@ -137,7 +131,6 @@ class MainPage extends Component {
       'connectionChange',
       this.handleFirstConnectivityChange.bind(this)
     )
-    AppState.removeEventListener('change', this.onAppStateChange)
     AppState.addEventListener('change', this.onAppStateChange.bind(this))
     this.initial()
   }
@@ -158,6 +151,8 @@ class MainPage extends Component {
     this.setState({
       lazy: false,
       loading: false
+    }, () => {
+      console.info(`[MAIN PAGE] Navigation loaded. Keys: ${this.unique}`)
     })
   }
 
@@ -213,6 +208,6 @@ export default withStyles(MainPage, (theme) => ({
     backgroundColor: theme['background-basic-color-3']
   },
   mainContent: {
-    height: appHeight
+    height: '100%'
   }
 }))

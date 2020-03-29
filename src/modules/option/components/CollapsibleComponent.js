@@ -34,6 +34,7 @@ export default class CollapsibleComponent extends Component {
   }
 
   render () {
+    const { lazy } = this.props
     const { collapsed } = this.state
     const rotate = collapsed ? 1 : 0
 
@@ -66,8 +67,8 @@ export default class CollapsibleComponent extends Component {
             />
           </Animated.View>
         </TouchableOpacity>
-        <Collapsible collapsed={!this.state.collapsed} align='center'>
-          {this.props.children}
+        <Collapsible collapsed={!collapsed} align='center'>
+          {!lazy || collapsed ? this.props.children : null}
         </Collapsible>
       </View>
     )

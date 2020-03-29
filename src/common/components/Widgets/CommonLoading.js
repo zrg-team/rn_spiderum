@@ -3,17 +3,23 @@ import {
   View,
   Easing,
   Animated,
+  AppState,
   Dimensions,
-  StyleSheet,
-  Image
+  findNodeHandle
 } from 'react-native'
-import { images } from '../../../assets/elements'
-
+import LottieView from 'lottie-react-native'
+import { BlurView } from '@react-native-community/blur'
+import {
+  Text,
+  withStyles
+} from 'react-native-ui-kitten'
+import { animations } from '../../../assets/elements'
 const { width } = Dimensions.get('window')
 
 let instanceLoadingComponent = null
 const DEFAULT_BLOCKING_MODE = true
 const DEFAULT_STATES = {
+  title: null,
   isShow: false,
   iconProps: {},
   overlayProps: {},
@@ -26,11 +32,29 @@ class CommonLoadingComponent extends Component {
   constructor (props) {
     super(props)
     this.state = {
+      appActive: true,
       ...DEFAULT_STATES
     }
     this.animation = new Animated.Value(0)
     this.runAnimation = this.runAnimation.bind(this)
     this.unMount = false
+    AppState.addEventListener('change', this.onAppStateChange.bind(this))
+  }
+
+  onAppStateChange (currentAppState) {
+    switch (currentAppState) {
+      case 'inactive':
+      case 'background':
+        this.setState({
+          appActive: false
+        })
+        break
+      case 'active': {
+        this.setState({
+          appActive: true
+        })
+      }
+    }
   }
 
   runAnimation ({ duration, fromValue, toValue }, callback) {
@@ -86,6 +110,7 @@ class CommonLoadingComponent extends Component {
 
   componentWillUnmount () {
     this.unMount = true
+    AppState.removeEventListener('change', this.onAppStateChange)
     const { global } = this.props
     if (global) {
       instanceLoadingComponent = null
@@ -93,6 +118,7 @@ class CommonLoadingComponent extends Component {
   }
 
   show (blocking, {
+    title,
     showLoadingIcon = true,
     iconProps = {},
     overlayProps = {},
@@ -101,7 +127,12 @@ class CommonLoadingComponent extends Component {
     animations = {},
     animationIconOnly = true
   }) {
+    const { parentRef } = this.props
+    if (parentRef) {
+      this.blurNode = findNodeHandle(parentRef)
+    }
     this.setState({
+      title,
       isShow: true,
       iconProps,
       overlayProps,
@@ -129,13 +160,39 @@ class CommonLoadingComponent extends Component {
     })
   }
 
-  render () {
+  renderBackground () {
+    const { themedStyle } = this.props
     const {
       isShow,
       blocking,
-      showLoadingIcon,
+      appActive,
       overlayStyles,
-      overlayProps,
+      overlayProps
+    } = this.state
+
+    return isShow && blocking && this.blurNode && appActive
+      ? (
+        <View
+          style={[themedStyle.overlay, overlayStyles]}
+          {...overlayProps}
+        >
+          <BlurView
+            viewRef={this.blurNode}
+            blurType='light'
+            blurAmount={10}
+            downsampleFactor={4}
+          />
+        </View>
+      ) : null
+  }
+
+  render () {
+    const { themedStyle } = this.props
+    const {
+      title,
+      isShow,
+      showLoadingIcon,
+      iconProps,
       animationIconOnly
     } = this.state
     if (!isShow) {
@@ -144,27 +201,29 @@ class CommonLoadingComponent extends Component {
     return (
       <Animated.View
         style={[
-          componentStyles.background,
+          themedStyle.background,
           !animationIconOnly ? this.getAnimationStyle() : {}
         ]}
       >
-        {isShow && blocking
-          ? (
-            <View
-              style={[componentStyles.overlay, overlayStyles]}
-              {...overlayProps}
-            />
-          ) : null}
-        <View style={componentStyles.loadingBarContainer}>
+        {this.renderBackground()}
+        <View style={themedStyle.loading_bar_container}>
           {showLoadingIcon
             ? (
               <Animated.View
                 style={[
-                  componentStyles.image,
+                  themedStyle.image_container,
                   animationIconOnly ? this.getAnimationStyle() : {}
                 ]}
               >
-                <Image style={componentStyles.image} source={images.splash} />
+                <LottieView
+                  style={themedStyle.image}
+                  source={animations.loading}
+                  autoPlay
+                  loop
+                  {...iconProps}
+                />
+                {title
+                  ? (<Text style={themedStyle.title}>{title}</Text>) : null}
               </Animated.View>
             ) : null}
         </View>
@@ -173,7 +232,7 @@ class CommonLoadingComponent extends Component {
   }
 }
 
-const componentStyles = StyleSheet.create({
+const componentStyles = (theme) => ({
   background: {
     top: 0,
     left: 0,
@@ -184,9 +243,16 @@ const componentStyles = StyleSheet.create({
     position: 'absolute',
     flexDirection: 'column'
   },
+  title: {
+    textAlign: 'center',
+    marginTop: 20
+  },
+  image_container: {
+    width: 220
+  },
   image: {
-    width: 120,
-    height: 120,
+    width: 160,
+    height: 160,
     alignSelf: 'center'
   },
   fill: {
@@ -197,9 +263,9 @@ const componentStyles = StyleSheet.create({
     zIndex: 111,
     width: '100%',
     height: '100%',
-    position: 'absolute',
-    backgroundColor: '#000',
-    opacity: 0.6
+    position: 'absolute'
+    // backgroundColor: '#000',
+    // opacity: 0.6
   },
   container: {
     height: '100%',
@@ -210,7 +276,7 @@ const componentStyles = StyleSheet.create({
   loading: {
     color: '#FFFFFF'
   },
-  loadingBarContainer: {
+  loading_bar_container: {
     width: '100%',
     height: '100%',
     display: 'flex',
@@ -218,7 +284,7 @@ const componentStyles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 999
   },
-  textContainer: {
+  text_container: {
     flex: 1,
     width,
     justifyContent: 'center'
@@ -226,7 +292,7 @@ const componentStyles = StyleSheet.create({
 })
 
 const CommonLoading = {
-  Component: CommonLoadingComponent,
+  Component: withStyles(CommonLoadingComponent, componentStyles),
   show (blocking = DEFAULT_BLOCKING_MODE, options = {}) {
     instanceLoadingComponent && instanceLoadingComponent.show(blocking, options)
   },

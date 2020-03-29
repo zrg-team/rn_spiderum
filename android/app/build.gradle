@@ -132,8 +132,8 @@ android {
         applicationId "com.zrgteam.awesome"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 12
-        versionName "1.1.0"
+        versionCode 14
+        versionName "1.1.1"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
     }

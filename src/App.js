@@ -16,13 +16,11 @@ class App extends PureComponent {
 
   render () {
     return (
-      <>
-        <Provider store={store.store}>
-          <PersistGate loading={null} persistor={store.persistor}>
-            <Root />
-          </PersistGate>
-        </Provider>
-      </>
+      <Provider store={store.store}>
+        <PersistGate loading={null} persistor={store.persistor}>
+          <Root />
+        </PersistGate>
+      </Provider>
     )
   }
 }

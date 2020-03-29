@@ -1,9 +1,33 @@
 import { requestLoading } from '../../common/effects'
-import { ENPOINTS, AVATAR_URL } from './models'
+import { ENPOINTS, AVATAR_URL, DEFAULT_POST_URL } from './models'
 import { setNews, setHots, setTops, setSearchResults } from './actions'
 import database from '../../libraries/Database'
 
 const cheerio = require('react-native-cheerio')
+
+function handleItem (item) {
+  let url = ''
+  if (item.slug) {
+    url = `${DEFAULT_POST_URL}/${item.slug}`
+    item.key = url
+  } else {
+    item.avatar = item.creator_id.avatar ? `${AVATAR_URL}${item.creator_id.avatar}` : null
+    url = decodeURIComponent(`${item.fb_share_url}`.replace('https://www.facebook.com/sharer/sharer.php?u=', ''))
+  }
+  const regex = /(<([^>]+)>)/ig
+  item.decription = `${item.body}`.substring(0, 1000).replace(regex, '')
+  delete item.body
+  return {
+    item,
+    url,
+    databaseItem: {
+      key: url,
+      title: item.title,
+      body: item.body,
+      image: item.og_image_url
+    }
+  }
+}
 
 export function parseHtml (page, data) {
   const results = {}
@@ -16,44 +40,36 @@ export function parseHtml (page, data) {
       if (key.includes('populartags')) {
         results.tags = pageData[key].tags
       } else if (key.includes('getRandomPost')) {
-        results.random = pageData[key]
+        results.random = pageData[key].map(item => {
+          const result = handleItem(item)
+          items.push(result.databaseItem)
+          deleteKeys.push(result.url)
+          item.key = result.url
+          return result.item
+        })
       } else if (key.includes('getTopPosts')) {
-        results.top = pageData[key].posts.items
+        results.top = pageData[key].posts.items.map(item => {
+          const result = handleItem(item)
+          items.push(result.databaseItem)
+          deleteKeys.push(result.url)
+          item.key = result.url
+          return result.item
+        })
       } else if (key.includes('getAllPosts')) {
         results.data = pageData[key].posts.items.map(item => {
-          // const itemDOM = cheerio.load(item.body)
-          // item.decription = itemDOM.text().substring(0, 256)
-          const regex = /(<([^>]+)>)/ig
-          item.decription = `${item.body}`.substring(0, 1000).replace(regex, '')
-          item.avatar = item.creator_id.avatar ? `${AVATAR_URL}${item.creator_id.avatar}` : null
-          const url = decodeURIComponent(`${item.fb_share_url}`.replace('https://www.facebook.com/sharer/sharer.php?u=', ''))
-          items.push({
-            key: url,
-            title: item.title,
-            body: item.body,
-            image: item.og_image_url
-          })
-          deleteKeys.push(url)
-          delete item.body
-          item.key = url
-          return item
+          const result = handleItem(item)
+          items.push(result.databaseItem)
+          deleteKeys.push(result.url)
+          item.key = result.url
+          return result.item
         })
       } else if (key.includes('category')) {
         results.data = pageData[key].posts.items.map(item => {
-          // const itemDOM = cheerio.load(item.body)
-          // item.decription = itemDOM.text().substring(0, 256)
-          item.avatar = item.creator_id.avatar ? `${AVATAR_URL}${item.creator_id.avatar}` : null
-          const url = decodeURIComponent(`${item.fb_share_url}`.replace('https://www.facebook.com/sharer/sharer.php?u=', ''))
-          items.push({
-            key: url,
-            title: item.title,
-            body: item.body,
-            image: item.og_image_url
-          })
-          deleteKeys.push(url)
-          delete item.body
-          item.key = url
-          return item
+          const result = handleItem(item)
+          items.push(result.databaseItem)
+          deleteKeys.push(result.url)
+          item.key = result.url
+          return result.item
         })
       }
     } catch (err) {
