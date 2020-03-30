@@ -7,7 +7,8 @@ import {
   Dimensions,
   ScrollView,
   StatusBar,
-  Animated
+  Animated,
+  Platform
 } from 'react-native'
 import {
   Text,
@@ -34,7 +35,8 @@ import ParallaxScrollView from '../../../libraries/components/Parallax/ParallaxS
 
 const { width, height } = Dimensions.get('window')
 
-const SCROLL_HEADER_HEIGHT = 70
+const SCROLL_HEADER_HEIGHT = Platform.OS === 'ios' ? 66 : 76
+const SCROLL_HEADER_HEIGHT_INNER = Platform.OS === 'ios' ? 60 : 70
 class ReadingBetaComponent extends React.Component {
   constructor (props) {
     super(props)
@@ -195,10 +197,20 @@ class ReadingBetaComponent extends React.Component {
         </Transition>
       )
     }
+    let Wrapper = View
+    let wrapperProps = {
+      style: themedStyle.viewBackgroundInner
+    }
+    let smallTranslateStyle = {}
+    if (Platform.OS !== 'ios') {
+      Wrapper = Animated.View
+      wrapperProps = [themedStyle.viewBackgroundInner, animationStyles.translateY]
+      smallTranslateStyle = animationStyles.smTranslateY
+    }
     const readingTime = moment.duration(article.reading_time, 'seconds').minutes()
     return (
       <View style={[themedStyle.backgroundColor, themedStyle.viewBackground]}>
-        <Animated.View style={[themedStyle.viewBackgroundInner, animationStyles.translateY]}>
+        <Wrapper {...wrapperProps}>
           <Animated.View key='avatar' style={[themedStyle.authorPhotoContainer, animationStyles.scale]}>
             {UserAvatarComponent}
           </Animated.View>
@@ -207,12 +219,12 @@ class ReadingBetaComponent extends React.Component {
               <ActivityAuthoring
                 noTransition
                 article={article}
-                style={[themedStyle.authorBar, animationStyles.smTranslateY]}
+                style={[themedStyle.authorBar, smallTranslateStyle]}
                 name={`${article.creator_id.display_name}`.trim()}
-                date={`${moment(article.created_at).fromNow()} . ${readingTime} phút đọc`}
+                date={`${moment(article.created_at).fromNow()} . ${readingTime} ${i18n.t('common.reading_mins')}`}
               />
             ) : null}
-        </Animated.View>
+        </Wrapper>
       </View>
     )
   }
@@ -426,13 +438,13 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
   },
   viewBackgroundInner: {
     width,
-    height: SCROLL_HEADER_HEIGHT,
+    height: SCROLL_HEADER_HEIGHT_INNER,
     display: 'flex',
     justifyContent: 'center'
   },
   viewBackground: {
     width,
-    height: 76,
+    height: SCROLL_HEADER_HEIGHT,
     position: 'absolute',
     bottom: -36,
     zIndex: 1,

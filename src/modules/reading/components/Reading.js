@@ -442,7 +442,7 @@ class ReadingComponent extends React.Component {
           article={article}
           style={[themedStyle.authorBar]}
           name={article.creator_id.display_name}
-          date={`${moment(article.created_at).fromNow()} . ${readingTime} phút đọc`}
+          date={`${moment(article.created_at).fromNow()} . ${readingTime} ${i18n.t('common.reading_mins')}`}
         />
         {
           loading

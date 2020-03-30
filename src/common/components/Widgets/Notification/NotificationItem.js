@@ -1,4 +1,5 @@
 import React from 'react'
+import i18n from 'i18n-js'
 import moment from 'moment'
 import {
   TouchableOpacity,
@@ -122,7 +123,7 @@ class NotificationItemComponent extends React.Component {
               onPress={this.handlePressAuthoring}
               photo={article.avatar ? { uri: article.avatar } : images.default_user}
               name={article.creator_id.display_name}
-              date={`${moment(article.created_at).fromNow()} . ${readingTime} phút đọc`}
+              date={`${moment(article.created_at).fromNow()} . ${readingTime} ${i18n.t('common.reading_mins')}`}
             />
           </ArticleActivityBar>
         </TouchableOpacity>

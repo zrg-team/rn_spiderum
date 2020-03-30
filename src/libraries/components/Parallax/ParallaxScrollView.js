@@ -5,7 +5,8 @@ import {
   Animated,
   Dimensions,
   ScrollView,
-  StatusBar
+  StatusBar,
+  Platform
 } from 'react-native'
 import { Transition } from 'react-navigation-fluid-transitions'
 import { SCREEN_HEIGHT, DEFAULT_WINDOW_MULTIPLIER } from './constants'
@@ -14,6 +15,8 @@ import styles from './styles'
 const { width } = Dimensions.get('window')
 
 const ScrollViewPropTypes = ScrollView.propTypes
+
+const IPHONE_HEADER_HEIGHT = 30
 
 export default class ParallaxScrollView extends Component {
   constructor () {
@@ -129,15 +132,29 @@ export default class ParallaxScrollView extends Component {
       return null
     }
 
-    const transform = [
-      {
-        translateY: scrollY.interpolate({
-          inputRange: [-windowHeight, 0, windowHeight],
-          outputRange: [windowHeight / 2, 0, -windowHeight + scrollHeaderHeight - StatusBar.currentHeight],
-          extrapolate: 'clamp'
-        })
-      }
-    ]
+    let transform = []
+
+    if (Platform.OS === 'ios') {
+      transform = [
+        {
+          translateY: scrollY.interpolate({
+            inputRange: [-windowHeight, 0, windowHeight],
+            outputRange: [windowHeight / 2, 0, -windowHeight + IPHONE_HEADER_HEIGHT],
+            extrapolate: 'clamp'
+          })
+        }
+      ]
+    } else {
+      transform = [
+        {
+          translateY: scrollY.interpolate({
+            inputRange: [-windowHeight, 0, windowHeight],
+            outputRange: [windowHeight / 2, 0, -windowHeight + scrollHeaderHeight - StatusBar.currentHeight],
+            extrapolate: 'clamp'
+          })
+        }
+      ]
+    }
 
     const scale = scrollY.interpolate({
       inputRange: [-windowHeight, 0, windowHeight],
@@ -164,23 +181,21 @@ export default class ParallaxScrollView extends Component {
     })
 
     return (
-      <>
-        <Animated.View
-          style={[{
-            zIndex: 999,
-            height: windowHeight,
-            position: 'absolute',
-            transform
-          }]}
-        >
-          {headerView({
-            scale: { transform: [{ scale }] },
-            translateY: { transform: [{ translateY }] },
-            opacity: { opacity },
-            smTranslateY: { transform: [{ translateY: smTranslateY }] }
-          })}
-        </Animated.View>
-      </>
+      <Animated.View
+        style={[{
+          zIndex: 999,
+          height: windowHeight,
+          position: 'absolute',
+          transform
+        }]}
+      >
+        {headerView({
+          scale: { transform: [{ scale }] },
+          translateY: { transform: [{ translateY }] },
+          opacity: { opacity },
+          smTranslateY: { transform: [{ translateY: smTranslateY }] }
+        })}
+      </Animated.View>
     )
   }
 

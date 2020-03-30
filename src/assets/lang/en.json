@@ -18,7 +18,8 @@
     "done": "Done",
     "update": "Update",
     "hot_news": "Top News",
-    "search_result": "Result"
+    "search_result": "Result",
+    "reading_mins": "Minutes"
   },
   "messages": {
     "saved_news": "Saved.",
