@@ -1,6 +1,6 @@
 {
   "name": "awesome",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -68,7 +68,7 @@
     "redux-saga": "^1.1.1",
     "reselect": "^4.0.0",
     "rn-placeholder": "^3.0.0",
-    "stacktrace-parser": "^0.1.7"
+    "stacktrace-parser": "^0.1.9"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
@@ -77,10 +77,12 @@
     "babel-jest": "^24.9.0",
     "eslint": "^6.6.0",
     "jest": "^24.9.0",
-    "react-native-bundle-visualizer": "^2.0.4",
     "metro-react-native-babel-preset": "^0.58.0",
+    "react-native-bundle-visualizer": "^2.0.4",
+    "react-native-flipper": "^0.34.0",
     "react-test-renderer": "16.11.0",
-    "rn-nodeify": "^10.2.0"
+    "rn-nodeify": "^10.2.0",
+    "rn-redux-middleware-flipper": "0.1.0"
   },
   "jest": {
     "preset": "react-native"

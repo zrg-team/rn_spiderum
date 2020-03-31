@@ -201,11 +201,13 @@ class ReadingBetaComponent extends React.Component {
     let wrapperProps = {
       style: themedStyle.viewBackgroundInner
     }
-    let smallTranslateStyle = {}
+    let smallTranslateStyle = []
     if (Platform.OS !== 'ios') {
       Wrapper = Animated.View
-      wrapperProps = [themedStyle.viewBackgroundInner, animationStyles.translateY]
-      smallTranslateStyle = animationStyles.smTranslateY
+      wrapperProps = {
+        style: [themedStyle.viewBackgroundInner, animationStyles.translateY]
+      }
+      smallTranslateStyle = [animationStyles.smTranslateY, animationStyles.smScale]
     }
     const readingTime = moment.duration(article.reading_time, 'seconds').minutes()
     return (
@@ -219,7 +221,7 @@ class ReadingBetaComponent extends React.Component {
               <ActivityAuthoring
                 noTransition
                 article={article}
-                style={[themedStyle.authorBar, smallTranslateStyle]}
+                style={[themedStyle.authorBar, ...smallTranslateStyle]}
                 name={`${article.creator_id.display_name}`.trim()}
                 date={`${moment(article.created_at).fromNow()} . ${readingTime} ${i18n.t('common.reading_mins')}`}
               />
@@ -432,7 +434,7 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
     left: 56,
     zIndex: 1,
     backgroundColor: theme['background-basic-color-2'],
-    marginTop: 5
+    marginBottom: 22
     // position: 'absolute'
     // bottom: -48
   },

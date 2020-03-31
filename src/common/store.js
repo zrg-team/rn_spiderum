@@ -19,6 +19,11 @@ const createMiddlewares = sagaMiddleware => {
   if (sagaMiddleware) {
     middlewares.push(sagaMiddleware)
   }
+  if (__DEV__) { // eslint-disable-line
+    const createFlipperMiddleware = require('rn-redux-middleware-flipper').default
+    middlewares.push(createFlipperMiddleware())
+  }
+
   return applyMiddleware.apply({}, middlewares)
 }
 

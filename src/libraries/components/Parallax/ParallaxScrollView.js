@@ -149,7 +149,11 @@ export default class ParallaxScrollView extends Component {
         {
           translateY: scrollY.interpolate({
             inputRange: [-windowHeight, 0, windowHeight],
-            outputRange: [windowHeight / 2, 0, -windowHeight + scrollHeaderHeight - StatusBar.currentHeight],
+            outputRange: [
+              windowHeight / 2,
+              0,
+              -windowHeight + scrollHeaderHeight - StatusBar.currentHeight - 12
+            ],
             extrapolate: 'clamp'
           })
         }
@@ -158,7 +162,13 @@ export default class ParallaxScrollView extends Component {
 
     const scale = scrollY.interpolate({
       inputRange: [-windowHeight, 0, windowHeight],
-      outputRange: [1, 1, 0.8],
+      outputRange: [1, 1, 0.7],
+      extrapolate: 'clamp'
+    })
+
+    const smScale = scrollY.interpolate({
+      inputRange: [-windowHeight, 0, windowHeight],
+      outputRange: [1, 1, 0.95],
       extrapolate: 'clamp'
     })
 
@@ -191,6 +201,7 @@ export default class ParallaxScrollView extends Component {
       >
         {headerView({
           scale: { transform: [{ scale }] },
+          smScale: { transform: [{ scale: smScale }] },
           translateY: { transform: [{ translateY }] },
           opacity: { opacity },
           smTranslateY: { transform: [{ translateY: smTranslateY }] }
