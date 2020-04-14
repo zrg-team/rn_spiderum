@@ -8,15 +8,18 @@ import {
   StatusBar,
   Platform
 } from 'react-native'
+import { SpringScrollView } from 'react-native-spring-scrollview'
 import { Transition } from 'react-navigation-fluid-transitions'
+import FastImage from 'react-native-fast-image'
 import { SCREEN_HEIGHT, DEFAULT_WINDOW_MULTIPLIER } from './constants'
 import styles from './styles'
 
 const { width } = Dimensions.get('window')
 
 const ScrollViewPropTypes = ScrollView.propTypes
-
+const AnimatedScroll = Animated.createAnimatedComponent(SpringScrollView)
 const IPHONE_HEADER_HEIGHT = 30
+const FastImageAnimated = Animated.createAnimatedComponent(FastImage)
 
 export default class ParallaxScrollView extends Component {
   constructor () {
@@ -33,8 +36,8 @@ export default class ParallaxScrollView extends Component {
   }
 
   renderBackground () {
-    var { noTransition, imageUrl, windowHeight, backgroundSource, onBackgroundLoadEnd, onBackgroundLoadError } = this.props
-    var { scrollY } = this.state
+    const { noTransition, imageUrl, windowHeight, backgroundSource, onBackgroundLoadEnd, onBackgroundLoadError } = this.props
+    const { scrollY } = this.state
     if (!windowHeight || !backgroundSource) {
       return null
     }
@@ -55,7 +58,7 @@ export default class ParallaxScrollView extends Component {
     let RenderComponent = null
     if (noTransition) {
       RenderComponent = (
-        <Animated.Image
+        <FastImageAnimated
           style={[
             styles.background,
             {
@@ -66,13 +69,12 @@ export default class ParallaxScrollView extends Component {
           source={backgroundSource}
           onLoadEnd={onBackgroundLoadEnd}
           onError={onBackgroundLoadError}
-        >
-        </Animated.Image>
+        />
       )
     } else {
       RenderComponent = (
         <Transition shared={imageUrl}>
-          <Animated.Image
+          <FastImageAnimated
             style={[
               styles.background,
               {
@@ -83,8 +85,7 @@ export default class ParallaxScrollView extends Component {
             source={backgroundSource}
             onLoadEnd={onBackgroundLoadEnd}
             onError={onBackgroundLoadError}
-          >
-          </Animated.Image>
+          />
         </Transition>
       )
     }
@@ -150,7 +151,7 @@ export default class ParallaxScrollView extends Component {
           translateY: scrollY.interpolate({
             inputRange: [-windowHeight, 0, windowHeight],
             outputRange: [
-              windowHeight / 2,
+              windowHeight,
               0,
               -windowHeight + scrollHeaderHeight - StatusBar.currentHeight - 12
             ],
@@ -163,6 +164,12 @@ export default class ParallaxScrollView extends Component {
     const scale = scrollY.interpolate({
       inputRange: [-windowHeight, 0, windowHeight],
       outputRange: [1, 1, 0.7],
+      extrapolate: 'clamp'
+    })
+
+    const translateX = scrollY.interpolate({
+      inputRange: [-windowHeight, 0, windowHeight],
+      outputRange: [0, 0, 32],
       extrapolate: 'clamp'
     })
 
@@ -186,23 +193,25 @@ export default class ParallaxScrollView extends Component {
 
     const opacity = scrollY.interpolate({
       inputRange: [-windowHeight, 0, windowHeight],
-      outputRange: [1, 1, 0],
+      outputRange: [0, 0, 1],
       extrapolate: 'clamp'
     })
 
     return (
       <Animated.View
-        style={[{
-          zIndex: 999,
+        style={{
+          zIndex: 999999,
+          // width: '100%',
           height: windowHeight,
           position: 'absolute',
           transform
-        }]}
+        }}
       >
         {headerView({
           scale: { transform: [{ scale }] },
           smScale: { transform: [{ scale: smScale }] },
           translateY: { transform: [{ translateY }] },
+          translateX: { transform: [{ translateX }] },
           opacity: { opacity },
           smTranslateY: { transform: [{ translateY: smTranslateY }] }
         })}
@@ -239,15 +248,17 @@ export default class ParallaxScrollView extends Component {
   }
 
   render () {
-    const { style, ...props } = this.props
+    const { style, scrollable, getScroller, ...props } = this.props
 
     return (
       <View style={[styles.container, style]}>
         {this.renderBackground()}
         {this.renderScrollHeader()}
-        <Animated.ScrollView
+        <AnimatedScroll
+          scrollEnabled={scrollable}
           ref={component => {
             this._scrollView = component
+            getScroller(this._scrollView)
           }}
           {...props}
           style={styles.scrollView}
@@ -261,7 +272,7 @@ export default class ParallaxScrollView extends Component {
           <View style={[styles.content, props.scrollableViewStyle]}>
             {this.props.children}
           </View>
-        </Animated.ScrollView>
+        </AnimatedScroll>
       </View>
     )
   }
@@ -276,6 +287,7 @@ ParallaxScrollView.defaultProps = {
 
 ParallaxScrollView.propTypes = {
   ...ScrollViewPropTypes,
+  getScroller: PropTypes.func,
   backgroundSource: PropTypes.object,
   windowHeight: PropTypes.number,
   navBarTitle: PropTypes.string,

@@ -3,7 +3,7 @@ import {
   View
 } from 'react-native'
 import { List, withStyles } from 'react-native-ui-kitten'
-import { navigationPush, screens } from '../../../common/utils/navigation'
+import { navigationPush, pages } from '../../../common/utils/navigation'
 import { images } from '../../../assets/elements'
 import CategoryItem from './CategoryItem'
 
@@ -27,7 +27,7 @@ class CategoriesComponent extends Component {
 
   handleReading (item) {
     const { navigation } = this.props
-    navigationPush(navigation, screens().CategoryDetail, { item })
+    navigationPush(navigation, pages().CategoryDetail, { item })
   }
 
   keyExtractor (item = {}, index) {

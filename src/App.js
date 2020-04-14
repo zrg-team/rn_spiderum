@@ -1,27 +1,17 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/es/integration/react'
 import store from './common/store'
 import Root from './common/hocs/Root'
-// import FlipperTicTacToe from './Test'
 
 // Disable message in the bottom
 console.disableYellowBox = true
-
 // Pure class no need Component
-export default class App extends PureComponent {
-  constructor (props) {
-    super(props)
-    window.navigator.userAgent = 'react-native'
-  }
-
-  render () {
-    return (
-      <Provider store={store.store}>
-        <PersistGate loading={null} persistor={store.persistor}>
-          <Root />
-        </PersistGate>
-      </Provider>
-    )
-  }
-}
+window.navigator.userAgent = 'react-native'
+export default () => (
+  <Provider store={store.store}>
+    <PersistGate loading={null} persistor={store.persistor}>
+      <Root />
+    </PersistGate>
+  </Provider>
+)

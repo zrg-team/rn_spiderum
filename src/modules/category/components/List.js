@@ -10,7 +10,7 @@ import { List, withStyles } from 'react-native-ui-kitten'
 import * as Animatable from 'react-native-animatable'
 import { DefaultSkeleton } from '../../../libraries/components/Skeleton'
 import { textStyle } from '../../../styles/common'
-import { navigationPush, screens } from '../../../common/utils/navigation'
+import { navigationPush, pages } from '../../../common/utils/navigation'
 import NewsItem from './NewsItem'
 
 class ListComponent extends Component {
@@ -46,12 +46,12 @@ class ListComponent extends Component {
 
   handleReading (article, itemIndex) {
     const { navigation, type } = this.props
-    navigationPush(navigation, screens().Reading, { article, itemIndex, type, category: true })
+    navigationPush(navigation, pages().Reading, { article, itemIndex, type, category: true })
   }
 
   handleAuthoring (article, itemIndex) {
     const { navigation } = this.props
-    navigationPush(navigation, screens().Profile, { profileId: article.creator_id.name })
+    navigationPush(navigation, pages().Profile, { profileId: article.creator_id.name })
   }
 
   componentDidMount () {

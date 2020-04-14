@@ -4,7 +4,7 @@ import {
 } from 'react-native'
 import { List, withStyles } from 'react-native-ui-kitten'
 import * as Animatable from 'react-native-animatable'
-import { navigationPush, screens } from '../../../common/utils/navigation'
+import { navigationPush, pages } from '../../../common/utils/navigation'
 import BookmarkItem from './BookmarkItem'
 
 class BookmarkComponent extends Component {
@@ -27,12 +27,12 @@ class BookmarkComponent extends Component {
 
   handleReading (article, itemIndex) {
     const { navigation } = this.props
-    navigationPush(navigation, screens().Reading, { article, itemIndex, type: 'bookmark' })
+    navigationPush(navigation, pages().Reading, { article, itemIndex, type: 'bookmark' })
   }
 
   handleAuthoring (article, itemIndex) {
     const { navigation } = this.props
-    navigationPush(navigation, screens().Profile, { profileId: article.creator_id.name })
+    navigationPush(navigation, pages().Profile, { profileId: article.creator_id.name })
   }
 
   keyExtractor (item = {}, index) {

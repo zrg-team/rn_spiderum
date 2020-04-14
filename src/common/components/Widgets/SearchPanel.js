@@ -23,7 +23,7 @@ import { BlurView } from '@react-native-community/blur'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { MODULE_NAME as MODULE_HOME } from '../../../modules/home/models'
 import commonStyles, { appHeight } from '../../../styles/common'
-import { navigationPush, screens } from '../../utils/navigation'
+import { navigationPush, pages } from '../../utils/navigation'
 import homeHandlers from '../../../modules/home/handlers'
 import { isIphoneX } from '../../../libraries/iphonex'
 import { images } from '../../../assets/elements'
@@ -104,7 +104,7 @@ class SearchPanelComponent extends PureComponent {
 
   handlePressNew (article) {
     this.handleHide()
-    navigationPush(undefined, screens().Reading, { article, itemIndex: null })
+    navigationPush(undefined, pages().Reading, { article, itemIndex: null })
   }
 
   runAnimation (callback) {

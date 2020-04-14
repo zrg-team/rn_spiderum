@@ -78,7 +78,9 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    enableHermes: true,  // clean and rebuild if changing
+    enableHermes: false,  // clean and rebuild if changing
+    bundleCommand          : "ram-bundle",
+    // extraPackagerArgs      : ["--indexed-ram-bundle"]
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -96,7 +98,7 @@ def enableSeparateBuildPerCPUArchitecture = true
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore.
@@ -132,8 +134,8 @@ android {
         applicationId "com.zrgteam.awesome"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 19
-        versionName "1.1.8"
+        versionCode 24
+        versionName "1.2.2"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
     }

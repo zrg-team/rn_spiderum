@@ -4,7 +4,6 @@ import * as FileSystem from 'react-native-fs'
 import DeviceInfo from 'react-native-device-info'
 import { Button, Text } from 'react-native-ui-kitten'
 import Icon from 'react-native-vector-icons/AntDesign'
-import SyntaxHighlighter from 'react-native-syntax-highlighter'
 import { View, StyleSheet, ScrollView, FlatList, TouchableOpacity } from 'react-native'
 import configFile from '../../../configs'
 import buildFile from '../../../configs/build'
@@ -98,7 +97,7 @@ export default class Debug extends Component {
 🛠️ Git: ${buildFile.gitVersion || ''}
 🛠️ Build Commit:
 
-${JSON.stringify(commit, null, 2)}
+${JSON.stringify(commit, null, 4)}
 
 🛠️ React Native Info:
 
@@ -106,8 +105,8 @@ ${buildFile.reactNativeInfo}
 🛠️ Build Gradle:
 ${buildFile.gradle}
   `,
-        config: JSON.stringify(configFile, null, 2),
-        state: JSON.stringify(state, null, 2)
+        config: JSON.stringify(configFile, null, 4),
+        state: JSON.stringify(state, null, 4)
       })
     } catch (err) {
       this.setState({
@@ -188,7 +187,7 @@ ${buildFile.gradle}
           'User Agent': userAgent,
           Version: version,
           'Javascript Engine': jsEngine
-        }, null, 2)
+        }, null, 4)
       })
     } catch (err) {
     }
@@ -321,11 +320,13 @@ ${item.data}
       </TouchableOpacity>,
       `${detail}` === `${item.id}`
         ? (
-          <View
+          <Text
             key='detail'
             style={{
               width: '100%',
-              height: undefined
+              height: undefined,
+              padding: 10,
+              backgroundColor: '#FFFFFF'
             }}
           >
             <Text
@@ -334,12 +335,10 @@ ${item.data}
             >
               {date.format('YYYY-MM-DD hh:mm:ss')}
             </Text>
-            <SyntaxHighlighter
-              language='javascript'
-            >
+            <Text style={styles.default_text}>
               {item.data || ''}
-            </SyntaxHighlighter>
-          </View>
+            </Text>
+          </Text>
         ) : null
     ]
   }
@@ -370,32 +369,29 @@ ZRG-TEAM
           </Text>
           <CollapsibleComponent title='DEVICE INFO'>
             <View style={[styles.detail]}>
-              <SyntaxHighlighter
-                language='javascript'
-                highlighter='hljs'
+              <Text
+                style={styles.default_text}
               >
                 {info || ''}
-              </SyntaxHighlighter>
+              </Text>
             </View>
           </CollapsibleComponent>
           <CollapsibleComponent title='BUILD INFORMATION'>
             <View style={[styles.detail]}>
-              <SyntaxHighlighter
-                language='javascript'
-                highlighter='hljs'
+              <Text
+                style={styles.default_text}
               >
                 {build || ''}
-              </SyntaxHighlighter>
+              </Text>
             </View>
           </CollapsibleComponent>
           <CollapsibleComponent title='CONFIG'>
             <View style={[styles.detail]}>
-              <SyntaxHighlighter
-                language='javascript'
-                highlighter='hljs'
+              <Text
+                style={styles.default_text}
               >
                 {config || ''}
-              </SyntaxHighlighter>
+              </Text>
             </View>
           </CollapsibleComponent>
           <Text
@@ -472,13 +468,14 @@ const styles = StyleSheet.create({
   },
   log_date: { color: '#4D6B40', paddingRight: 5 },
   log_data: { flex: 1, paddingRight: 5, color: '#FFFFFF' },
-  log_date_full: { width: '100%', paddingTop: 10, paddingBottom: 10, paddingLeft: 10, color: '#107C10', backgroundColor: '#FFFFFF' },
+  log_date_full: { width: '100%', color: '#107C10', paddingRight: 10 },
   log_list: {
     width: '100%',
     height: undefined,
     backgroundColor: '#000000'
   },
   default_text: {
-    color: '#107C10'
+    color: 'gray',
+    padding: 10
   }
 })

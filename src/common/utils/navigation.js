@@ -1,13 +1,13 @@
 import { NavigationActions, StackActions, DrawerActions } from 'react-navigation'
-import { SCREENS } from '../routes'
+import { PAGES } from '../routes'
 
 let navigator
 export function setTopLevelNavigator (navigatorRef) {
   navigator = navigatorRef
 }
 
-export function screens () {
-  return SCREENS
+export function pages () {
+  return PAGES
 }
 
 export function navigationReset (navigation = navigator, page, params = {}, key = new Date().getTime()) {

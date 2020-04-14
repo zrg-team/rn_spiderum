@@ -13,7 +13,7 @@ import { withStyles } from 'react-native-ui-kitten'
 import { DEBUG_PAGE } from '../../../configs'
 import BottomSheet from '../../../common/components/Widgets/BottomSheet'
 import Information from './Information'
-import { navigationPush, screens } from '../../../common/utils/navigation'
+import { navigationPush, pages } from '../../../common/utils/navigation'
 
 class OptionsComponent extends Component {
   constructor (props) {
@@ -35,13 +35,13 @@ class OptionsComponent extends Component {
         toggleUIMode()
         break
       case 'bookmark':
-        navigationPush(navigation, screens().Bookmark)
+        navigationPush(navigation, pages().Bookmark)
         break
       case 'about':
         BottomSheet.show(<Information />)
         break
       case 'debug':
-        navigationPush(navigation, screens().Debug)
+        navigationPush(navigation, pages().Debug)
         break
       case 'spiderum':
         Linking.openURL('https://spiderum.com/')

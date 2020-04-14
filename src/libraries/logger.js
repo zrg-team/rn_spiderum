@@ -18,7 +18,7 @@ async function writeLog (level, message, ...options) {
       timestamp: Date.now(),
       module: level,
       data:
-        `📢 ${message} 📢\n${options.map(item => {
+        ` ${message} \n${options.map(item => {
           if (item instanceof Error && item.response) {
             return JSON.stringify({
               message: item.message,

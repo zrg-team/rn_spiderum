@@ -5,14 +5,14 @@ import {
 } from 'react-native-ui-kitten'
 import FadeLoading from '../common/components/Widgets/FadeLoading'
 import DefaultPage from '../common/hocs/DefaultPage'
-import { SCREENS } from '../common/routes'
+import { PAGES } from '../common/routes'
 
 class LoadingPage extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
       ready: false,
-      screen: props.page || SCREENS.TabGroup
+      screen: props.page || PAGES.TabGroup
     }
   }
 

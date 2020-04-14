@@ -6,7 +6,7 @@ import {
   BottomTabBar,
   createStackNavigator
 } from 'react-navigation'
-
+import { register } from 'react-native-bundle-splitter'
 import createScreensStackNavigator from 'react-native-screens/createNativeStackNavigator'
 import { FluidNavigator } from 'react-navigation-fluid-transitions'
 import { fadeIn } from 'react-navigation-transitions'
@@ -14,38 +14,28 @@ import { fadeIn } from 'react-navigation-transitions'
 import commonStyle, { TAB_BAR_HEIGHT } from '../styles/common'
 import TabarItem from './containers/TabarItem'
 
-import DebugPage from '../pages/DebugPage'
-import HomePage from '../pages/HomePage'
-import NewsPage from '../pages/NewsPage'
-import TopPage from '../pages/TopPage'
-import OptionPage from '../pages/OptionPage'
-import ProfilePage from '../pages/ProfilePage'
-import LoadingPage from '../pages/LoadingPage'
-import ReadingPage from '../pages/ReadingPage'
-import BookmarkPage from '../pages/BookmarkPage'
-import AppIntroPage from '../pages/AppIntroPage'
-import CategoriesPage from '../pages/CategoriesPage'
-import CategoryDetailPage from '../pages/CategoryDetailPage'
+import createOptionFlow, { PAGES as OPTION_PAGES } from './flows/option'
+import createReadingFlow, { PAGES as READING_PAGES } from './flows/reading'
+import createCategoryFlow, { PAGES as CATEGORY_PAGES } from './flows/category'
 
-export const SCREENS = {
+import LoadingPage from '../pages/LoadingPage'
+import AppIntroPage from '../pages/AppIntroPage'
+
+export const PAGES = {
+  AppIntro: 'AppIntro',
   Home: 'Home',
   News: 'News',
   Top: 'Top',
   Option: 'Option',
   Loading: 'Loading',
   TabGroup: 'TabGroup',
-  OptionList: 'OptionList',
-  HotList: 'HotList',
   NewsList: 'NewsList',
   TopList: 'TopList',
-  Reading: 'Reading',
+  HotList: 'HotList',
   Category: 'Category',
-  Categories: 'Categories',
-  CategoryDetail: 'CategoryDetail',
-  Profile: 'Profile',
-  Bookmark: 'Bookmark',
-  AppIntro: 'AppIntro',
-  Debug: 'Debug'
+  ...OPTION_PAGES,
+  ...READING_PAGES,
+  ...CATEGORY_PAGES
 }
 
 const customScreenOption = {
@@ -62,14 +52,19 @@ export default ({
   persistor = undefined,
   dispatch = null,
   appIntro,
-  themedStyle
+  themedStyle,
+  setTopLevelNavigator,
+  ...navigationProps
 }) => {
+  // create flow
+  const optionPages = createOptionFlow(customScreenOption)
+  const readingPages = createReadingFlow(customScreenOption)
+  const categogyPages = createCategoryFlow(customScreenOption)
+
   // Option flow
   const OptionFlow = createNativeStackNavigator({
-    [SCREENS.OptionList]: { screen: OptionPage, ...customScreenOption },
-    [SCREENS.Bookmark]: { screen: BookmarkPage, ...customScreenOption },
-    [SCREENS.Reading]: { screen: ReadingPage, ...customScreenOption },
-    [SCREENS.Debug]: { screen: DebugPage, ...customScreenOption }
+    ...optionPages,
+    ...readingPages
   }, {
     headerMode: 'none',
     navigationOptions: ({ navigation }) => {
@@ -84,9 +79,8 @@ export default ({
   })
   // Option Home flow
   const HomeFlow = FluidNavigator({
-    [SCREENS.HotList]: { screen: HomePage },
-    [SCREENS.Reading]: { screen: ReadingPage },
-    [SCREENS.Profile]: { screen: ProfilePage }
+    [PAGES.HotList]: { screen: register({ require: () => require('../pages/HomePage') }) },
+    ...readingPages
   }, {
     headerMode: 'none',
     navigationOptions: ({ navigation }) => {
@@ -101,9 +95,8 @@ export default ({
   })
   // News Home flow
   const NewsFlow = FluidNavigator({
-    [SCREENS.NewsList]: { screen: NewsPage },
-    [SCREENS.Reading]: { screen: ReadingPage },
-    [SCREENS.Profile]: { screen: ProfilePage }
+    [PAGES.NewsList]: { screen: register({ require: () => require('../pages/NewsPage') }) },
+    ...readingPages
   }, {
     headerMode: 'none',
     navigationOptions: ({ navigation }) => {
@@ -118,9 +111,8 @@ export default ({
   })
   // Top Home flow
   const TopFlow = FluidNavigator({
-    [SCREENS.TopList]: { screen: TopPage },
-    [SCREENS.Reading]: { screen: ReadingPage },
-    [SCREENS.Profile]: { screen: ProfilePage }
+    [PAGES.TopList]: { screen: register({ require: () => require('../pages/TopPage') }) },
+    ...readingPages
   }, {
     headerMode: 'none',
     navigationOptions: ({ navigation }) => {
@@ -135,10 +127,8 @@ export default ({
   })
   // Category Home flow
   const CategoryFlow = createNativeStackNavigator({
-    [SCREENS.Categories]: { screen: CategoriesPage, ...customScreenOption },
-    [SCREENS.CategoryDetail]: { screen: CategoryDetailPage, ...customScreenOption },
-    [SCREENS.Reading]: { screen: ReadingPage, ...customScreenOption },
-    [SCREENS.Profile]: { screen: ProfilePage, ...customScreenOption }
+    ...categogyPages,
+    ...readingPages
   }, {
     headerMode: 'none',
     navigationOptions: ({ navigation }) => {
@@ -153,11 +143,11 @@ export default ({
   })
   // Tab navigator
   const TabGroup = createBottomTabNavigator({
-    [SCREENS.Home]: HomeFlow,
-    [SCREENS.News]: NewsFlow,
-    [SCREENS.Top]: TopFlow,
-    [SCREENS.Category]: CategoryFlow,
-    [SCREENS.Option]: OptionFlow
+    [PAGES.Home]: HomeFlow,
+    [PAGES.News]: NewsFlow,
+    [PAGES.Top]: TopFlow,
+    [PAGES.Category]: CategoryFlow,
+    [PAGES.Option]: OptionFlow
   }, {
     defaultNavigationOptions: ({ navigation }) => ({
       tabBarComponent: (props) => {
@@ -184,7 +174,7 @@ export default ({
     backBehavior: 'none',
     animationEnabled: false,
     // removeClippedSubviews: false,
-    initialRouteName: SCREENS.Home,
+    initialRouteName: PAGES.Home,
     barStyle: themedStyle.barStyle,
     activeColor: commonStyle.activeMenu.color
   })
@@ -193,49 +183,50 @@ export default ({
   if (appIntro || Platform.OS === 'ios') {
     AppNavigator = createNativeStackNavigator(
       {
-        [SCREENS.Loading]: {
+        [PAGES.Loading]: {
           screen: (props) => (
             <LoadingPage
               time={0}
               dispatch={dispatch}
               persistor={persistor}
-              page={SCREENS.TabGroup}
+              page={PAGES.TabGroup}
               {...props}
             />
           ),
           ...customScreenOption
         },
-        [SCREENS.TabGroup]: { screen: TabGroup, ...customScreenOption }
+        [PAGES.TabGroup]: { screen: TabGroup, ...customScreenOption }
       },
       {
         headerMode: 'none',
         cardShadowEnabled: false,
         transitionConfig: () => fadeIn(),
         cardStyle: themedStyle.mainNavigator,
-        initialRouteName: SCREENS.Loading
+        initialRouteName: PAGES.Loading
       }
     )
   } else {
     AppNavigator = FluidNavigator(
       {
-        [SCREENS.Loading]: {
+        [PAGES.Loading]: {
           screen: (props) => (
             <LoadingPage
               time={300}
-              page={SCREENS.AppIntro}
+              page={PAGES.AppIntro}
               {...props}
             />
           )
         },
-        [SCREENS.AppIntro]: { screen: AppIntroPage }
+        [PAGES.AppIntro]: { screen: AppIntroPage }
       },
       {
         headerMode: 'none',
-        initialRouteName: SCREENS.LoadingPage,
+        initialRouteName: PAGES.Loading,
         defaultNavigationOptions: { gesturesEnabled: false }
       }
     )
   }
 
-  return createAppContainer(AppNavigator)
+  const NavigationComponent = createAppContainer(AppNavigator)
+  return <NavigationComponent {...navigationProps} ref={setTopLevelNavigator} />
 }

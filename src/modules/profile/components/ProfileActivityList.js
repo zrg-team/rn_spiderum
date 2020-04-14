@@ -8,7 +8,7 @@ import {
 } from './ProfileActivityListItem'
 import { AVATAR_URL } from '../models'
 import { images } from '../../../assets/elements'
-import { navigationPush, screens } from '../../../common/utils/navigation'
+import { navigationPush, pages } from '../../../common/utils/navigation'
 
 class ProfileActivityListComponent extends React.Component {
   constructor (props) {
@@ -21,7 +21,7 @@ class ProfileActivityListComponent extends React.Component {
 
   handlePressItem (item) {
     const { navigation } = this.props
-    navigationPush(navigation, screens().Reading, { article: item })
+    navigationPush(navigation, pages().Reading, { article: item })
   }
 
   keyExtractor (item, index) {

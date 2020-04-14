@@ -3,17 +3,17 @@ Read https://spiderum.com mobile app, powered by react-native
 
 # About
 
-Ứng dụng đọc tin tức từ spiderum.com. Ứng dụng unofficial đến từ cộng đồng người đọc spiderum.com, Tập trung vào các tính năng:
+An Application to read news from spiderum.com. Unofficial application from spiderum.com reader community, Focus on features:
 
-+ Ứng dụng mở và sử dụng nhanh
-+ Đọc offline
-+ Giao diện dễ dùng và hiện đại
-+ Đọc tin tức đầy đủ
-+ Tính năng đọc tiếp nối
-+ Hỗ trợ giao diện nền tối
++ Application open and use quickly
++ Worked properly including network problem
++ Easy to use and modern interface
++ Read the full news
++ Continue reading feature
++ Support dark theme
 + ...
 
-Được xây dựng từ cộng đồng nên ứng dụng không có bất cứ quảng cáo hay phương thức thu lợi nhuận nào.
+Built from the community, the application does not have any advertising or profit.
 
 ### Download:
 https://play.google.com/store/apps/details?id=com.zrgteam.awesome

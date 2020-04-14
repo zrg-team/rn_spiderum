@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import merge from 'lodash/merge'
 import { StyleSheet, Dimensions, StatusBar, Platform } from 'react-native'
 import { isIphoneX } from '../libraries/iphonex'
 import { STYLE_SHEET, DEFAULT_HEADER_GRADIENT } from '../configs'
@@ -100,7 +100,7 @@ const style = {
   }
 }
 
-export default StyleSheet.create(_.merge(style, STYLE_SHEET))
+export default StyleSheet.create(merge(style, STYLE_SHEET))
 
 export const textStyle = {
   headline: {

@@ -24,6 +24,7 @@ import {
   setNavigationPage,
   setNetworkStatus
 } from '../actions/common'
+import AppRouteComponent from './NavigationContainer'
 
 // gets the current screen from navigation state
 function getActiveRouteName (navigationState) {
@@ -37,8 +38,6 @@ function getActiveRouteName (navigationState) {
   }
   return route.routeName
 }
-
-let LazyComponent = null
 class MainPage extends Component {
   constructor (props) {
     super(props)
@@ -67,21 +66,24 @@ class MainPage extends Component {
   }
 
   getNavigator (appIntro, language) {
-    const { lazy } = this.state
-    if (lazy) {
-      return View
-    }
     if (`${appIntro}_${language}` === this.unique) {
       return this.AppNavigator
     }
     const { persistor, dispatch, themedStyle } = this.props
-    this.AppNavigator = LazyComponent({
-      persistor,
-      dispatch,
-      appIntro,
-      setTopLevelNavigator,
-      themedStyle
-    })
+    this.AppNavigator = (
+      <AppRouteComponent
+        {
+        ...{
+          persistor,
+          dispatch,
+          themedStyle,
+          language,
+          appIntro: appIntro,
+          setTopLevelNavigator
+        }}
+        onNavigationStateChange={this.handleNavigationStateChange}
+      />
+    )
     this.unique = `${appIntro}_${language}`
     console.info(`[MAIN PAGE] Navigation reloaded. Keys: ${this.unique}`)
     return this.AppNavigator
@@ -136,17 +138,23 @@ class MainPage extends Component {
   }
 
   initial () {
-    LazyComponent = require('../routes').default
     const { persistor, dispatch, appIntro, language, themedStyle } = this.props
     // TODO: Loading page
     this.unique = `${appIntro}_${language}`
-    this.AppNavigator = LazyComponent({
-      persistor,
-      dispatch,
-      appIntro,
-      setTopLevelNavigator,
-      themedStyle
-    })
+    this.AppNavigator = (
+      <AppRouteComponent
+        {
+        ...{
+          persistor,
+          dispatch,
+          language,
+          appIntro,
+          themedStyle,
+          setTopLevelNavigator
+        }}
+        onNavigationStateChange={this.handleNavigationStateChange}
+      />
+    )
     this.setState({
       lazy: false,
       loading: false
@@ -173,13 +181,7 @@ class MainPage extends Component {
             { opacity: loading ? 0 : 1 }
           ]}
         >
-          <AppNavigator
-            key='main'
-            ref={navigatorRef => {
-              setTopLevelNavigator(navigatorRef)
-            }}
-            onNavigationStateChange={this.handleNavigationStateChange}
-          />
+          {AppNavigator || null}
         </View>
         <Modal.Component key='common-modal' global />
         <BottomSheet.Component zIndex={2} parentRef={this.navigatorRef} key='common-bottom-sheet' global />

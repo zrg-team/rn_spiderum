@@ -8,10 +8,12 @@ import {
   ScrollView,
   StatusBar,
   Animated,
-  Platform
+  Platform,
+  TouchableOpacity
 } from 'react-native'
 import {
   Text,
+  Icon,
   Avatar,
   withStyles
 } from 'react-native-ui-kitten'
@@ -19,7 +21,7 @@ import Share from 'react-native-share'
 import WebView from 'react-native-webview'
 import FastImage from 'react-native-fast-image'
 import ActionButton from 'react-native-action-button'
-import Icon from 'react-native-vector-icons/SimpleLineIcons'
+import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons'
 import { Transition } from 'react-navigation-fluid-transitions'
 import { READING_URL } from '../models'
 import HtmlContent from './reading/HtmlContent'
@@ -37,6 +39,8 @@ const { width, height } = Dimensions.get('window')
 
 const SCROLL_HEADER_HEIGHT = Platform.OS === 'ios' ? 66 : 76
 const SCROLL_HEADER_HEIGHT_INNER = Platform.OS === 'ios' ? 60 : 70
+const HEADER_IMAGE_HEIGHT = height * 0.4
+const AnimatedIcon = Animated.createAnimatedComponent(Icon)
 class ReadingBetaComponent extends React.Component {
   constructor (props) {
     super(props)
@@ -55,6 +59,11 @@ class ReadingBetaComponent extends React.Component {
     this.handleOpenSource = this.handleOpenSource.bind(this)
     this.renderNavBarView = this.renderNavBarView.bind(this)
     this.handleGoBack = this.handleGoBack.bind(this)
+    this.getScroller = this.getScroller.bind(this)
+  }
+
+  getScroller (ref) {
+    this.contentScroller = ref
   }
 
   handleGoBack () {
@@ -107,12 +116,18 @@ class ReadingBetaComponent extends React.Component {
 
   handleIncreaseFont () {
     const { setFontSize, fontSize } = this.props
-    setFontSize(fontSize + 1)
+    this.contentScroller && this.contentScroller.scrollTo({ x: 0, y: 0, animated: false })
+    setTimeout(() => {
+      setFontSize(fontSize + 1)
+    }, 0)
   }
 
   handleReduceFont () {
     const { setFontSize, fontSize } = this.props
-    setFontSize(fontSize - 1)
+    this.contentScroller && this.contentScroller.scrollTo({ x: 0, y: 0, animated: false })
+    setTimeout(() => {
+      setFontSize(fontSize - 1)
+    }, 0)
   }
 
   async componentDidMount () {
@@ -143,29 +158,29 @@ class ReadingBetaComponent extends React.Component {
     return (
       <ActionButton fixNativeFeedbackRadius key='1' buttonColor='rgba(231,76,60,1)'>
         <ActionButton.Item key='2' buttonColor='#3498db' title={i18n.t('reading.open_source')} onPress={this.handleOpenSource}>
-          <Icon name='globe' style={themedStyle.actionIcon} />
+          <SimpleLineIcon name='globe' style={themedStyle.actionIcon} />
         </ActionButton.Item>
         {type === 'bookmark'
           ? (
             <ActionButton.Item key='1' buttonColor='#9b59b6' title={i18n.t('reading.remove')} onPress={this.handleRemove}>
-              <Icon name='close' style={themedStyle.actionIcon} />
+              <SimpleLineIcon name='close' style={themedStyle.actionIcon} />
             </ActionButton.Item>
           ) : (
             <ActionButton.Item key='1' buttonColor='#9b59b6' title={i18n.t('reading.save_news')} onPress={this.handleSave}>
-              <Icon name='cloud-download' style={themedStyle.actionIcon} />
+              <SimpleLineIcon name='cloud-download' style={themedStyle.actionIcon} />
             </ActionButton.Item>
           )}
         <ActionButton.Item key='2' buttonColor='#3498db' title={i18n.t('reading.share')} onPress={this.handleShare}>
-          <Icon name='share' style={themedStyle.actionIcon} />
+          <SimpleLineIcon name='share' style={themedStyle.actionIcon} />
         </ActionButton.Item>
         <ActionButton.Item key='3' buttonColor='#1abc9c' title={i18n.t('reading.font_size')} onPress={this.handleIncreaseFont}>
-          <Icon name='magnifier-add' style={themedStyle.actionIcon} />
+          <SimpleLineIcon name='magnifier-add' style={themedStyle.actionIcon} />
         </ActionButton.Item>
         <ActionButton.Item key='4' buttonColor='#1abc9c' title={i18n.t('reading.font_size')} onPress={this.handleReduceFont}>
-          <Icon name='magnifier-remove' style={themedStyle.actionIcon} />
+          <SimpleLineIcon name='magnifier-remove' style={themedStyle.actionIcon} />
         </ActionButton.Item>
         <ActionButton.Item key='5' buttonColor='#9b59b6' title={i18n.t('common.back')} onPress={this.handleGoBack}>
-          <Icon name='action-undo' style={themedStyle.actionIcon} />
+          <SimpleLineIcon name='action-undo' style={themedStyle.actionIcon} />
         </ActionButton.Item>
       </ActionButton>
     )
@@ -210,29 +225,54 @@ class ReadingBetaComponent extends React.Component {
       smallTranslateStyle = [animationStyles.smTranslateY, animationStyles.smScale]
     }
     const readingTime = moment.duration(article.reading_time, 'seconds').minutes()
+    // TODO: stupid hack UI here
     return (
-      <View style={[themedStyle.backgroundColor, themedStyle.viewBackground]}>
-        <Wrapper {...wrapperProps}>
-          <Animated.View key='avatar' style={[themedStyle.authorPhotoContainer, animationStyles.scale]}>
-            {UserAvatarComponent}
-          </Animated.View>
-          {article.creator_id
-            ? (
-              <ActivityAuthoring
-                noTransition
-                article={article}
-                style={[themedStyle.authorBar, ...smallTranslateStyle]}
-                name={`${article.creator_id.display_name}`.trim()}
-                date={`${moment(article.created_at).fromNow()} . ${readingTime} ${i18n.t('common.reading_mins')}`}
-              />
-            ) : null}
-        </Wrapper>
-      </View>
+      <>
+        <TouchableOpacity
+          onPress={this.handleGoBack}
+          style={themedStyle.hackBackContainer}
+        />
+        <View style={[themedStyle.backgroundColor, themedStyle.viewBackground]}>
+          <Wrapper {...wrapperProps}>
+            <AnimatedIcon
+              style={[themedStyle.backIcon, animationStyles.opacity]}
+              name='arrow-left'
+            />
+            <Animated.View
+              key='avatar'
+              style={[
+                themedStyle.authorPhotoContainer,
+                {
+                  transform: [
+                    ...animationStyles.scale.transform,
+                    ...animationStyles.translateX.transform
+                  ]
+                }
+              ]}
+            >
+              {UserAvatarComponent}
+            </Animated.View>
+            {article.creator_id
+              ? (
+                <ActivityAuthoring
+                  noTransition
+                  article={article}
+                  style={[
+                    themedStyle.authorBar,
+                    ...smallTranslateStyle
+                  ]}
+                  name={`${article.creator_id.display_name || 'No name'}`.trim()}
+                  date={`${moment(article.created_at).fromNow()} . ${readingTime} ${i18n.t('common.reading_mins')}`}
+                />
+              ) : null}
+          </Wrapper>
+        </View>
+      </>
     )
   }
 
   renderNavBarView (animationStyle) {
-    const { navigation } = this.props
+    const { navigation, themedStyle } = this.props
     return (
       <Animated.View
         style={[
@@ -244,63 +284,88 @@ class ReadingBetaComponent extends React.Component {
           transition={false}
           title={i18n.t('pages.reading').toUpperCase()}
           navigation={navigation}
-          headerContainer={{
-            backgroundColor: 'transparent',
-            width: '100%',
-            marginTop: StatusBar.currentHeight
-          }}
+          headerContainer={themedStyle.defaultHeader}
         />
       </Animated.View>
     )
   }
 
+  renderContentLite ({ data, loading }) {
+    const { themedStyle, article, getComments, noComment, fontSize } = this.props
+    return (
+      <View
+        style={themedStyle.wrapperContentLite}
+      >
+        <ScrollView
+          key='content'
+          ref={this.getScroller}
+          style={themedStyle.contentLite}
+        >
+          <Text
+            key='title'
+            style={themedStyle.titleLabel}
+            category='h5'
+          >
+            {article.title}
+          </Text>
+          <HtmlContent
+            data={data}
+            loading={loading}
+            fontSize={fontSize}
+          />
+          <View style={themedStyle.endingBlock} />
+          <Text style={themedStyle.readMoreText} category='h6'>{i18n.t('reading.swipe_to_read_more')}</Text>
+          <CommentList article={article} noComment={noComment} getComments={getComments} />
+        </ScrollView>
+        {this.renderActions()}
+      </View>
+    )
+  }
+
+  renderContentWebview () {
+    const { article } = this.props
+    return (
+      <WebView
+        source={{ uri: article.key }}
+        style={{ alignSelf: 'stretch', height, width }}
+      />
+    )
+  }
+
+  renderCategories () {
+    const { themedStyle, article } = this.props
+    return (
+      <ScrollView horizontal key='info' style={[themedStyle.tagContainer]}>
+        {article.tags && article.tags.map(item => {
+          return (
+            <View
+              style={[themedStyle.badgeContainer, themedStyle.badge, commonStyles.shadow]}
+              key={item._id}
+            >
+              <Text style={themedStyle.textBadge}>{`${item.name}`.toUpperCase()}</Text>
+            </View>
+          )
+        })}
+      </ScrollView>
+    )
+  }
+
   render () {
     const {
-      noTransition,
       themedStyle,
       article = {},
       fontSize,
       noComment,
-      getComments
+      getComments,
+      noTransition
     } = this.props
     const { data, loading, images } = this.state
 
     if (!loading && !data) {
-      return (
-        <WebView
-          source={{ uri: article.key }}
-          style={{ alignSelf: 'stretch', height, width }}
-        />
-      )
+      return this.renderContentWebview()
     }
     if (!loading && images && images.length > 26) {
-      return (
-        <View
-          style={themedStyle.wrapperContentLite}
-        >
-          <ScrollView
-            key='content'
-            style={themedStyle.contentLite}
-          >
-            <Text
-              key='title'
-              style={themedStyle.titleLabel}
-              category='h5'
-            >
-              {article.title}
-            </Text>
-            <HtmlContent
-              data={data}
-              loading={loading}
-              fontSize={fontSize}
-            />
-            <View style={themedStyle.endingBlock} />
-            <Text style={themedStyle.readMoreText} category='h6'>{i18n.t('reading.swipe_to_read_more')}</Text>
-            <CommentList article={article} noComment={noComment} getComments={getComments} />
-          </ScrollView>
-          {this.renderActions()}
-        </View>
-      )
+      return this.renderContentLite({ data, loading })
     }
 
     const imageSource = article.og_image_url
@@ -312,8 +377,11 @@ class ReadingBetaComponent extends React.Component {
     return [
       <ParallaxScrollView
         key='0'
+        scrollable={!loading}
+        getScroller={this.getScroller}
         noTransition={noTransition}
-        windowHeight={height * 0.35}
+        imageUrl={article.og_image_url}
+        windowHeight={HEADER_IMAGE_HEIGHT}
         backgroundSource={imageSource}
         style={themedStyle.container}
         userImage={article.avatar}
@@ -325,18 +393,7 @@ class ReadingBetaComponent extends React.Component {
         scrollHeaderHeight={SCROLL_HEADER_HEIGHT}
         navBarColor={this.getThemeColor()}
       >
-        <ScrollView horizontal key='info' style={[themedStyle.tagContainer]}>
-          {article.tags && article.tags.map(item => {
-            return (
-              <View
-                style={[themedStyle.badgeContainer, themedStyle.badge, commonStyles.shadow]}
-                key={item._id}
-              >
-                <Text style={themedStyle.textBadge}>{`${item.name}`.toUpperCase()}</Text>
-              </View>
-            )
-          })}
-        </ScrollView>
+        {this.renderCategories()}
         <Text
           key='title'
           style={themedStyle.titleLabel}
@@ -449,7 +506,7 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
     height: SCROLL_HEADER_HEIGHT,
     position: 'absolute',
     bottom: -36,
-    zIndex: 1,
+    zIndex: 2,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 0.5 * 5 },
@@ -515,7 +572,7 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
     paddingVertical: 10
   },
   wrapperContentLite: {
-    paddingTop: 20,
+    paddingTop: StatusBar.currentHeight + 10,
     paddingBottom: 10,
     flex: 1
   },
@@ -525,9 +582,24 @@ export default withStyles(ReadingBetaComponent, (theme) => ({
     display: 'flex'
   },
   actionIcon: { fontSize: 20, height: 22, color: '#FFFFFF' },
-  errorImage: {
-    width: 180,
-    height: 180,
-    alignSelf: 'center'
+  backIcon: {
+    fontSize: 36,
+    left: 10,
+    position: 'absolute',
+    color: theme['text-basic-color']
+    // justifyContent: 'center'
+  },
+  hackBackContainer: {
+    width: 80,
+    height: HEADER_IMAGE_HEIGHT,
+    position: 'relative',
+    marginTop: StatusBar.currentHeight,
+    zIndex: 9999,
+    backgroundColor: 'transparent'
+  },
+  defaultHeader: {
+    backgroundColor: 'transparent',
+    width: '100%',
+    marginTop: StatusBar.currentHeight
   }
 }))

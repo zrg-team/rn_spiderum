@@ -8,9 +8,11 @@ const styles = StyleSheet.create({
     borderColor: 'transparent'
   },
   scrollView: {
+    zIndex: 1,
     backgroundColor: 'transparent'
   },
   background: {
+    zIndex: 0,
     position: 'absolute',
     width: SCREEN_WIDTH,
     resizeMode: 'cover'
