@@ -21,7 +21,8 @@ import Icon from 'react-native-vector-icons/SimpleLineIcons'
 import YouTube from 'react-native-youtube'
 import WebView from 'react-native-webview'
 import FastImage from 'react-native-fast-image'
-import { Transition } from 'react-navigation-fluid-transitions'
+import { SharedElement } from 'react-navigation-shared-element'
+// import { Transition } from 'react-navigation-fluid-transitions'
 import { CommentList } from './comments/CommentList'
 import { READING_URL } from '../models'
 import Toast from '../../../common/components/Widgets/Toast'
@@ -409,13 +410,13 @@ class ReadingComponent extends React.Component {
             )
           } else {
             UserAvatarComponent = (
-              <Transition shared={`${article._id}_${article.avatar}_avatar`}>
+              <SharedElement id={`${article._id}_${article.avatar}_avatar`}>
                 <Avatar
                   style={themedStyle.authorPhoto}
                   size='large'
                   source={article.avatar ? { uri: article.avatar } : images.default_user}
                 />
-              </Transition>
+              </SharedElement>
             )
           }
           return [

@@ -1,9 +1,10 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, memo, useState } from 'react'
 import {
   View,
   Image,
   Linking,
-  Dimensions
+  Dimensions,
+  TouchableOpacity
 } from 'react-native'
 import {
   Text,
@@ -16,10 +17,56 @@ import LottieView from 'lottie-react-native'
 import * as Animatable from 'react-native-animatable'
 import { ContentSkeleton } from '../../../../libraries/components/Skeleton'
 import ImageResize from '../../../../common/components/Layout/ImageResize'
-import { animations } from '../../../../assets/elements'
+import { animations, images } from '../../../../assets/elements'
 
 const { width } = Dimensions.get('window')
 
+const IframeComponent = memo(({ item }) => {
+  const ratio = item.width / item.height
+  const uri = `https://${item.src}`.replace('////', '//')
+  const [isOpen, setOpen] = useState(false)
+  if (isOpen) {
+    return (
+      <WebView
+        key={`yotube_${item.src}`}
+        source={{ uri }}
+        onError={syntheticEvent => {
+          const { nativeEvent } = syntheticEvent
+          console.debug('[RENDER YOUTUBE]', nativeEvent)
+        }}
+        onHttpError={syntheticEvent => {
+          const { nativeEvent } = syntheticEvent
+          console.debug('[RENDER YOUTUBE]', nativeEvent)
+        }}
+        style={{ alignSelf: 'stretch', height: width / ratio, width }}
+      />
+    )
+  }
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        setOpen(true)
+      }}
+    >
+      <Image
+        source={images.video_placeholder}
+        style={{ alignSelf: 'stretch', height: width / ratio, width }}
+      />
+    </TouchableOpacity>
+  )
+  // const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/ // eslint-disable-line
+  // const match = uri.match(regExp)
+  // if (match && match[7].length === 11) {
+  //   return (
+  //     <YouTube
+  //       key={`yotube_${item.src}`}
+  //       apiKey='AIzaSyDMK1RbmZhPs3sNfNXTXy3_gvzJaW6Xa64'
+  //       videoId={match[7]} // The YouTube video ID
+  //       style={{ alignSelf: 'stretch', height: width / ratio, width }}
+  //     />
+  //   )
+  // }
+})
 class ReadingBetaComponent extends React.Component {
   constructor (props) {
     super(props)
@@ -68,34 +115,8 @@ class ReadingBetaComponent extends React.Component {
         )
       },
       iframe: (item, children) => {
-        const ratio = item.width / item.height
-        const uri = `https://${item.src}`.replace('////', '//')
-        // const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/ // eslint-disable-line
-        // const match = uri.match(regExp)
-        // if (match && match[7].length === 11) {
-        //   return (
-        //     <YouTube
-        //       key={`yotube_${item.src}`}
-        //       apiKey='AIzaSyDMK1RbmZhPs3sNfNXTXy3_gvzJaW6Xa64'
-        //       videoId={match[7]} // The YouTube video ID
-        //       style={{ alignSelf: 'stretch', height: width / ratio, width }}
-        //     />
-        //   )
-        // }
         return (
-          <WebView
-            key={`yotube_${item.src}`}
-            source={{ uri }}
-            onError={syntheticEvent => {
-              const { nativeEvent } = syntheticEvent
-              console.debug('[RENDER YOUTUBE]', nativeEvent)
-            }}
-            onHttpError={syntheticEvent => {
-              const { nativeEvent } = syntheticEvent
-              console.debug('[RENDER YOUTUBE]', nativeEvent)
-            }}
-            style={{ alignSelf: 'stretch', height: width / ratio, width }}
-          />
+          <IframeComponent item={item} />
         )
       }
     }

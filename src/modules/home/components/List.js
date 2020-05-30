@@ -83,7 +83,6 @@ class ListComponent extends Component {
   }
 
   renderItem ({ item, index }) {
-    const { themedStyle } = this.props
     const shouldHaveAnimation = this.showAnimationNewItem && this.showAnimationNewItem > 0
     this.showAnimationNewItem -= 1
     return (
@@ -92,7 +91,6 @@ class ListComponent extends Component {
         itemIndex={index}
         animationDeplay={(10 - this.showAnimationNewItem) * 240}
         shouldHaveAnimation={shouldHaveAnimation}
-        style={themedStyle.item}
         onPress={this.handleReading}
         onPressAuthoring={this.handleAuthoring}
         article={item}

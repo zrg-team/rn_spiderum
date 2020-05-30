@@ -9,7 +9,8 @@ import {
   Platform
 } from 'react-native'
 import { SpringScrollView } from 'react-native-spring-scrollview'
-import { Transition } from 'react-navigation-fluid-transitions'
+import { SharedElement } from 'react-navigation-shared-element'
+// import { Transition } from 'react-navigation-fluid-transitions'
 import FastImage from 'react-native-fast-image'
 import { SCREEN_HEIGHT, DEFAULT_WINDOW_MULTIPLIER } from './constants'
 import styles from './styles'
@@ -73,7 +74,7 @@ export default class ParallaxScrollView extends Component {
       )
     } else {
       RenderComponent = (
-        <Transition shared={imageUrl}>
+        <SharedElement id={imageUrl}>
           <FastImageAnimated
             style={[
               styles.background,
@@ -86,7 +87,7 @@ export default class ParallaxScrollView extends Component {
             onLoadEnd={onBackgroundLoadEnd}
             onError={onBackgroundLoadError}
           />
-        </Transition>
+        </SharedElement>
       )
     }
 

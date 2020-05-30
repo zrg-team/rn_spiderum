@@ -50,7 +50,6 @@ export default class SliderEntry extends Component {
         onPress={() => onPress(data)}
         style={styles.slideInnerContainer}
       >
-        <View style={styles.shadow} />
         <View style={[styles.imageContainer, even ? styles.imageContainerEven : {}]}>
           {/* this.image */}
           <View style={[styles.radiusMask, even ? styles.radiusMaskEven : {}]} />

@@ -20,13 +20,22 @@ const defaultState = {
   message: null,
   data: {},
   appState: 'active',
-  key: ''
+  key: '',
+  currentPage: '',
+  previousPage: ''
 }
 
 const handlers = {
   [actions.clearAll]: (state, action) => {
     return {
       ...defaultState
+    }
+  },
+  [actions.setNavigationPage]: (state, action) => {
+    return {
+      ...state,
+      currentPage: action.payload.currentPage,
+      previousPage: action.payload.previousPage
     }
   },
   [actions.setSessionKey]: (state, action) => ({

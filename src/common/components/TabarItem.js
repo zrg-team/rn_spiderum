@@ -3,9 +3,22 @@ import * as Animatable from 'react-native-animatable'
 import Icon from 'react-native-vector-icons/AntDesign'
 import commonStyles from '../../styles/common'
 
-const TABS = ['Home', 'HotList', 'News', 'NewsList', 'Top', 'TopList', 'Category', 'Categories', 'Option', 'OptionList']
-export default memo(({ style, focused, navigation, previousPage }) => {
-  const { routeName } = navigation.state
+const pageFlowMapper = {
+  Home: 'Home',
+  HotList: 'Home',
+  News: 'News',
+  NewsList: 'News',
+  Option: 'Option',
+  OptionList: 'Option',
+  Top: 'Top',
+  TopList: 'Top',
+  Category: 'Category',
+  Categories: 'Category'
+}
+export default memo(({ style, currentPage, route }) => {
+  const { name: routeName } = route
+
+  const focused = pageFlowMapper[routeName] === pageFlowMapper[currentPage]
   let source
   const render = []
   if (routeName === 'Home') {
@@ -21,12 +34,7 @@ export default memo(({ style, focused, navigation, previousPage }) => {
   }
   // You can return any component that you like here!
   if (focused) {
-    const preIndex = TABS.findIndex((item) => item === previousPage)
-    const nextIndex = TABS.findIndex((item) => item === routeName)
-    let animation = 'zoomIn'
-    if (nextIndex !== -1 && preIndex !== -1) {
-      animation = nextIndex > preIndex ? 'slideInLeft' : 'slideInRight'
-    }
+    const animation = 'zoomIn'
     render.push(
       <Animatable.View
         key='bar'

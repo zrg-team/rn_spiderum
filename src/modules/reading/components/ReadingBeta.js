@@ -22,7 +22,8 @@ import WebView from 'react-native-webview'
 import FastImage from 'react-native-fast-image'
 import ActionButton from 'react-native-action-button'
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons'
-import { Transition } from 'react-navigation-fluid-transitions'
+import { SharedElement } from 'react-navigation-shared-element'
+// import { Transition } from 'react-navigation-fluid-transitions'
 import { READING_URL } from '../models'
 import HtmlContent from './reading/HtmlContent'
 import { CommentList } from './comments/CommentList'
@@ -203,13 +204,13 @@ class ReadingBetaComponent extends React.Component {
       )
     } else {
       UserAvatarComponent = (
-        <Transition shared={`${article._id}_${article.avatar}_avatar`}>
+        <SharedElement id={`${article._id}_${article.avatar}_avatar`}>
           <Avatar
             style={themedStyle.authorPhoto}
             size='large'
             source={article.avatar ? { uri: article.avatar } : commonImages.default_user}
           />
-        </Transition>
+        </SharedElement>
       )
     }
     let Wrapper = View

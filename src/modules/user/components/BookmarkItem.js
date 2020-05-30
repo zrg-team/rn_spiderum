@@ -9,7 +9,8 @@ import {
   Text,
   withStyles
 } from 'react-native-ui-kitten'
-import { Transition } from 'react-navigation-fluid-transitions'
+import { SharedElement } from 'react-navigation-shared-element'
+// import { Transition } from 'react-navigation-fluid-transitions'
 import * as Animatable from 'react-native-animatable'
 import FastImage from 'react-native-fast-image'
 import { ArticleActivityBar } from '../../home/components/item/ArticleActivityBar'
@@ -72,13 +73,13 @@ class BookmarkItemComponent extends React.Component {
           onPress={this.handlePress}
         >
           <View style={[themedStyle.innerContainer]}>
-            <Transition shared={article.og_image_url}>
+            <SharedElement id={article.og_image_url}>
               <FastImage
                 style={themedStyle.image}
                 resizeMode={FastImage.resizeMode.cover}
                 source={article.og_image_url ? { uri: article.og_image_url } : images.default_image}
               />
-            </Transition>
+            </SharedElement>
             <View style={themedStyle.infoContainer}>
               <Text
                 numberOfLines={2}

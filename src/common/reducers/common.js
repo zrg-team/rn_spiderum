@@ -6,8 +6,6 @@ import moment from 'moment'
 const defaultState = {
   notifications: {},
   language: 'en',
-  currentPage: '',
-  previousPage: '',
   appIntro: false,
   copilot: false
 }
@@ -38,13 +36,6 @@ const handlers = {
     return {
       ...state,
       language: action.payload
-    }
-  },
-  [actions.setNavigationPage]: (state, action) => {
-    return {
-      ...state,
-      currentPage: action.payload.currentPage,
-      previousPage: action.payload.previousPage
     }
   },
   [actions.updateAppIntro]: (state, action) => {

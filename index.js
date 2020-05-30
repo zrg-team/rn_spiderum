@@ -1,4 +1,5 @@
 import './src/libraries/logger'
+import 'react-native-gesture-handler'
 import { AppRegistry, Platform } from 'react-native'
 import { enableScreens } from 'react-native-screens'
 import { getTimeSinceStartup } from 'react-native-startup-time'

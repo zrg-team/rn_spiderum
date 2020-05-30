@@ -78,7 +78,7 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    enableHermes: false,  // clean and rebuild if changing
+    enableHermes: true,  // clean and rebuild if changing
     bundleCommand          : "ram-bundle",
     // extraPackagerArgs      : ["--indexed-ram-bundle"]
 ]
@@ -134,8 +134,8 @@ android {
         applicationId "com.zrgteam.awesome"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 24
-        versionName "1.2.2"
+        versionCode 25
+        versionName "1.2.5"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
     }

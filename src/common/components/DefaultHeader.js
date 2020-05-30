@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { memo } from 'react'
 // import i18n from 'i18n-js'
 import {
   Icon,
@@ -7,60 +7,55 @@ import {
   TopNavigationAction
 } from 'react-native-ui-kitten'
 import LinearGradient from 'react-native-linear-gradient'
+import { useNavigationState, useNavigation } from '@react-navigation/native'
 // import * as Animatable from 'react-native-animatable'
 import commonStyles, { HEADER_GRADIENT } from '../../styles/common'
 import { navigationPop, navigationPopToTop } from '../utils/navigation'
 import SearchPanel from '../components/Widgets/SearchPanel'
 
-class DefaultHeader extends PureComponent {
-  constructor (props) {
-    super(props)
-    this.handleBack = this.handleBack.bind(this)
-    this.handleSearch = this.handleSearch.bind(this)
-    this.renderRightComponent = this.renderRightComponent.bind(this)
+const DefaultHeader = memo((props) => {
+  let navigation = null
+  try {
+    navigation = useNavigation()
+  } catch (err) {
   }
-
-  handleSearch () {
+  const handleSearch = () => {
     SearchPanel.show()
   }
 
-  handleBack () {
-    const { navigation, backTopTop = false, onPressBack } = this.props
-    if (onPressBack) {
-      return onPressBack()
+  const handleBack = () => {
+    try {
+      const { backTopTop = false, onPressBack } = props
+      if (onPressBack) {
+        return onPressBack()
+      }
+      if (backTopTop) {
+        return navigationPopToTop(navigation)
+      }
+      navigationPop(navigation)
+    } catch (err) {
+
     }
-    if (backTopTop) {
-      return navigationPopToTop(navigation)
-    }
-    navigationPop(navigation)
   }
 
-  getStackLength () {
-    const { navigation } = this.props
+  const getStackLength = () => {
     try {
-      const parent = navigation.dangerouslyGetParent()
-      if (
-        parent &&
-        parent.state &&
-        parent.state.routes
-      ) {
-        return parent.state.routes.length
-      }
-      return 0
+      const routesLength = useNavigationState(state => state.routes.length)
+      return routesLength
     } catch (err) {
       return 0
     }
   }
 
-  renderLeftComponent (props) {
-    const { leftComponent, noBack, onPressBack } = this.props
+  const renderLeftComponent = () => {
+    const { leftComponent, noBack, onPressBack } = props
     if (leftComponent) {
       return leftComponent
     }
-    if (onPressBack || (this.getStackLength() > 1 && !noBack)) {
+    if (onPressBack || (getStackLength() > 1 && !noBack)) {
       return (
         <TopNavigationAction
-          onPress={this.handleBack}
+          onPress={handleBack}
           icon={(style) => {
             return (<Icon style={[style, {}]} name='arrow-left' />)
           }}
@@ -70,13 +65,13 @@ class DefaultHeader extends PureComponent {
     return null
   }
 
-  renderRightComponent () {
-    const { search } = this.props
+  const renderRightComponent = () => {
+    const { search } = props
     if (search) {
       return [
         <TopNavigationAction
           key='search'
-          onPress={this.handleSearch}
+          onPress={handleSearch}
           icon={(style) => {
             return (<Icon style={[style, { fontSize: 30, width: 28 }]} name='search' />)
           }}
@@ -86,48 +81,46 @@ class DefaultHeader extends PureComponent {
     return null
   }
 
-  render () {
-    const {
-      title = '',
-      themedStyle,
-      linearGradient,
-      headerContainer = {},
-      headerWrapperContainer = {}
-      // leftTitle = ''
-    } = this.props
+  const {
+    title = '',
+    themedStyle,
+    linearGradient,
+    headerContainer = {},
+    headerWrapperContainer = {}
+    // leftTitle = ''
+  } = props
 
-    if (!linearGradient) {
-      return (
-        <TopNavigation
-          title={title}
-          alignment='center'
-          titleStyle={{}}
-          style={[themedStyle.header, commonStyles.shadow, headerContainer]}
-          leftControl={this.renderLeftComponent()}
-          rightControls={this.renderRightComponent()}
-        />
-      )
-    }
+  if (!linearGradient) {
     return (
-      <LinearGradient
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        colors={HEADER_GRADIENT}
-        // locations={[0.1, 0.6, 1]}
-        style={[themedStyle.linearGradient, commonStyles.shadow, headerWrapperContainer]}
-      >
-        <TopNavigation
-          title={title}
-          alignment='center'
-          titleStyle={{}}
-          style={[themedStyle.header, commonStyles.shadow, headerContainer]}
-          leftControl={this.renderLeftComponent()}
-          rightControls={this.renderRightComponent()}
-        />
-      </LinearGradient>
+      <TopNavigation
+        title={title}
+        alignment='center'
+        titleStyle={{}}
+        style={[themedStyle.header, commonStyles.shadow, headerContainer]}
+        leftControl={renderLeftComponent()}
+        rightControls={renderRightComponent()}
+      />
     )
   }
-}
+  return (
+    <LinearGradient
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      colors={HEADER_GRADIENT}
+      // locations={[0.1, 0.6, 1]}
+      style={[themedStyle.linearGradient, commonStyles.shadow, headerWrapperContainer]}
+    >
+      <TopNavigation
+        title={title}
+        alignment='center'
+        titleStyle={{}}
+        style={[themedStyle.header, commonStyles.shadow, headerContainer]}
+        leftControl={renderLeftComponent()}
+        rightControls={renderRightComponent()}
+      />
+    </LinearGradient>
+  )
+})
 
 export default withStyles(DefaultHeader, (theme) => ({
   header: {

@@ -23,7 +23,8 @@ export const images = {
   spiderum_banner: require('../assets/images/spiderum_banner.png'),
   splash: require('../assets/images/splash.png'),
   default_parallax: require('../assets/images/default_parallax.jpg'),
-  no_result: require('../assets/images/no_result.png')
+  no_result: require('../assets/images/no_result.png'),
+  video_placeholder: require('../assets/images/video_placeholder.jpg')
 }
 
 export const animations = {

@@ -18,7 +18,7 @@ import Toast from '../components/Widgets/Toast'
 import CommonLoading from '../components/Widgets/CommonLoading'
 import SearchPanel from '../components/Widgets/SearchPanel'
 import BottomSheet from '../components/Widgets/BottomSheet'
-import { setTopLevelNavigator } from '../utils/navigation'
+import { setTopLevelNavigator, getActiveRouteName } from '../utils/navigation'
 import {
   setApplicationState,
   setNavigationPage,
@@ -26,18 +26,6 @@ import {
 } from '../actions/common'
 import AppRouteComponent from './NavigationContainer'
 
-// gets the current screen from navigation state
-function getActiveRouteName (navigationState) {
-  if (!navigationState) {
-    return null
-  }
-  const route = navigationState.routes[navigationState.index]
-  // dive into nested navigators
-  if (route.routes) {
-    return getActiveRouteName(route)
-  }
-  return route.routeName
-}
 class MainPage extends Component {
   constructor (props) {
     super(props)
@@ -79,9 +67,9 @@ class MainPage extends Component {
           themedStyle,
           language,
           appIntro: appIntro,
-          setTopLevelNavigator
+          setTopLevelNavigator,
+          handleNavigationStateChange: this.handleNavigationStateChange
         }}
-        onNavigationStateChange={this.handleNavigationStateChange}
       />
     )
     this.unique = `${appIntro}_${language}`
@@ -97,11 +85,11 @@ class MainPage extends Component {
   }
 
   // Usefull in analysis report
-  handleNavigationStateChange (prevState, currentState) {
+  handleNavigationStateChange (currentState) {
     const { dispatch } = this.props
     const currentPage = getActiveRouteName(currentState)
-    const previousPage = getActiveRouteName(prevState)
-    dispatch(setNavigationPage({ currentPage, previousPage }))
+    dispatch(setNavigationPage({ currentPage, previousPage: this.currentPage }))
+    this.currentPage = currentPage
   }
 
   // Whole app will rerender. So be carefull
@@ -150,9 +138,9 @@ class MainPage extends Component {
           language,
           appIntro,
           themedStyle,
-          setTopLevelNavigator
+          setTopLevelNavigator,
+          handleNavigationStateChange: this.handleNavigationStateChange
         }}
-        onNavigationStateChange={this.handleNavigationStateChange}
       />
     )
     this.setState({
@@ -188,7 +176,6 @@ class MainPage extends Component {
         <SearchPanel.Component parentRef={this.navigatorRef} key='search-panel' global />
         <ProgressBar.Component key='progress-bar' global />
         <CommonLoading.Component parentRef={this.navigatorRef} key='common-bar' global />
-        {/* <Camera.Component key='app-camera' zIndex={5} global /> */}
         <Toast.Component key='toast-bar' global />
       </>
     )

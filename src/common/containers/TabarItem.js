@@ -8,6 +8,7 @@ const mapDispatchToProps = (dispatch, props) => ({
 
 const mapStateToProps = (state, props) => {
   return {
+    currentPage: state.session.currentPage,
     previousPage: state.common.previousPage
   }
 }

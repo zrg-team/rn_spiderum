@@ -3,7 +3,8 @@ import {
   View,
   TouchableOpacity
 } from 'react-native'
-import { Transition } from 'react-navigation-fluid-transitions'
+import { SharedElement } from 'react-navigation-shared-element'
+// import { Transition } from 'react-navigation-fluid-transitions'
 import { Text, Avatar, withStyles } from 'react-native-ui-kitten'
 import { textStyle } from '../../../../styles/common'
 
@@ -38,7 +39,7 @@ class ActivityAuthoringComponent extends React.Component {
       )
     } else {
       Content = (
-        <Transition shared={`${article.creator_id._id}_${article._id}`}>
+        <SharedElement id={`${article.creator_id._id}_${article._id}`}>
           <View style={themedStyle.authorInfoContainer}>
             <Text style={themedStyle.authorNameLabel}>{name}</Text>
             <Text
@@ -50,7 +51,7 @@ class ActivityAuthoringComponent extends React.Component {
               {date}
             </Text>
           </View>
-        </Transition>
+        </SharedElement>
       )
     }
     return (
@@ -61,12 +62,12 @@ class ActivityAuthoringComponent extends React.Component {
       >
         {photo
           ? (
-            <Transition shared={`${article._id}_${article.avatar}_avatar`}>
+            <SharedElement id={`${article._id}_${article.avatar}_avatar`}>
               <Avatar
                 style={[themedStyle.authorPhoto, photoStyle]}
                 source={photo}
               />
-            </Transition>
+            </SharedElement>
           ) : <View style={themedStyle.noPhoto} />}
         {Content}
       </TouchableOpacity>

@@ -1,17 +1,12 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Platform } from 'react-native'
-import {
-  createAppContainer,
-  createBottomTabNavigator,
-  BottomTabBar,
-  createStackNavigator
-} from 'react-navigation'
 import { register } from 'react-native-bundle-splitter'
-import createScreensStackNavigator from 'react-native-screens/createNativeStackNavigator'
-import { FluidNavigator } from 'react-navigation-fluid-transitions'
-import { fadeIn } from 'react-navigation-transitions'
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
+import { createSharedElementStackNavigator } from 'react-navigation-shared-element'
+import { createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs'
 // import { icons } from '../assets/elements'
-import commonStyle, { TAB_BAR_HEIGHT } from '../styles/common'
+import commonStyle from '../styles/common'
 import TabarItem from './containers/TabarItem'
 
 import createOptionFlow, { PAGES as OPTION_PAGES } from './flows/option'
@@ -44,9 +39,147 @@ const customScreenOption = {
   }
 }
 
-const createNativeStackNavigator = Platform.OS !== 'ios'
-  ? createScreensStackNavigator
-  : createStackNavigator
+const tabStackProps = {
+  headerMode: 'none'
+}
+const tabStackScreenProps = {
+  sharedElements: (route, otherRoute, showing) => {
+    const { article } = route.params
+    if (!article) {
+      return []
+    }
+    return [article.og_image_url, `${article._id}_${article.avatar}_avatar`]
+  }
+}
+
+const optionPages = createOptionFlow(customScreenOption)
+const readingPages = createReadingFlow(customScreenOption)
+const categogyPages = {
+  ...createCategoryFlow(customScreenOption),
+  ...readingPages
+}
+const homeFlowPages = {
+  [PAGES.HotList]: { screen: register({ require: () => require('../pages/HomePage') }) },
+  ...readingPages
+}
+const newFlowPages = {
+  [PAGES.NewsList]: { screen: register({ require: () => require('../pages/NewsPage') }) },
+  ...readingPages
+}
+const topFlowPages = {
+  [PAGES.TopList]: { screen: register({ require: () => require('../pages/TopPage') }) },
+  ...readingPages
+}
+
+// Flow for option tab
+const OptionStack = createStackNavigator()
+const OptionNavigation = memo(({ navigation, route }) => {
+  if (route.state && route.state.index > 0) {
+    navigation.setOptions({ tabBarVisible: false })
+  } else {
+    navigation.setOptions({ tabBarVisible: true })
+  }
+  return (
+    <OptionStack.Navigator
+      {...tabStackProps}
+    >
+      {Object.keys(optionPages).map((key, index) => {
+        const item = optionPages[key]
+        return (
+          <OptionStack.Screen key={key} name={key} component={item.screen} {...tabStackScreenProps} />
+        )
+      })}
+    </OptionStack.Navigator>
+  )
+})
+
+// Flow for home tab
+const HomeStack = createSharedElementStackNavigator()
+const HomeNavigation = memo(({ navigation, route }) => {
+  if (route.state && route.state.index > 0) {
+    navigation.setOptions({ tabBarVisible: false })
+  } else {
+    navigation.setOptions({ tabBarVisible: true })
+  }
+  return (
+    <HomeStack.Navigator
+      {...tabStackProps}
+    >
+      {Object.keys(homeFlowPages).map((key, index) => {
+        const item = homeFlowPages[key]
+        return (
+          <HomeStack.Screen key={key} name={key} component={item.screen} {...tabStackScreenProps} />
+        )
+      })}
+    </HomeStack.Navigator>
+  )
+})
+
+// Flow for news tab
+const NewsStack = createSharedElementStackNavigator()
+const NewsNavigation = memo(({ navigation, route }) => {
+  if (route.state && route.state.index > 0) {
+    navigation.setOptions({ tabBarVisible: false })
+  } else {
+    navigation.setOptions({ tabBarVisible: true })
+  }
+  return (
+    <NewsStack.Navigator
+      {...tabStackProps}
+    >
+      {Object.keys(newFlowPages).map((key, index) => {
+        const item = newFlowPages[key]
+        return (
+          <NewsStack.Screen key={key} name={key} component={item.screen} {...tabStackScreenProps} />
+        )
+      })}
+    </NewsStack.Navigator>
+  )
+})
+
+// Flow for top tab
+const TopStack = createSharedElementStackNavigator()
+const TopNavigation = memo(({ navigation, route }) => {
+  if (route.state && route.state.index > 0) {
+    navigation.setOptions({ tabBarVisible: false })
+  } else {
+    navigation.setOptions({ tabBarVisible: true })
+  }
+  return (
+    <TopStack.Navigator
+      {...tabStackProps}
+    >
+      {Object.keys(topFlowPages).map((key, index) => {
+        const item = topFlowPages[key]
+        return (
+          <TopStack.Screen key={key} name={key} component={item.screen} {...tabStackScreenProps} />
+        )
+      })}
+    </TopStack.Navigator>
+  )
+})
+
+// Flow for categories tab
+const CategoriesStack = createStackNavigator()
+const CategoriesNavigation = memo(({ navigation, route }) => {
+  if (route.state && route.state.index > 0) {
+    navigation.setOptions({ tabBarVisible: false })
+  } else {
+    navigation.setOptions({ tabBarVisible: true })
+  }
+  return (
+    <CategoriesStack.Navigator
+      {...tabStackProps}
+    >
+      {Object.keys(categogyPages).map((key, index) => {
+        const item = categogyPages[key]
+        return (
+          <CategoriesStack.Screen key={key} name={key} component={item.screen} {...tabStackScreenProps} />
+        )
+      })}
+    </CategoriesStack.Navigator>
+  )
+})
 
 export default ({
   persistor = undefined,
@@ -54,179 +187,118 @@ export default ({
   appIntro,
   themedStyle,
   setTopLevelNavigator,
+  handleNavigationStateChange,
   ...navigationProps
 }) => {
-  // create flow
-  const optionPages = createOptionFlow(customScreenOption)
-  const readingPages = createReadingFlow(customScreenOption)
-  const categogyPages = createCategoryFlow(customScreenOption)
+  let appNavigators = {}
+  let appNavigatorProps = {}
 
-  // Option flow
-  const OptionFlow = createNativeStackNavigator({
-    ...optionPages,
-    ...readingPages
-  }, {
-    headerMode: 'none',
-    navigationOptions: ({ navigation }) => {
-      let tabBarVisible = true
-      if (navigation.state.index > 0) {
-        tabBarVisible = false
-      }
-      return {
-        tabBarVisible
-      }
-    }
+  const Tab = createBottomTabNavigator()
+  const BottomTabBarWithStyle = memo((props) => {
+    return (
+      <BottomTabBar
+        {...props}
+        style={[
+          themedStyle.barStyle,
+          commonStyle.bottom_bar_container,
+          commonStyle.shadow
+        ]}
+      />
+    )
   })
-  // Option Home flow
-  const HomeFlow = FluidNavigator({
-    [PAGES.HotList]: { screen: register({ require: () => require('../pages/HomePage') }) },
-    ...readingPages
-  }, {
-    headerMode: 'none',
-    navigationOptions: ({ navigation }) => {
-      let tabBarVisible = true
-      if (navigation.state.index > 0) {
-        tabBarVisible = false
-      }
-      return {
-        tabBarVisible
-      }
-    }
-  })
-  // News Home flow
-  const NewsFlow = FluidNavigator({
-    [PAGES.NewsList]: { screen: register({ require: () => require('../pages/NewsPage') }) },
-    ...readingPages
-  }, {
-    headerMode: 'none',
-    navigationOptions: ({ navigation }) => {
-      let tabBarVisible = true
-      if (navigation.state.index > 0) {
-        tabBarVisible = false
-      }
-      return {
-        tabBarVisible
-      }
-    }
-  })
-  // Top Home flow
-  const TopFlow = FluidNavigator({
-    [PAGES.TopList]: { screen: register({ require: () => require('../pages/TopPage') }) },
-    ...readingPages
-  }, {
-    headerMode: 'none',
-    navigationOptions: ({ navigation }) => {
-      let tabBarVisible = true
-      if (navigation.state.index > 0) {
-        tabBarVisible = false
-      }
-      return {
-        tabBarVisible
-      }
-    }
-  })
-  // Category Home flow
-  const CategoryFlow = createNativeStackNavigator({
-    ...categogyPages,
-    ...readingPages
-  }, {
-    headerMode: 'none',
-    navigationOptions: ({ navigation }) => {
-      let tabBarVisible = true
-      if (navigation.state.index > 0) {
-        tabBarVisible = false
-      }
-      return {
-        tabBarVisible
-      }
-    }
-  })
-  // Tab navigator
-  const TabGroup = createBottomTabNavigator({
-    [PAGES.Home]: HomeFlow,
-    [PAGES.News]: NewsFlow,
-    [PAGES.Top]: TopFlow,
-    [PAGES.Category]: CategoryFlow,
-    [PAGES.Option]: OptionFlow
-  }, {
-    defaultNavigationOptions: ({ navigation }) => ({
-      tabBarComponent: (props) => {
-        return (
-          <BottomTabBar
+  const TabGroup = memo((mainProps) => (
+    <Tab.Navigator
+      // shifting
+      animationEnabled={false}
+      backBehavior='none'
+      initialRouteName={PAGES.Home}
+      tabBar={(props) => <BottomTabBarWithStyle {...props} />}
+      tabBarOptions={{
+        showLabel: false
+      }}
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused }) => {
+          return (
+            <TabarItem
+              route={route}
+              key={route.name}
+              focused={focused}
+              style={themedStyle.tabBarStyle}
+            />
+          )
+        }
+      })}
+    >
+      <Tab.Screen name={PAGES.Home} component={HomeNavigation} />
+      <Tab.Screen name={PAGES.News} component={NewsNavigation} />
+      <Tab.Screen name={PAGES.Top} component={TopNavigation} />
+      <Tab.Screen name={PAGES.Category} component={CategoriesNavigation} />
+      <Tab.Screen name={PAGES.Option} component={OptionNavigation} />
+    </Tab.Navigator>
+  ))
+
+  if (appIntro || Platform.OS === 'ios') {
+    appNavigators = {
+      [PAGES.Loading]: {
+        screen: (props) => (
+          <LoadingPage
+            time={0}
+            dispatch={dispatch}
+            persistor={persistor}
+            page={PAGES.TabGroup}
             {...props}
-            style={[themedStyle.barStyle, commonStyle.bottom_bar_container, commonStyle.shadow]}
+          />
+        ),
+        ...customScreenOption
+      },
+      [PAGES.TabGroup]: { screen: TabGroup }
+    }
+    appNavigatorProps = {
+      headerMode: 'none',
+      cardShadowEnabled: false,
+      initialRouteName: PAGES.Loading
+    }
+  } else {
+    appNavigators = {
+      [PAGES.Loading]: {
+        screen: (props) => (
+          <LoadingPage
+            time={300}
+            page={PAGES.AppIntro}
+            {...props}
           />
         )
       },
-      tabBarLabel: (data) => {
-        return null
-      },
-      tabBarIcon: ({ focused }) => {
-        const { routeName } = navigation.state
-        return <TabarItem key={routeName} focused={focused} navigation={navigation} style={themedStyle.tabBarStyle} />
-      }
-    }),
-    lazy: true,
-    height: TAB_BAR_HEIGHT,
-    labeled: false,
-    shifting: true,
-    swipeEnabled: false,
-    backBehavior: 'none',
-    animationEnabled: false,
-    // removeClippedSubviews: false,
-    initialRouteName: PAGES.Home,
-    barStyle: themedStyle.barStyle,
-    activeColor: commonStyle.activeMenu.color
-  })
-
-  let AppNavigator = null
-  if (appIntro || Platform.OS === 'ios') {
-    AppNavigator = createNativeStackNavigator(
-      {
-        [PAGES.Loading]: {
-          screen: (props) => (
-            <LoadingPage
-              time={0}
-              dispatch={dispatch}
-              persistor={persistor}
-              page={PAGES.TabGroup}
-              {...props}
-            />
-          ),
-          ...customScreenOption
-        },
-        [PAGES.TabGroup]: { screen: TabGroup, ...customScreenOption }
-      },
-      {
-        headerMode: 'none',
-        cardShadowEnabled: false,
-        transitionConfig: () => fadeIn(),
-        cardStyle: themedStyle.mainNavigator,
-        initialRouteName: PAGES.Loading
-      }
-    )
-  } else {
-    AppNavigator = FluidNavigator(
-      {
-        [PAGES.Loading]: {
-          screen: (props) => (
-            <LoadingPage
-              time={300}
-              page={PAGES.AppIntro}
-              {...props}
-            />
-          )
-        },
-        [PAGES.AppIntro]: { screen: AppIntroPage }
-      },
-      {
-        headerMode: 'none',
-        initialRouteName: PAGES.Loading,
-        defaultNavigationOptions: { gesturesEnabled: false }
-      }
-    )
+      [PAGES.AppIntro]: { screen: AppIntroPage }
+    }
+    appNavigatorProps = {
+      headerMode: 'none',
+      cardShadowEnabled: false,
+      initialRouteName: PAGES.Loading
+    }
   }
-
-  const NavigationComponent = createAppContainer(AppNavigator)
-  return <NavigationComponent {...navigationProps} ref={setTopLevelNavigator} />
+  const MainStack = createStackNavigator()
+  return (
+    <NavigationContainer
+      ref={setTopLevelNavigator}
+      onStateChange={handleNavigationStateChange}
+      {...navigationProps}
+    >
+      <MainStack.Navigator {...appNavigatorProps}>
+        {Object.keys(appNavigators).map((key, index) => {
+          const item = appNavigators[key]
+          if (item.function) {
+            return (
+              <MainStack.Screen key={key} name={key}>
+                {item.function}
+              </MainStack.Screen>
+            )
+          }
+          return (
+            <MainStack.Screen key={key} name={key} component={item.screen} />
+          )
+        })}
+      </MainStack.Navigator>
+    </NavigationContainer>
+  )
 }

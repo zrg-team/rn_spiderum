@@ -2,17 +2,17 @@ import React, { Component } from 'react'
 import DefaultPage from '../common/hocs/DefaultPage'
 import ReadingContainer from '../modules/reading/containers/ReadingContainer'
 import ReadingBeta from '../modules/reading/containers/ReadingBeta'
+import { getRouteParams } from '../common/utils/navigation'
 
 export default class NewsPage extends Component {
   constructor (props) {
     super(props)
-    const { navigation } = props
-    const itemIndex = navigation.getParam('itemIndex', null)
+    const itemIndex = getRouteParams('itemIndex', props, null)
     this.state = {
       page: null,
-      article: navigation.getParam('article', {}),
-      type: navigation.getParam('type', null),
-      category: navigation.getParam('category', false),
+      article: getRouteParams('article', props, {}),
+      type: getRouteParams('type', props, null),
+      category: getRouteParams('category', props, false),
       itemIndex,
       dataIndex: !isNaN(itemIndex)
         ? [itemIndex - 1, itemIndex, itemIndex + 1].filter(item => !isNaN(item) && item >= 0)
