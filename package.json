@@ -64,7 +64,7 @@
     "react-native-svg": "9.13.3",
     "react-native-ui-kitten": "^4.2.0",
     "react-native-vector-icons": "^6.6.0",
-    "react-native-webview": "^9.0.2",
+    "react-native-webview": "^11.0.0",
     "react-navigation": "^4.3.9",
     "react-navigation-shared-element": "v3",
     "react-navigation-stack": "^2.5.1",
