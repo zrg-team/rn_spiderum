@@ -50,7 +50,7 @@
     "react-native-neomorph-shadows": "^1.0.3",
     "react-native-permissions": "^2.0.2",
     "react-native-push-notification": "^3.1.9",
-    "react-native-reanimated": "^1.8.0",
+    "react-native-reanimated": "^2.10.0",
     "react-native-render-html": "^4.2.0",
     "react-native-safe-area-context": "^1.0.0",
     "react-native-screens": "^2.2.0",
